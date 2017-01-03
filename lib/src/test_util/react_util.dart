@@ -212,6 +212,12 @@ final _EventSimulatorAlias keyUp = react_test_utils.Simulate.keyUp;
 /// Helper function to simulate keyPress events.
 final _EventSimulatorAlias keyPress = react_test_utils.Simulate.keyPress;
 
+/// Helper function to simulate mouseDown events.
+final _EventSimulatorAlias mouseDown = react_test_utils.Simulate.mouseDown;
+
+/// Helper function to simulate mouseDown events.
+final _EventSimulatorAlias mouseUp = react_test_utils.Simulate.mouseUp;
+
 /// Helper function to simulate mouseEnter events.
 final _EventSimulatorAlias mouseEnter = (componentOrNode, [Map eventData = const {}]) =>
     Simulate._mouseEnter(componentOrNode, jsify(eventData));
