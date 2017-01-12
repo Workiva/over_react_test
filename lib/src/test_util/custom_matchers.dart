@@ -205,12 +205,12 @@ Matcher hasAttr(String attributeName, value) => new _ElementAttributeMatcher(att
 /// Returns a matcher that matches an element with the nodeName of [nodeName].
 Matcher hasNodeName(String nodeName) => new IsNode(equalsIgnoringCase(nodeName));
 
-/// Returns a matcher that matches Dart, JS composite, and DOM [ReactElement]s and [ReactComponent]s
+/// Returns a matcher that matches Dart, JS composite, and DOM `ReactElement`s and `ReactComponent`s
 /// that contain the prop pair ([propKey], propValue).
 ///
-/// Since props of DOM [ReactComponent]s cannot be read directly, the element's attributes are matched instead.
+/// Since props of DOM `ReactComponent`s cannot be read directly, the element's attributes are matched instead.
 ///
-/// This matcher will always fail when unsupported prop keys are tested against a DOM [ReactComponent].
+/// This matcher will always fail when unsupported prop keys are tested against a DOM `ReactComponent`.
 ///
 /// TODO: add support for prop keys that aren't the same as their attribute keys
 Matcher hasProp(dynamic propKey, dynamic propValue) => new _HasPropMatcher(propKey, propValue);
@@ -265,7 +265,7 @@ class _IsFocused extends Matcher {
 /// A matcher that matches the currently focused element (`document.activeElement`).
 const Matcher isFocused = const _IsFocused();
 
-/// A matcher to verify that a [RequiredPropError] is thrown with a provided `RequiredPropError.message`
+/// A matcher to verify that a `RequiredPropError` is thrown with a provided [message]
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
@@ -279,8 +279,8 @@ Matcher throwsRequiredPropError(String message) {
   ));
 }
 
-/// A matcher to verify that a [InvalidPropCombinationError] is thrown with a provided `InvalidPropCombinationError.prop1`,
-/// `InvalidPropCombinationError.prop2`, and `InvalidPropCombinationError.message`.
+/// A matcher to verify that an `InvalidPropCombinationError` is thrown with a provided [prop1],
+/// [prop2], and [message].
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
@@ -296,7 +296,7 @@ Matcher throwsInvalidPropCombinationError(String prop1, String prop2, String mes
   ));
 }
 
-/// A matcher to verify that the [InvalidPropValueError] is thrown with a provided `InvalidPropValueError.message`
+/// A matcher to verify that the `InvalidPropValueError` is thrown with a provided [message].
 ///
 ///  Deprecated: Use [throwsPropError_Value].
 @Deprecated('2.0.0')

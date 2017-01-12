@@ -53,8 +53,8 @@ var _shallowRenderers = [];
 
 /// Adds [renderedInstance] to [_renderedInstances].
 ///
-/// If [_renderedInstances.length] is larger than or equal to [maxRenderedQueueLength] the oldest instance will be
-/// unmounted and removed from the list.
+/// If the `length` of [_renderedInstances] is larger than or equal to [maxRenderedQueueLength] the oldest
+/// [renderedInstance] will be unmounted and removed from the list.
 void _addToRenderedInstanceQueue(dynamic renderedInstance) {
   if (_renderedInstances.length >= maxRenderedQueueLength) {
     unmount(_renderedInstances.last);
@@ -66,8 +66,8 @@ void _addToRenderedInstanceQueue(dynamic renderedInstance) {
 
 /// Adds [renderer] to [_shallowRenderers].
 ///
-/// If [_shallowRenderers.length] is larger than or equal to [maxShallowRendererQueueLength] the oldest rendered will be
-/// unmounted and removed from the list.
+/// If the `length` of [_shallowRenderers] is larger than or equal to [maxShallowRendererQueueLength] the oldest
+/// [renderer] will be unmounted and removed from the list.
 void _addToShallowRendererQueue(react_test_utils.ReactShallowRenderer renderer) {
   if (_shallowRenderers.length >= maxShallowRendererQueueLength) {
     _shallowRenderers.last.unmount();
@@ -90,7 +90,7 @@ void _addToShallowRendererQueue(react_test_utils.ReactShallowRenderer renderer) 
 /// Shallow-renders a component using [react_test_utils.ReactShallowRenderer].
 ///
 /// By default the rendered instance will be added to [_renderedInstances] via [_addToRenderedInstanceQueue] to not
-/// have this happen set [addToRenderedQueue] to false.
+/// have this happen set [addToRendererQueue] to false.
 ///
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
 ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true}) {
@@ -102,7 +102,7 @@ ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true
 
 /// Unmounts a React component.
 ///
-/// [instanceOrContainerNode] can be a [ReactComponent]/[Element] React instance,
+/// [instanceOrContainerNode] can be a `ReactComponent`/[Element] React instance,
 /// or an [Element] container node (argument to [react_dom.render]).
 ///
 /// For convenience, this method does nothing if [instanceOrContainerNode] is null,
@@ -176,7 +176,7 @@ void tearDownAttachedNodes() {
 
 /// Returns a rendered component's ref, or null if it doesn't exist.
 ///
-/// The return type is [ReactComponent] for composite components, and [Element] for DOM components.
+/// The return type is `ReactComponent` for composite components, and [Element] for DOM components.
 ///
 /// Using `getRef()` can be tedious for nested / complex components. It is recommended to use [getByTestId] instead.
 dynamic getRef(ReactComponent instance, dynamic ref) {
@@ -240,8 +240,8 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// This method works for:
 ///
-/// * [ReactComponent] render trees (output of [render])
-/// * [ReactElement] trees (output of [renderShallow]/[Component.render])
+/// * `ReactComponent` render trees (output of [render])
+/// * [ReactElement] trees (output of [renderShallow]/`Component.render`)
 ///
 /// __Example:__
 ///
