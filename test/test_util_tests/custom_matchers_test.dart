@@ -2,11 +2,11 @@ library custom_matchers_test;
 
 import 'dart:html';
 
+import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
-import 'package:web_skin_dart/test_util.dart';
-import 'package:web_skin_dart/ui_core.dart';
+import 'package:ui_test_utils/test_util.dart';
 
-import '../wsd_test_util/test_js_component.dart';
+import './utils/test_js_component.dart';
 
 /// Main entry point for CustomMatchers testing
 main() {

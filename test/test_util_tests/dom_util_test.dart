@@ -2,9 +2,9 @@ library test_util_dom_util_test;
 
 import 'dart:html';
 
+import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
-import 'package:web_skin_dart/test_util.dart';
-import 'package:web_skin_dart/ui_core.dart';
+import 'package:ui_test_utils/test_util.dart';
 
 /// Main entry point for DomUtil testing
 main() {
