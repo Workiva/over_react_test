@@ -6,7 +6,9 @@ runner_image: drydock-prod.workiva.net/workiva/smithy-runner-dart:124921
 
 script:
   - pub get
-  - ./tool/smithy_dart2js_tests.sh
+  # Do not run tests on smithy, because they keep timing out.
+  # - ./tool/smithy_dart2js_tests.sh
+  - DART_FLAGS=--checked  xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test
 
 artifacts:
   build:
