@@ -7,7 +7,7 @@ import 'package:react/react.dart' as react;
 import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_client.dart';
 import 'package:test/test.dart';
-import 'package:ui_test_utils/test_util.dart';
+import 'package:ui_test_utils/ui_test_utils.dart';
 
 import './utils/test_js_component.dart';
 import './utils/nested_component.dart';
