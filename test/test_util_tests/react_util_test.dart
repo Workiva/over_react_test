@@ -21,19 +21,23 @@ main() {
       expect(getProps(shallowInstance), containsPair('isRenderResult', true), reason: 'should be the div ReactElement returned by render()');
     });
 
-    test('renderAttachedToDocument renders the component into the document and [renderAttachedToDocument] removes those attached nodes', () {
-      expect(document.body.children, isEmpty);
+    group('', () {
+      var renderedInstance;
 
-      var renderedInstance = renderAttachedToDocument(Wrapper());
+      tearDown(() {
+        expect(renderedInstance.isMounted(), isFalse, reason: 'The React instance should have been unmounted.');
 
-      expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
-          reason: 'The component should have been rendered into the container div.');
+        expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+      });
 
-      expect(renderedInstance.isMounted(), isFalse,
-          reason: 'The React instance should have been unmounted.');
+      test('renderAttachedToDocument renders the component into the document', () {
+        expect(document.body.children, isEmpty);
 
-      expect(document.body.children, isEmpty,
-          reason: 'All attached mount points should have been removed.');
+        renderedInstance = renderAttachedToDocument(Wrapper());
+
+        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+            reason: 'The component should have been rendered into the container div.');
+      });
     });
 
     group('getRef', () {
