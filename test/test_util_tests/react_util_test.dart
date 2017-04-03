@@ -29,8 +29,6 @@ main() {
       expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
           reason: 'The component should have been rendered into the container div.');
 
-      tearDownAttachedNodes();
-
       expect(renderedInstance.isMounted(), isFalse,
           reason: 'The React instance should have been unmounted.');
 

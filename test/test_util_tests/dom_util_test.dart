@@ -33,8 +33,6 @@ main() {
       triggerDocumentClick(findDomNode(renderedInstance));
 
       expect(flag, isTrue);
-
-      tearDownAttachedNodes();
     });
 
     test('and throws when the target is not attached to the document', () {
@@ -61,8 +59,6 @@ main() {
       await triggerFocus(findDomNode(renderedInstance));
 
       expect(flag, isTrue);
-
-      tearDownAttachedNodes();
     });
 
     test('and throws when the target is not attached to the document', () {

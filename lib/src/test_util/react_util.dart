@@ -13,6 +13,7 @@ import 'package:react/react_client.dart';
 import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
+import 'package:test/test.dart';
 
 export 'package:over_react/src/util/react_wrappers.dart';
 
@@ -157,21 +158,14 @@ List<Element> _attachedReactContainers = [];
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
-  _attachedReactContainers.add(container);
-
   document.body.append(container);
 
-  return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
-}
-
-/// Unmounts and removes the mount nodes for components rendered via [renderAttachedToDocument].
-void tearDownAttachedNodes() {
-  _attachedReactContainers.forEach((container) {
+  addTearDown(() {
     react_dom.unmountComponentAtNode(container);
     container.remove();
   });
 
-  _attachedReactContainers.clear();
+  return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
 /// Returns a rendered component's ref, or null if it doesn't exist.
