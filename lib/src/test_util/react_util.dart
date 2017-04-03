@@ -303,11 +303,103 @@ bool _hasTestId(Map props, String key, String value) {
     return results.single;
   }
 }
+
 /// Returns the [Element] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Element getDomByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render((Test()..addTestId('value'))());
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     getComponentRootDomByTestId(renderedInstance, 'value'); // returns the `outer` `<div>`
+///
+/// Related: [queryByTestId].
+Element getComponentRootDomByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
   return findDomNode(getByTestId(root, value, key: key));
+}
+
+/// Returns the [Element] of the first descendant of [root] that has its [key] html attribute value set to a
+/// space-delimited string containing [value].
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render((Test()..addTestId('value'))());
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
+///
+/// Related: [queryAllByTestId], [getComponentRootDomByTestId].
+Element queryByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+  return findDomNode(root).querySelector('[$key~="$value"]');
+}
+
+/// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render(Dom.div()(
+///       (Test()..addTestId('value'))(),
+///       (Test()..addTestId('value'))()
+///     ));
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
+List<Element> queryAllByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+  return findDomNode(root).querySelectorAll('[$key~="$value"]');
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
