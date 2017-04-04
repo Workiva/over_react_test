@@ -1,5 +1,3 @@
-library test_util.dom_util;
-
 import 'dart:async';
 import 'dart:html';
 import 'dart:js';

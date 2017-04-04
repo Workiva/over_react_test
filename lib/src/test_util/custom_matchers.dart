@@ -1,5 +1,3 @@
-library test_util.custom_matchers;
-
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';

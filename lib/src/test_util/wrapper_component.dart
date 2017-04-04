@@ -1,5 +1,3 @@
-library test_util.wrapper_component;
-
 import 'package:over_react/over_react.dart';
 
 /// A helper component for use in tests where a component needs to be
