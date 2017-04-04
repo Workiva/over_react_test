@@ -168,16 +168,7 @@ List<Element> _attachedReactContainers = [];
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
-/// Returns a rendered component's ref, or null if it doesn't exist.
-///
-/// The return type is `ReactComponent` for composite components, and [Element] for DOM components.
-///
-/// Using `getRef()` can be tedious for nested / complex components. It is recommended to use [getByTestId] instead.
-dynamic getRef(ReactComponent instance, dynamic ref) {
-  if (instance == null) {
-    return null;
   }
-  return getProperty(instance.refs, ref);
 }
 
 typedef void _EventSimulatorAlias(componentOrNode, [Map eventData]);
@@ -467,11 +458,4 @@ List findDescendantsWithProp(/* [1] */ root, dynamic propKey) {
   }));
 
   return descendantsWithProp;
-}
-
-/// Helper component that renders whatever you tell it to. Necessary for rendering components with the 'ref' prop.
-ReactComponentFactory RenderingContainerComponentFactory = react.registerComponent(() => new RenderingContainerComponent());
-class RenderingContainerComponent extends react.Component {
-  @override
-  render() => props['renderer']();
 }

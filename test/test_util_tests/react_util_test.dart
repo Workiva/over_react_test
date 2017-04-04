@@ -38,22 +38,6 @@ main() {
       });
     });
 
-    group('getRef', () {
-      test('returns the ref if it exists', () {
-        var renderedInstance = render(RenderingContainerComponentFactory({'renderer': Dom.div()..ref = 'childDiv'}));
-
-        var ref = getRef(renderedInstance, 'childDiv');
-        expect(ref, isNotNull);
-      });
-
-      test('returns null if the ref doesn\'t exist', () {
-        var renderedInstance = render(RenderingContainerComponentFactory({'renderer': Dom.div()}));
-
-        var ref = getRef(renderedInstance, 'childDiv');
-        expect(ref, isNull);
-      });
-    });
-
     group('click', () {
       test('simulates a click on a component', () {
         var flag = false;
