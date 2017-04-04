@@ -416,6 +416,28 @@ main() {
         });
       });
     });
+
+    test('throwsPropError', () {
+      expect(() => throw new PropError('propName', 'message'), throwsPropError('propName', 'message'));
+    });
+
+    test('throwsPropError_Required', () {
+      expect(() => throw new PropError.required('propName', 'message'),
+          throwsPropError_Required('propName', 'message')
+      );
+    });
+
+    test('throwsPropError_Value', () {
+      expect(() => throw new PropError.value('value', 'propName', 'message'),
+          throwsPropError_Value('value', 'propName', 'message')
+      );
+    });
+
+    test('throwsPropError_Combination', () {
+      expect(() => throw new PropError.combination('prop1Name', 'prop2Name', 'message'),
+          throwsPropError_Combination('prop1Name', 'prop2Name', 'message')
+      );
+    });
   });
 }
 
