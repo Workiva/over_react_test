@@ -38,6 +38,29 @@
 
     > __Note:__ `8081` is the default port used, but your project may use something different. Be sure to take note of the output when running `pub serve` to ensure you are using the correct port.
 
+## Variable and Type Naming Conventions
+
+Usage | Actual Type | Suggested Referencing
+--- | --- | ---
+`render` and `render` helper functions | `ReactElement` \| `Element` | `renderedInstance`
+Component class | `ReactClass` | `type`
+VDOM Instance (invoked `UiProps`) | `ReactElement` | `instance`
+`findDomNode`, `queryByTestId`, etc. | `Element` | `node`
+The Dart component | `react.Component` (backed by `ReactComponent`) | `component`
+Invoked `UiFactory` | `UiProps` | `builder`
+
+Example:
+
+```dart
+test('my test' () {
+  var sampleBuilder = Sample();
+  var sampleInstance = sampleBuilder();
+  var renderedInstance = render(sampleInstance);
+  SampleComponent sampleComponent = getDartComponent(renderedInstance);
+  var sampleNode = findDomNode(renderedInstance);
+});
+```
+
 ## Documentation
 
 You would never skip reading the docs for a new language you are asked to learn, so _please_ don't skip over reading these, either.
