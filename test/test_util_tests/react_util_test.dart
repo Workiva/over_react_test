@@ -38,6 +38,22 @@ main() {
       });
     });
 
+
+    test('renderAttachedToDocument renders the component into the document', () {
+      expect(document.body.children, isEmpty);
+
+      var renderedInstance = renderAttachedToDocument(Wrapper(), autoTearDown: false);
+
+      expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+          reason: 'The component should have been rendered into the container div.');
+
+      tearDownAttachedNodes();
+
+      expect(renderedInstance.isMounted(), isFalse, reason: 'The React instance should have been unmounted.');
+
+      expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+    });
+
     group('click', () {
       test('simulates a click on a component', () {
         var flag = false;

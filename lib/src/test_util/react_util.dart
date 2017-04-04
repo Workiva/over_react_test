@@ -32,71 +32,25 @@ export 'package:over_react/src/util/react_wrappers.dart';
 //     `ReactComponent`, whereas DOM component instance will be of type
 //     `Element`.
 
-/// Maximum number of components that can be rendered at a given time, before being automatically unmounted.
-///
-/// Defaulted to `5` because typically a single test will not render more than `5` components.
-int maxRenderedQueueLength = 5;
-
-/// Maximum number of shallow renderers that can be mounted at a given time, before being automatically unmounted.
-///
-/// Defaulted to `5` because typically a single test will not create more than `5` shallow renderers.
-int maxShallowRendererQueueLength = 5;
-
-/// Rolling list of rendered instances.
-///
-/// Should never have a length that exceeds [maxRenderedQueueLength].
-var _renderedInstances = [];
-
-/// Rolling list of shallow renderers.
-///
-/// Should never have a length that exceeds [maxShallowRendererQueueLength].
-var _shallowRenderers = [];
-
-/// Adds [renderedInstance] to [_renderedInstances].
-///
-/// If the `length` of [_renderedInstances] is larger than or equal to [maxRenderedQueueLength] the oldest
-/// [renderedInstance] will be unmounted and removed from the list.
-void _addToRenderedInstanceQueue(dynamic renderedInstance) {
-  if (_renderedInstances.length >= maxRenderedQueueLength) {
-    unmount(_renderedInstances.last);
-    _renderedInstances.removeLast();
-  }
-
-  _renderedInstances.insert(0, renderedInstance);
-}
-
-/// Adds [renderer] to [_shallowRenderers].
-///
-/// If the `length` of [_shallowRenderers] is larger than or equal to [maxShallowRendererQueueLength] the oldest
-/// [renderer] will be unmounted and removed from the list.
-void _addToShallowRendererQueue(react_test_utils.ReactShallowRenderer renderer) {
-  if (_shallowRenderers.length >= maxShallowRendererQueueLength) {
-    _shallowRenderers.last.unmount();
-    _shallowRenderers.removeLast();
-  }
-
-  _shallowRenderers.insert(0, renderer);
-}
-
 /// Renders a React component or builder into a detached node and returns the component instance.
 ///
-/// By default the rendered instance will be added to [_shallowRenderers] via [_addToShallowRendererQueue] to not
-/// have this happen set [addToRenderedQueue] to false.
-/* [1] */ render(dynamic component, {bool addToRenderedQueue: true}) {
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
+/* [1] */ render(dynamic component, {bool autoTearDown = true}) {
   var renderedInstance = react_test_utils.renderIntoDocument(component is component_base.UiProps ? component.build() : component);
-  if (addToRenderedQueue) _addToRenderedInstanceQueue(renderedInstance);
+  if (autoTearDown) addTearDown(() { unmount(renderedInstance); });
   return renderedInstance;
 }
 
 /// Shallow-renders a component using [react_test_utils.ReactShallowRenderer].
 ///
-/// By default the rendered instance will be added to [_renderedInstances] via [_addToRenderedInstanceQueue] to not
-/// have this happen set [addToRendererQueue] to false.
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
 ///
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
-ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true}) {
+ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true}) {
   var renderer = react_test_utils.createRenderer();
-  if (addToRendererQueue) _addToShallowRendererQueue(renderer);
+  if (autoTearDown) addTearDown(() { renderer.unmount(); });
   renderer.render(instance);
   return renderer.getRenderOutput();
 }
@@ -109,9 +63,7 @@ ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true
 /// For convenience, this method does nothing if [instanceOrContainerNode] is null,
 /// or if it's a non-mounted React instance.
 void unmount(dynamic instanceOrContainerNode) {
-  if (instanceOrContainerNode == null) {
-    return;
-  }
+  if (instanceOrContainerNode == null) return;
 
   Element containerNode;
 
@@ -121,9 +73,7 @@ void unmount(dynamic instanceOrContainerNode) {
       react_test_utils.isCompositeComponent(instanceOrContainerNode) ||
       react_test_utils.isDOMComponent(instanceOrContainerNode)
   ) {
-    if (!instanceOrContainerNode.isMounted()) {
-      return;
-    }
+    if (!instanceOrContainerNode.isMounted()) return;
 
     containerNode = findDomNode(instanceOrContainerNode)?.parent;
   } else {
@@ -137,37 +87,46 @@ void unmount(dynamic instanceOrContainerNode) {
 
 /// Renders a React component or builder into a detached node and returns the associated DOM node.
 ///
-/// By default the rendered instance will be added to [_renderedInstances] via [_addToRenderedInstanceQueue] to not
-/// have this happen set [addToRenderedQueue] to false.
-Element renderAndGetDom(dynamic component, {bool addToRenderedQueue: true}) {
-  return findDomNode(render(component, addToRenderedQueue: addToRenderedQueue));
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
+Element renderAndGetDom(dynamic component, {bool autoTearDown: true}) {
+  return findDomNode(render(component, autoTearDown: autoTearDown));
 }
 
 /// Renders a React component or builder into a detached node and returns the associtated Dart component.
-react.Component renderAndGetComponent(dynamic component) => getDartComponent(render(component));
+react.Component renderAndGetComponent(dynamic component, {bool autoTearDown: true}) => getDartComponent(render(component, autoTearDown: autoTearDown));
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
 
 /// Renders the component into the document as opposed to a headless node.
 /// Returns the rendered component.
-/* [1] */ renderAttachedToDocument(dynamic component) {
+/* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true}) {
   var container = new DivElement()
-    ..className = 'render-attached-to-document-container'
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
   document.body.append(container);
 
-  addTearDown(() {
-    react_dom.unmountComponentAtNode(container);
-    container.remove();
-  });
+  if (autoTearDown) {
+    addTearDown(() {
+      react_dom.unmountComponentAtNode(container);
+      container.remove();
+    });
+  } else {
+    _attachedReactContainers.add(container);
+  }
 
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
+/// Unmounts and removes the mount nodes for components rendered via [renderAttachedToDocument] that are not
+/// automatically unmounted.
+void tearDownAttachedNodes() {
+  for (var container in _attachedReactContainers) {
+    react_dom.unmountComponentAtNode(container);
+    container.remove();
   }
 }
 
