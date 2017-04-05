@@ -42,11 +42,11 @@
 
 Usage | Actual Type | Suggested Referencing
 --- | --- | ---
-`render` and `render` helper functions | `ReactElement` \| `Element` | `renderedInstance`
+`render` and `render` helper functions | `ReactElement` \| `Element` | `instance`
 Component class | `ReactClass` | `type`
-VDOM Instance (invoked `UiProps`) | `ReactElement` | `instance`
+VDOM Instance (invoked `UiProps`) | `ReactElement` | `-ReactElement`  or not suffixed
 `findDomNode`, `queryByTestId`, etc. | `Element` | `node`
-The Dart component | `react.Component` (backed by `ReactComponent`) | `component`
+The Dart component | `react.Component` (backed by `ReactComponent`) | `dartInstance`
 Invoked `UiFactory` | `UiProps` | `builder`
 
 Example:
@@ -54,9 +54,9 @@ Example:
 ```dart
 test('my test' () {
   var sampleBuilder = Sample();
-  var sampleInstance = sampleBuilder();
-  var renderedInstance = render(sampleInstance);
-  SampleComponent sampleComponent = getDartComponent(renderedInstance);
+  var sampleReactElement = sampleBuilder(); // Or var sample = sampleBuilder();
+  var instance = render(sampleInstance);
+  SampleComponent sampleDartInstance = getDartComponent(renderedInstance);
   var sampleNode = findDomNode(renderedInstance);
 });
 ```
