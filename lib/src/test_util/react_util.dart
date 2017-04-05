@@ -36,9 +36,18 @@ export 'package:over_react/src/util/react_wrappers.dart';
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false.
-/* [1] */ render(dynamic component, {bool autoTearDown = true}) {
-  var renderedInstance = react_test_utils.renderIntoDocument(component is component_base.UiProps ? component.build() : component);
+/* [1] */ render(dynamic component, {bool autoTearDown = true, Element container}) {
+  var renderedInstance;
+  component = component is component_base.UiProps ? component.build() : component;
+
+  if (container == null) {
+    renderedInstance = react_test_utils.renderIntoDocument(component);
+  } else {
+    renderedInstance = react_dom.render(component, container);
+  }
+
   if (autoTearDown) addTearDown(() { unmount(renderedInstance); });
+
   return renderedInstance;
 }
 
@@ -101,8 +110,8 @@ List<Element> _attachedReactContainers = [];
 
 /// Renders the component into the document as opposed to a headless node.
 /// Returns the rendered component.
-/* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true}) {
-  var container = new DivElement()
+/* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true, Element container}) {
+  container ??= new DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');

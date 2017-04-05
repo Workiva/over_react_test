@@ -36,10 +36,21 @@ main() {
         expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
             reason: 'The component should have been rendered into the container div.');
       });
+
+      test('renderAttachedToDocument renders the component into the document with a given container', () {
+        expect(document.body.children, isEmpty);
+
+        var container = new DivElement();
+        renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
+
+        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+            reason: 'The component should have been rendered into the container div.');
+        expect(document.body.children[0], container);
+      });
     });
 
 
-    test('renderAttachedToDocument renders the component into the document', () {
+    test('renderAttachedToDocument renders the component into the document and tearDownAttachedNodes cleans them up', () {
       expect(document.body.children, isEmpty);
 
       var renderedInstance = renderAttachedToDocument(Wrapper(), autoTearDown: false);
