@@ -23,6 +23,10 @@ import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
 /// Renders [node], and returns a `TestJacket` instance to use in a test.
 ///
 /// Will render into [mountNode] if provided.
+///
+/// To render attached to the [document] set [attachedToDocument] to `true`.
+///
+/// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
 TestJacket<T> mount<T extends react.Component>(dynamic node, {
     Element mountNode,
     bool attachedToDocument: false,
@@ -51,30 +55,46 @@ class TestJacket<T extends react.Component> {
         : react_util.render(node, container: mountNode, autoTearDown: autoTearDown);
   }
 
+  /// Rerenders the [node] into the same [mountNode].
+  ///
+  /// _Note:_ Only really useful when providing a [mountNode].
   void rerender(dynamic node) {
     _render(node);
   }
 
+  /// Returns the mounted React component instance.
   /* [1] */ getInstance() {
     return _renderedInstance;
   }
 
+  /// Returns the props associated with the mounted React component instance.
   Map getProps() {
     return over_react.getProps(getInstance());
   }
 
+  /// Returns the DOM node associated with the mounted React component instance.
   Element getNode() {
     return over_react.findDomNode(_renderedInstance);
   }
 
+  /// Returns the native Dart compoentn associated with the mounted React component instance, or null if the component
+  /// is not Dart based.
   T getDartInstance() {
     return over_react.getDartComponent(_renderedInstance) as T;
   }
 
+  /// Update the Dart component's state to the provided [newState] value and force a re-render.
+  ///
+  /// Optionally accepts a callback that gets called after the component updates.
+  ///
+  /// Also allows [newState] to be used as a transactional `setState` callback.
+  ///
+  /// See: <https://facebook.github.io/react/docs/react-component.html#setstate>
   void setState(newState, [callback]) {
     getDartInstance().setState(newState, callback);
   }
 
+  /// Unmounts the React component instance and cleans up any attached DOM nodes.
   void unmount() {
     react_util.unmount(_renderedInstance);
     mountNode?.remove();
