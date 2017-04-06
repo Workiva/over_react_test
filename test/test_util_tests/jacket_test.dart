@@ -3,7 +3,6 @@ import 'dart:html';
 import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:ui_test_utils/ui_test_utils.dart';
-import 'package:ui_test_utils/src/test_util/jacket.dart';
 
 /// Main entry point for DomUtil testing
 main() {
