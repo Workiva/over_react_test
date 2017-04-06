@@ -25,7 +25,7 @@ import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
 /// Will render into [mountNode] if provided.
 TestJacket<T> mount<T extends react.Component>(dynamic node, {
     Element mountNode,
-    bool attachedToDocument,
+    bool attachedToDocument: false,
     bool autoTearDown: true
 }) {
   return new TestJacket<T>(node,
@@ -59,6 +59,10 @@ class TestJacket<T extends react.Component> {
     return _renderedInstance;
   }
 
+  Map getProps() {
+    return over_react.getProps(getInstance());
+  }
+
   Element getNode() {
     return over_react.findDomNode(_renderedInstance);
   }
@@ -69,5 +73,11 @@ class TestJacket<T extends react.Component> {
 
   void setState(newState, [callback]) {
     getDartInstance().setState(newState, callback);
+  }
+
+  void unmount() {
+    react_util.unmount(_renderedInstance);
+    mountNode?.remove();
+    react_util.tearDownAttachedNodes();
   }
 }
