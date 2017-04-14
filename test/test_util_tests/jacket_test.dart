@@ -24,7 +24,7 @@ main() {
 
         test('with the given container', () {
           var mountNode = new DivElement();
-          jacket = mount(Sample(), attachedToDocument: true, mountNode: mountNode);
+          jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode);
 
           expect(document.body.children[0], mountNode);
           expect(jacket.getInstance().isMounted(), isTrue);
@@ -32,7 +32,7 @@ main() {
         });
 
         test('without the given container', () {
-          jacket = mount(Sample(), attachedToDocument: true);
+          jacket = mount(Sample()(), attachedToDocument: true);
 
           expect(jacket.getInstance().isMounted(), isTrue);
           expect(document.body.children[0].children[0], jacket.getNode());
@@ -60,7 +60,7 @@ main() {
 
         test('with the given container', () {
           var mountNode = new DivElement();
-          jacket = mount(Sample(), attachedToDocument: true, mountNode: mountNode, autoTearDown: false);
+          jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode, autoTearDown: false);
 
           expect(document.body.children[0], mountNode);
           expect(jacket.getInstance().isMounted(), isTrue);
@@ -68,7 +68,7 @@ main() {
         });
 
         test('without the given container', () {
-          jacket = mount(Sample(), attachedToDocument: true, autoTearDown: false);
+          jacket = mount(Sample()(), attachedToDocument: true, autoTearDown: false);
 
           expect(jacket.getInstance().isMounted(), isTrue);
           expect(document.body.children[0].children[0], jacket.getNode());
@@ -93,7 +93,7 @@ main() {
 
         test('with the given container', () {
           var mountNode = new DivElement();
-          jacket = mount(Sample(), mountNode: mountNode);
+          jacket = mount(Sample()(), mountNode: mountNode);
 
           expect(document.body.children, isEmpty);
           expect(jacket.getInstance().isMounted(), isTrue);
@@ -101,7 +101,7 @@ main() {
         });
 
         test('without the given container', () {
-          jacket = mount(Sample());
+          jacket = mount(Sample()());
 
           expect(jacket.getInstance().isMounted(), isTrue);
         });
@@ -128,7 +128,7 @@ main() {
 
         test('with the given container', () {
           var mountNode = new DivElement();
-          jacket = mount(Sample(), mountNode: mountNode, autoTearDown: false);
+          jacket = mount(Sample()(), mountNode: mountNode, autoTearDown: false);
 
           expect(document.body.children.isEmpty, isTrue);
           expect(jacket.getInstance().isMounted(), isTrue);
@@ -136,7 +136,7 @@ main() {
         });
 
         test('without the given container', () {
-          jacket = mount(Sample(), autoTearDown: false);
+          jacket = mount(Sample()(), autoTearDown: false);
 
           expect(document.body.children, isEmpty);
           expect(jacket.getInstance().isMounted(), isTrue);
@@ -150,7 +150,7 @@ main() {
 
     setUp(() {
       var mountNode = new DivElement();
-      jacket = mount<SampleComponent>(Sample()..addTestId('sample'),
+      jacket = mount<SampleComponent>((Sample()..addTestId('sample'))(),
           mountNode: mountNode,
           attachedToDocument: true
       );
