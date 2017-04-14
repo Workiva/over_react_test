@@ -150,7 +150,7 @@ main() {
 
     setUp(() {
       var mountNode = new DivElement();
-      jacket = new TestJacket<SampleComponent>(Sample()..addTestId('sample'),
+      jacket = mount<SampleComponent>(Sample()..addTestId('sample'),
           mountNode: mountNode,
           attachedToDocument: true
       );
@@ -160,7 +160,7 @@ main() {
     });
 
     test('rerender', () {
-      jacket.rerender(Sample()..foo = true);
+      jacket.rerender((Sample()..foo = true)());
 
       expect(Sample(jacket.getProps()).foo, isTrue);
     });

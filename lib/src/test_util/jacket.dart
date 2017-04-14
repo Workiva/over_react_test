@@ -2,6 +2,9 @@ import 'dart:html';
 
 import 'package:over_react/over_react.dart' as over_react;
 import 'package:react/react.dart' as react;
+import 'package:react/react_client.dart' show ReactElement;
+import 'package:react/react_client/react_interop.dart' show ReactComponent;
+import 'package:react/react_test_utils.dart' as react_test_utils;
 
 import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
 
@@ -24,7 +27,7 @@ import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
 ///
 /// Will render into [mountNode] if provided.
 ///
-/// To render attached to the [document] set [attachedToDocument] to `true`.
+/// To render into a node attached to document.body, as opposed to a detached node, set [attachedToDocument] to true.
 ///
 /// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
 TestJacket<T> mount<T extends react.Component>(dynamic node, {
@@ -32,39 +35,43 @@ TestJacket<T> mount<T extends react.Component>(dynamic node, {
     bool attachedToDocument: false,
     bool autoTearDown: true
 }) {
-  return new TestJacket<T>(node,
+  return new TestJacket<T>._(node,
       mountNode: mountNode,
       attachedToDocument: attachedToDocument,
       autoTearDown: autoTearDown
   );
 }
 
+/// Provides more a more consistent and easier to use API to test and manipulate a rendered [ReactComponent].
 class TestJacket<T extends react.Component> {
   /* [1] */ Object _renderedInstance;
   final Element mountNode;
   final bool attachedToDocument;
   final bool autoTearDown;
 
-  TestJacket(dynamic node, {this.mountNode, this.attachedToDocument: false, this.autoTearDown: true}) {
-    _render(node);
+  TestJacket._(ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
+      : this.mountNode = mountNode ?? new DivElement() {
+    _render(reactElement);
   }
 
-  void _render(dynamic node) {
+  void _render(ReactElement reactElement) {
     _renderedInstance = attachedToDocument
-        ? react_util.renderAttachedToDocument(node, container: mountNode, autoTearDown: autoTearDown)
-        : react_util.render(node, container: mountNode, autoTearDown: autoTearDown);
+        ? react_util.renderAttachedToDocument(reactElement, container: mountNode, autoTearDown: autoTearDown)
+        : react_util.render(reactElement, container: mountNode, autoTearDown: autoTearDown);
   }
 
-  /// Rerenders the [node] into the same [mountNode].
-  ///
-  /// _Note:_ Only really useful when providing a [mountNode].
-  void rerender(dynamic node) {
-    _render(node);
+  /// Rerenders the [reactElement] into the same [mountNode].
+  void rerender(ReactElement reactElement) {
+    _render(reactElement);
   }
 
   /// Returns the mounted React component instance.
-  /* [1] */ getInstance() {
-    return _renderedInstance;
+  ReactComponent getInstance() {
+    if (!react_test_utils.isCompositeComponent(_renderedInstance)) {
+      throw new UnsupportedError('Not a composite component');
+    }
+
+    return _renderedInstance as ReactComponent;
   }
 
   /// Returns the props associated with the mounted React component instance.

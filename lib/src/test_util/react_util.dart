@@ -46,7 +46,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
     renderedInstance = react_dom.render(component, container);
   }
 
-  if (autoTearDown) addTearDown(() { unmount(renderedInstance); });
+  if (autoTearDown) addTearDown(() => unmount(renderedInstance));
 
   return renderedInstance;
 }
@@ -59,7 +59,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
 ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true}) {
   var renderer = react_test_utils.createRenderer();
-  if (autoTearDown) addTearDown(() { renderer.unmount(); });
+  if (autoTearDown) addTearDown(() => renderer.unmount());
   renderer.render(instance);
   return renderer.getRenderOutput();
 }
@@ -108,7 +108,8 @@ react.Component renderAndGetComponent(dynamic component, {bool autoTearDown: tru
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
 
-/// Renders the component into the document as opposed to a headless node.
+/// Renders the component into a node attached to document.body as opposed to a detached node.
+///
 /// Returns the rendered component.
 /* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true, Element container}) {
   container ??= new DivElement()
