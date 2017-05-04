@@ -1,6 +1,6 @@
-# Contributing to ui_test_utils
+# Contributing to OverReact Test
 
-Looking to contribute something to the ui_test_utils library? __Here's how you can help.__
+Looking to contribute something to the OverReact Test library? __Here's how you can help.__
 
 + __[Coding Standards](#coding-standards)__
   + [General Formatting Guidelines](#general-formatting-guidelines)
@@ -64,12 +64,12 @@ __Guidelines for bug reports:__
    fix available.
 
 2. __Record a screencast of yourself reproducing the issue__.
-  1. Be sure the problem exists in ui_test_utils's code by building a
+  1. Be sure the problem exists in OverReact Test's code by building a
      reduced test case that one of the reviewers can pull locally
      and test out.
 
 3. __Share as much information as possible.__ Include operating system and version, browser and version, version of
-   `ui_test_utils`, etc. where appropriate.
+   OverReact Test, etc. where appropriate.
 
 Always include steps to reproduce the bug.
 
@@ -97,7 +97,7 @@ __Example Bug Report:__
 ### Feature requests
 
 Feature requests are welcome. But take a moment to find out whether your idea fits with the scope and aims of the
-project. It's up to *you* to make a strong case to convince the `ui_test_utils` team of the merits of this feature.
+project. It's up to *you* to make a strong case to convince the OverReact Test team of the merits of this feature.
 Please provide as much detail and context as possible.
 
 &nbsp;
@@ -123,11 +123,11 @@ Adhering to the following process is the best way to get your work included in t
    # Navigate to the directory where you store repos locally
    cd ~/your-local-git-repo-spot
    # Clone your fork of the repo into the current directory
-   git clone git@github.com:<your-username>/ui_test_utils
+   git clone git@github.com:<your-username>/over_react_test
    # Navigate to the newly cloned directory
-   cd ~/your-local-git-repo-spot/ui_test_utils
+   cd ~/your-local-git-repo-spot/over_react_test
    # Assign the repo you forked from to a remote called "upstream"
-   git remote add upstream git@github.com:Workiva/ui_test_utils
+   git remote add upstream git@github.com:Workiva/over_react_test
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -174,7 +174,7 @@ Adhering to the following process is the best way to get your work included in t
 
 ## Git Commit Message Standards
 
-Below you will find an example commit message that follows the guidelines we would like all ui_test_utils contributors
+Below you will find an example commit message that follows the guidelines we would like all OverReact Test contributors
 to follow.
 
 ```
@@ -209,7 +209,7 @@ Further paragraphs come after blank lines.
 
 ## Developer Workflow
 
-The `ui_test_utils` developer workflow couldn't be any more simple!
+The OverReact Test developer workflow couldn't be any more simple!
 
 When you're ready to run the tests... run:
 

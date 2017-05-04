@@ -5,7 +5,7 @@ import 'package:react/react.dart' as react;
 import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_client.dart';
 import 'package:test/test.dart';
-import 'package:ui_test_utils/ui_test_utils.dart';
+import 'package:over_react_test/over_react_test.dart';
 
 import './utils/test_js_component.dart';
 import './utils/nested_component.dart';

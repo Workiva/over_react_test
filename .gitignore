@@ -37,7 +37,7 @@ packages
 build/
 
 
-# Since ui_test_utils is a library package, we shouldn't track pubspec.lock:
+# Since over_react_test is a library package, we shouldn't track pubspec.lock:
 # https://www.dartlang.org/tools/pub/glossary.html#library-package
 pubspec.lock
 

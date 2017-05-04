@@ -6,7 +6,7 @@ import 'package:react/react_client.dart' show ReactElement;
 import 'package:react/react_client/react_interop.dart' show ReactComponent;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 
-import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
+import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 
 // Notes
 // ---------------------------------------------------------------------------

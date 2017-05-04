@@ -1,9 +1,9 @@
-# ui_test_utils
+# OverReact Test
 
-[![Pub](https://img.shields.io/pub/v/ui_test_utils.svg)](https://pub.dartlang.org/packages/ui_test_utils)
-[![Build Status](https://travis-ci.org/Workiva/ui_test_utils.svg?branch=master)](https://travis-ci.org/Workiva/ui_test_utils)
-[![Test Coverage](https://codecov.io/github/Workiva/ui_test_utils/coverage.svg?branch=master)](https://codecov.io/github/Workiva/ui_test_utils?branch=master)
-[![Documentation](https://img.shields.io/badge/Documentation-ui_test_utils-blue.svg)](http://www.dartdocs.org/documentation/dartdoc/latest/)
+[![Pub](https://img.shields.io/pub/v/over_react_test.svg)](https://pub.dartlang.org/packages/over_react_test)
+[![Build Status](https://travis-ci.org/Workiva/over_react_test.svg?branch=master)](https://travis-ci.org/Workiva/over_react_test)
+[![Test Coverage](https://codecov.io/github/Workiva/over_react_test/coverage.svg?branch=master)](https://codecov.io/github/Workiva/over_react_test?branch=master)
+[![Documentation](https://img.shields.io/badge/Documentation-over_react_test-blue.svg)](http://www.dartdocs.org/documentation/dartdoc/latest/)
 
 > A library for testing [OverReact][over-react] components.
 
@@ -17,7 +17,7 @@
 1. Import it into your test files:
 
     ```dart
-    import 'package:ui_test_utils/ui_test_utils.dart';
+    import 'package:over_react_test/over_react_test.dart';
     ```
 
 2. Add the `test/pub_serve` transformer to your `pubspec.yaml` _after_ the `over_react` transformer.
@@ -74,7 +74,7 @@ Yes please! ([__Please read our contributor guidelines first__][contributing-doc
 
 ## Versioning
 
-The `ui_test_utils` library adheres to [Semantic Versioning](http://semver.org/):
+The `over_react_test` library adheres to [Semantic Versioning](http://semver.org/):
 
 * Any API changes that are not backwards compatible will __bump the major version__ _(and reset the minor / patch)_.
 * Any new functionality that is added in a backwards-compatible manner will __bump the minor version__
