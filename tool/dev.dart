@@ -8,14 +8,14 @@ main(List<String> args) async {
   ];
 
   config.analyze.entryPoints = directories;
+  config.copyLicense.directories = directories;
 
   config.test
     ..pubServe = true
     ..platforms = [
-      'vm',
       'content-shell',
     ]
-    // Prevent test load timeouts on Smithy.
+    // Prevent test load timeouts.
     ..concurrency = 1
     ..unitTests = [
       'test/over_react_test.dart',
