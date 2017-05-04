@@ -18,7 +18,7 @@ main(List<String> args) async {
     // Prevent test load timeouts on Smithy.
     ..concurrency = 1
     ..unitTests = [
-      'test/test_util_test.dart',
+      'test/over_react_test.dart',
     ];
 
   config.coverage

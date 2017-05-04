@@ -5,10 +5,10 @@ import 'package:over_react/over_react.dart';
 import 'package:react/react_client.dart';
 import 'package:test/test.dart';
 
-import 'test_util_tests/custom_matchers_test.dart' as custom_matchers_test;
-import 'test_util_tests/dom_util_test.dart' as test_util_dom_util_test;
-import 'test_util_tests/jacket_test.dart' as jacket_test;
-import 'test_util_tests/react_util_test.dart' as react_util_test;
+import 'over_react_test/custom_matchers_test.dart' as custom_matchers_test;
+import 'over_react_test/dom_util_test.dart' as test_util_dom_util_test;
+import 'over_react_test/jacket_test.dart' as jacket_test;
+import 'over_react_test/react_util_test.dart' as react_util_test;
 
 main() {
   setClientConfiguration();
