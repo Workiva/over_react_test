@@ -30,12 +30,12 @@ import 'package:ui_test_utils/src/test_util/react_util.dart' as react_util;
 /// To render into a node attached to document.body, as opposed to a detached node, set [attachedToDocument] to true.
 ///
 /// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
-TestJacket<T> mount<T extends react.Component>(dynamic node, {
+TestJacket<T> mount<T extends react.Component>(ReactElement reactElement, {
     Element mountNode,
     bool attachedToDocument: false,
     bool autoTearDown: true
 }) {
-  return new TestJacket<T>._(node,
+  return new TestJacket<T>._(reactElement,
       mountNode: mountNode,
       attachedToDocument: attachedToDocument,
       autoTearDown: autoTearDown
@@ -50,7 +50,9 @@ class TestJacket<T extends react.Component> {
   final bool autoTearDown;
 
   TestJacket._(ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
-      : this.mountNode = mountNode ?? new DivElement() {
+      : this.mountNode = mountNode ?? (new DivElement()
+          ..style.height = '800px'
+          ..style.width= '800px') {
     _render(reactElement);
   }
 
