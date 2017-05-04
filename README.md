@@ -42,7 +42,7 @@
 
 Usage | Actual Type | Suggested Referencing
 --- | --- | ---
-`render` and `render` helper functions | `ReactElement` \| `Element` | `instance`
+`render` and `render` helper functions | `ReactComponent` \| `Element` | `instance`
 Component class | `ReactClass` | `type`
 VDOM Instance (invoked `UiProps`) | `ReactElement` | `-ReactElement`  or not suffixed
 `findDomNode`, `queryByTestId`, etc. | `Element` | `node`
