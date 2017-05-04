@@ -99,7 +99,7 @@ class TestJacket<T extends react.Component> {
   /// Also allows [newState] to be used as a transactional `setState` callback.
   ///
   /// See: <https://facebook.github.io/react/docs/react-component.html#setstate>
-  void setState(Map newState, [callback()]) {
+  void setState(newState, [callback()]) {
     getDartInstance().setState(newState, callback);
   }
 
