@@ -64,7 +64,7 @@ linter:
     - throw_in_finally
     # - type_annotate_public_apis
     - type_init_formals
-    # - unawaited_futures
+    - unawaited_futures
     - unnecessary_brace_in_string_interps
     - unnecessary_getters_setters
     - unnecessary_lambdas

@@ -23,7 +23,7 @@ import 'package:over_react_test/src/over_react_test/react_util.dart' as react_ut
 //     `ReactComponent`, whereas DOM component instance will be of type
 //     `Element`.
 
-/// Renders [node], and returns a `TestJacket` instance to use in a test.
+/// Renders [reactElement], and returns a `TestJacket` instance to use in a test.
 ///
 /// Will render into [mountNode] if provided.
 ///
@@ -99,7 +99,7 @@ class TestJacket<T extends react.Component> {
   /// Also allows [newState] to be used as a transactional `setState` callback.
   ///
   /// See: <https://facebook.github.io/react/docs/react-component.html#setstate>
-  void setState(newState, [callback]) {
+  void setState(Map newState, [callback()]) {
     getDartInstance().setState(newState, callback);
   }
 

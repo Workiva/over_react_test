@@ -111,7 +111,7 @@ class ClassNameMatcher extends Matcher {
 class IsNode extends CustomMatcher {
   IsNode(matcher) : super("Element with nodeName that is", "nodeName", matcher);
   @override
-  featureValueOf(actual) => actual.nodeName;
+  featureValueOf(covariant Element actual) => actual.nodeName;
 }
 
 class _ElementClassNameMatcher extends CustomMatcher {
