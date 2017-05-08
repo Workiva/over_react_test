@@ -1,18 +1,19 @@
 @JS()
-library test_util.react_util;
+library over_react_test.react_util;
 
 import 'dart:collection';
 import 'dart:html';
 
 import 'package:js/js.dart';
+import 'package:over_react/over_react.dart';
+import 'package:over_react/component_base.dart' as component_base;
 import 'package:react/react.dart' as react;
 import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_client.dart';
 import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
-import 'package:web_skin_dart/ui_core.dart';
-import 'package:over_react/component_base.dart' as component_base;
+import 'package:test/test.dart';
 
 export 'package:over_react/src/util/react_wrappers.dart';
 
@@ -31,71 +32,34 @@ export 'package:over_react/src/util/react_wrappers.dart';
 //     `ReactComponent`, whereas DOM component instance will be of type
 //     `Element`.
 
-/// Maximum number of components that can be rendered at a given time, before being automatically unmounted.
-///
-/// Defaulted to `5` because typically a single test will not render more than `5` components.
-int maxRenderedQueueLength = 5;
-
-/// Maximum number of shallow renderers that can be mounted at a given time, before being automatically unmounted.
-///
-/// Defaulted to `5` because typically a single test will not create more than `5` shallow renderers.
-int maxShallowRendererQueueLength = 5;
-
-/// Rolling list of rendered instances.
-///
-/// Should never have a length that exceeds [maxRenderedQueueLength].
-var _renderedInstances = [];
-
-/// Rolling list of shallow renderers.
-///
-/// Should never have a length that exceeds [maxShallowRendererQueueLength].
-var _shallowRenderers = [];
-
-/// Adds [renderedInstance] to [_renderedInstances].
-///
-/// If the `length` of [_renderedInstances] is larger than or equal to [maxRenderedQueueLength] the oldest
-/// [renderedInstance] will be unmounted and removed from the list.
-void _addToRenderedInstanceQueue(dynamic renderedInstance) {
-  if (_renderedInstances.length >= maxRenderedQueueLength) {
-    unmount(_renderedInstances.last);
-    _renderedInstances.removeLast();
-  }
-
-  _renderedInstances.insert(0, renderedInstance);
-}
-
-/// Adds [renderer] to [_shallowRenderers].
-///
-/// If the `length` of [_shallowRenderers] is larger than or equal to [maxShallowRendererQueueLength] the oldest
-/// [renderer] will be unmounted and removed from the list.
-void _addToShallowRendererQueue(react_test_utils.ReactShallowRenderer renderer) {
-  if (_shallowRenderers.length >= maxShallowRendererQueueLength) {
-    _shallowRenderers.last.unmount();
-    _shallowRenderers.removeLast();
-  }
-
-  _shallowRenderers.insert(0, renderer);
-}
-
 /// Renders a React component or builder into a detached node and returns the component instance.
 ///
-/// By default the rendered instance will be added to [_shallowRenderers] via [_addToShallowRendererQueue] to not
-/// have this happen set [addToRenderedQueue] to false.
-/* [1] */ render(dynamic component, {bool addToRenderedQueue: true}) {
-  var renderedInstance = react_test_utils.renderIntoDocument(component is component_base.UiProps ? component.build() : component);
-  if (addToRenderedQueue) _addToRenderedInstanceQueue(renderedInstance);
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
+/* [1] */ render(dynamic component, {bool autoTearDown = true, Element container}) {
+  var renderedInstance;
+  component = component is component_base.UiProps ? component.build() : component;
+
+  if (container == null) {
+    renderedInstance = react_test_utils.renderIntoDocument(component);
+  } else {
+    renderedInstance = react_dom.render(component, container);
+  }
+
+  if (autoTearDown) addTearDown(() => unmount(renderedInstance));
+
   return renderedInstance;
 }
 
 /// Shallow-renders a component using [react_test_utils.ReactShallowRenderer].
 ///
-/// By default the rendered instance will be added to [_renderedInstances] via [_addToRenderedInstanceQueue] to not
-/// have this happen set [addToRendererQueue] to false.
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
 ///
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
-ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true}) {
+ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true}) {
   var renderer = react_test_utils.createRenderer();
-  if (addToRendererQueue) _addToShallowRendererQueue(renderer);
+  if (autoTearDown) addTearDown(() => renderer.unmount());
   renderer.render(instance);
   return renderer.getRenderOutput();
 }
@@ -108,9 +72,7 @@ ReactElement renderShallow(ReactElement instance, {bool addToRendererQueue: true
 /// For convenience, this method does nothing if [instanceOrContainerNode] is null,
 /// or if it's a non-mounted React instance.
 void unmount(dynamic instanceOrContainerNode) {
-  if (instanceOrContainerNode == null) {
-    return;
-  }
+  if (instanceOrContainerNode == null) return;
 
   Element containerNode;
 
@@ -120,9 +82,7 @@ void unmount(dynamic instanceOrContainerNode) {
       react_test_utils.isCompositeComponent(instanceOrContainerNode) ||
       react_test_utils.isDOMComponent(instanceOrContainerNode)
   ) {
-    if (!instanceOrContainerNode.isMounted()) {
-      return;
-    }
+    if (!instanceOrContainerNode.isMounted()) return;
 
     containerNode = findDomNode(instanceOrContainerNode)?.parent;
   } else {
@@ -136,54 +96,48 @@ void unmount(dynamic instanceOrContainerNode) {
 
 /// Renders a React component or builder into a detached node and returns the associated DOM node.
 ///
-/// By default the rendered instance will be added to [_renderedInstances] via [_addToRenderedInstanceQueue] to not
-/// have this happen set [addToRenderedQueue] to false.
-Element renderAndGetDom(dynamic component, {bool addToRenderedQueue: true}) {
-  return findDomNode(render(component, addToRenderedQueue: addToRenderedQueue));
+/// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
+/// [autoTearDown] to false.
+Element renderAndGetDom(dynamic component, {bool autoTearDown: true}) {
+  return findDomNode(render(component, autoTearDown: autoTearDown));
 }
 
 /// Renders a React component or builder into a detached node and returns the associtated Dart component.
-react.Component renderAndGetComponent(dynamic component) => getDartComponent(render(component));
+react.Component renderAndGetComponent(dynamic component, {bool autoTearDown: true}) => getDartComponent(render(component, autoTearDown: autoTearDown));
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
 
-/// Renders the component into the document as opposed to a headless node.
+/// Renders the component into a node attached to document.body as opposed to a detached node.
+///
 /// Returns the rendered component.
-/* [1] */ renderAttachedToDocument(dynamic component) {
-  var container = new DivElement()
-    ..className = 'render-attached-to-document-container'
+/* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true, Element container}) {
+  container ??= new DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
-  _attachedReactContainers.add(container);
-
   document.body.append(container);
+
+  if (autoTearDown) {
+    addTearDown(() {
+      react_dom.unmountComponentAtNode(container);
+      container.remove();
+    });
+  } else {
+    _attachedReactContainers.add(container);
+  }
 
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
-/// Unmounts and removes the mount nodes for components rendered via [renderAttachedToDocument].
+/// Unmounts and removes the mount nodes for components rendered via [renderAttachedToDocument] that are not
+/// automatically unmounted.
 void tearDownAttachedNodes() {
-  _attachedReactContainers.forEach((container) {
+  for (var container in _attachedReactContainers) {
     react_dom.unmountComponentAtNode(container);
     container.remove();
-  });
-
-  _attachedReactContainers.clear();
-}
-
-/// Returns a rendered component's ref, or null if it doesn't exist.
-///
-/// The return type is `ReactComponent` for composite components, and [Element] for DOM components.
-///
-/// Using `getRef()` can be tedious for nested / complex components. It is recommended to use [getByTestId] instead.
-dynamic getRef(ReactComponent instance, dynamic ref) {
-  if (instance == null) {
-    return null;
   }
-  return getProperty(instance.refs, ref);
 }
 
 typedef void _EventSimulatorAlias(componentOrNode, [Map eventData]);
@@ -303,11 +257,103 @@ bool _hasTestId(Map props, String key, String value) {
     return results.single;
   }
 }
+
 /// Returns the [Element] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Element getDomByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render((Test()..addTestId('value'))());
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     getComponentRootDomByTestId(renderedInstance, 'value'); // returns the `outer` `<div>`
+///
+/// Related: [queryByTestId].
+Element getComponentRootDomByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
   return findDomNode(getByTestId(root, value, key: key));
+}
+
+/// Returns the [Element] of the first descendant of [root] that has its [key] html attribute value set to a
+/// space-delimited string containing [value].
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render((Test()..addTestId('value'))());
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
+///
+/// Related: [queryAllByTestId], [getComponentRootDomByTestId].
+Element queryByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+  return findDomNode(root).querySelector('[$key~="$value"]');
+}
+
+/// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
+///
+/// __Example:__
+///
+///     // Render method for `Test` `UiFactory`:
+///     render() {
+///       return (Dom.div()..addTestId('outer'))(
+///         (Dom.div()
+///           ..addProps(copyUnconsumedProps())
+///           ..addTestId('inner')
+///         )()
+///       );
+///     }
+///
+///     // Within a test:
+///     var renderedInstance = render(Dom.div()(
+///       (Test()..addTestId('value'))(),
+///       (Test()..addTestId('value'))()
+///     ));
+///
+///     // Will result in the following DOM:
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///     <div data-test-id="outer">
+///       <div data-test-id="inner value">
+///       </div>
+///     </div>
+///
+///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
+List<Element> queryAllByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+  return findDomNode(root).querySelectorAll('[$key~="$value"]');
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
@@ -381,11 +427,4 @@ List findDescendantsWithProp(/* [1] */ root, dynamic propKey) {
   }));
 
   return descendantsWithProp;
-}
-
-/// Helper component that renders whatever you tell it to. Necessary for rendering components with the 'ref' prop.
-ReactComponentFactory RenderingContainerComponentFactory = react.registerComponent(() => new RenderingContainerComponent());
-class RenderingContainerComponent extends react.Component {
-  @override
-  render() => props['renderer']();
 }

@@ -1,12 +1,10 @@
-library custom_matchers_test;
-
 import 'dart:html';
 
+import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
-import 'package:web_skin_dart/test_util.dart';
-import 'package:web_skin_dart/ui_core.dart';
+import 'package:over_react_test/over_react_test.dart';
 
-import '../wsd_test_util/test_js_component.dart';
+import './utils/test_js_component.dart';
 
 /// Main entry point for CustomMatchers testing
 main() {
@@ -417,6 +415,28 @@ main() {
           );
         });
       });
+    });
+
+    test('throwsPropError', () {
+      expect(() => throw new PropError('propName', 'message'), throwsPropError('propName', 'message'));
+    });
+
+    test('throwsPropError_Required', () {
+      expect(() => throw new PropError.required('propName', 'message'),
+          throwsPropError_Required('propName', 'message')
+      );
+    });
+
+    test('throwsPropError_Value', () {
+      expect(() => throw new PropError.value('value', 'propName', 'message'),
+          throwsPropError_Value('value', 'propName', 'message')
+      );
+    });
+
+    test('throwsPropError_Combination', () {
+      expect(() => throw new PropError.combination('prop1Name', 'prop2Name', 'message'),
+          throwsPropError_Combination('prop1Name', 'prop2Name', 'message')
+      );
     });
   });
 }

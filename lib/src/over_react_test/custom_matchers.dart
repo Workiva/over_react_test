@@ -1,12 +1,10 @@
-library test_util.custom_matchers;
-
 import 'dart:html';
 
+import 'package:over_react/over_react.dart';
 import 'package:matcher/matcher.dart';
 import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
-import 'package:web_skin_dart/ui_core.dart';
 
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
@@ -30,7 +28,7 @@ class ClassNameMatcher extends Matcher {
   static Iterable getClassIterable(dynamic classNames) {
     Iterable classes;
     if (classNames is Iterable<String>) {
-      classes = (classNames as Iterable).where((className) => className != null).expand(splitSpaceDelimitedString);
+      classes = classNames.where((className) => className != null).expand(splitSpaceDelimitedString);
     } else if (classNames is String) {
       classes = splitSpaceDelimitedString(classNames);
     } else {
@@ -41,7 +39,7 @@ class ClassNameMatcher extends Matcher {
   }
 
   @override
-  bool matches(String className, Map matchState) {
+  bool matches(covariant String className, Map matchState) {
     Iterable actualClasses = getClassIterable(className);
     Set missingClasses = expectedClasses.difference(actualClasses.toSet());
     Set unwantedClasses = unexpectedClasses.intersection(actualClasses.toSet());
@@ -113,13 +111,13 @@ class ClassNameMatcher extends Matcher {
 class IsNode extends CustomMatcher {
   IsNode(matcher) : super("Element with nodeName that is", "nodeName", matcher);
   @override
-  featureValueOf(actual) => actual.nodeName;
+  featureValueOf(covariant Element actual) => actual.nodeName;
 }
 
 class _ElementClassNameMatcher extends CustomMatcher {
   _ElementClassNameMatcher(matcher) : super('Element that', 'className', matcher);
   @override
-  featureValueOf(Element actual) => actual.className;
+  featureValueOf(covariant Element actual) => actual.className;
 }
 class _ElementAttributeMatcher extends CustomMatcher {
   String _attributeName;
@@ -129,7 +127,7 @@ class _ElementAttributeMatcher extends CustomMatcher {
       super('Element with "$attributeName" attribute that equals', 'attributes', matcher);
 
   @override
-  featureValueOf(Element element) => element.getAttribute(_attributeName);
+  featureValueOf(covariant Element element) => element.getAttribute(_attributeName);
 }
 
 class _HasToStringValue extends CustomMatcher {
@@ -264,49 +262,6 @@ class _IsFocused extends Matcher {
 
 /// A matcher that matches the currently focused element (`document.activeElement`).
 const Matcher isFocused = const _IsFocused();
-
-/// A matcher to verify that a `RequiredPropError` is thrown with a provided [message]
-///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
-///  as a [DomException]
-///
-///  Deprecated: Use [throwsPropError_Required].
-@Deprecated('2.0.0')
-Matcher throwsRequiredPropError(String message) {
-  return throwsA(predicate(
-      (error) => error == 'V8 Exception' /* workaround for https://github.com/dart-lang/sdk/issues/26093 */ ||
-          error.toString().contains('RequiredPropError: $message'), 'Should have message $message'
-  ));
-}
-
-/// A matcher to verify that an `InvalidPropCombinationError` is thrown with a provided [prop1],
-/// [prop2], and [message].
-///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
-///  as a [DomException]
-///
-///  Deprecated: Use [throwsPropError_Combination].
-@Deprecated('2.0.0')
-Matcher throwsInvalidPropCombinationError(String prop1, String prop2, String message) {
-  return throwsA(predicate(
-      (error) => error == 'V8 Exception' /* workaround for https://github.com/dart-lang/sdk/issues/26093 */ ||
-          error.toString().contains(
-              'InvalidPropCombinationError: Prop $prop1 and prop $prop2 are set to incompatible values: $message'
-          )
-  ));
-}
-
-/// A matcher to verify that the `InvalidPropValueError` is thrown with a provided [message].
-///
-///  Deprecated: Use [throwsPropError_Value].
-@Deprecated('2.0.0')
-Matcher throwsInvalidPropError(dynamic value, String name, String message){
-  return throwsA(predicate(
-      (error) => error == 'V8 Exception' /* workaround for https://github.com/dart-lang/sdk/issues/26093 */ ||
-          error.toString().contains('InvalidPropValueError: Prop $name set to ${Error.safeToString(value)}: $message'),
-          'Should have message $message'
-  ));
-}
 
 /// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
 ///

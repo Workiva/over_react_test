@@ -1,10 +1,8 @@
-library test_util_dom_util_test;
-
 import 'dart:html';
 
+import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
-import 'package:web_skin_dart/test_util.dart';
-import 'package:web_skin_dart/ui_core.dart';
+import 'package:over_react_test/over_react_test.dart';
 
 /// Main entry point for DomUtil testing
 main() {
@@ -33,8 +31,6 @@ main() {
       triggerDocumentClick(findDomNode(renderedInstance));
 
       expect(flag, isTrue);
-
-      tearDownAttachedNodes();
     });
 
     test('and throws when the target is not attached to the document', () {
@@ -61,8 +57,6 @@ main() {
       await triggerFocus(findDomNode(renderedInstance));
 
       expect(flag, isTrue);
-
-      tearDownAttachedNodes();
     });
 
     test('and throws when the target is not attached to the document', () {
