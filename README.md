@@ -38,7 +38,9 @@
 
     > __Note:__ `8081` is the default port used, but your project may use something different. Be sure to take note of the output when running `pub serve` to ensure you are using the correct port.
 
-## Variable and Type Naming Conventions
+## Naming Conventions
+
+#### Variables and Types
 
 Usage | Actual Type | Suggested Referencing
 --- | --- | ---
@@ -60,6 +62,48 @@ test('my test' () {
   var sampleNode = findDomNode(renderedInstance);
 });
 ```
+
+#### Test IDs
+
+When coming up with test ID strings:
+- __DO NOT__ use spaces; space-delimited strings will be treated as test IDs
+    
+    Just like CSS class names, you can use multiple test IDs together, and use any one of them to target a given component/node.
+
+- __PREFER__ following our naming scheme for consistency across projects:
+    
+    `<library>.<Component>[.<subpart>...].<part>`
+    
+    We recommend including a library abbreviation and component name within a test ID so that it's easy to track down where that ID came from.
+    
+    Namespacing (`.<subpart>`) can be added however it makes sense.
+    
+    Finally, test IDs should be descriptive and useful in the context of tests.
+    
+    Examples:
+    
+    - `wsd.DatepickerPrimitive.goToSelectedButton`
+    - `sox.AbstractDataLayoutGroup.headerBlock.title`
+
+- __CONSIDER__ adding multiple IDs to serve different purposes
+
+  ```dart
+  for (var i = 0; i < items.length; i++) {
+    // ...
+      ..addTestId('foo.Bar.menuItem')
+      ..addTestId('foo.Bar.menuItem.$i')
+      ..addTestId('foo.Bar.menuItem.${items[i].id}')
+    // ...
+  }
+  ```
+  
+  With the output of above code, you can:
+  * target all of the `Bar` component's menu items using `foo.Bar.menuItem`
+  * target the 4th item using `foo.Bar.menuItem.3`
+  * target the item corresponding to an item with id `baz123` using `foo.Bar.menuItem.baz123`
+  
+  This won't always be needed, but it comes in handy in certain cases.
+
 
 ## Documentation
 
