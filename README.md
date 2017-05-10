@@ -66,7 +66,7 @@ test('my test' () {
 #### Test IDs
 
 When coming up with test ID strings:
-- __DO NOT__ use spaces; space-delimited strings will be treated as test IDs
+- __DO NOT__ use spaces; space-delimited strings will be treated as separate test IDs
     
     Just like CSS class names, you can use multiple test IDs together, and use any one of them to target a given component/node.
 
