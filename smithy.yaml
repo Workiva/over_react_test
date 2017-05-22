@@ -8,7 +8,6 @@ script:
   - pub get
   # Do not run tests on smithy, because they keep timing out.
   # - ./tool/smithy_dart2js_tests.sh
-  - DART_FLAGS=--checked  xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test
 
 artifacts:
   build:
