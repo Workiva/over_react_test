@@ -128,4 +128,4 @@ The `over_react_test` library adheres to [Semantic Versioning](http://semver.org
 
 
 [contributing-docs]: https://github.com/Workiva/over_react/blob/master/.github/CONTRIBUTING.md
-[over-react]: https://github.com/Workiva/over_react#overreact
+[over-react]: https://github.com/Workiva/over_react
