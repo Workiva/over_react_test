@@ -306,7 +306,7 @@ Matcher throwsPropError_Required(String propName, [String message = '']) {
 Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
-      hasToStringValue(contains('InvalidPropValueError: Prop $propName set to ${Error.safeToString(invalidValue)}. '
+      hasToStringValue(contains('InvalidPropValueError: Prop $propName set to $invalidValue. '
           '$message'.trim()
       ))
   ));
