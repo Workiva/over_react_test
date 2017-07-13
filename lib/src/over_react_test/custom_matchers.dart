@@ -277,6 +277,17 @@ class _IsFocused extends Matcher {
 /// A matcher that matches the currently focused element (`document.activeElement`).
 const Matcher isFocused = const _IsFocused();
 
+/// A matcher to verify that an [AssertionError] is thrown.
+///
+/// Necessary since the following does not work consistently on all platforms:
+///
+///     throwsA(const isInstanceOf<AssertionError>());
+final Matcher throwsAssertionError = throwsA(anyOf(
+  hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
+  hasToStringValue(contains('AssertionError')),
+  hasToStringValue(contains('Failed assertion')),
+));
+
 /// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
