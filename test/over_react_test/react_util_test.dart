@@ -15,11 +15,9 @@
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';
-import 'package:react/react.dart' as react;
-import 'package:react/react_dom.dart' as react_dom;
-import 'package:react/react_client.dart';
-import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
+import 'package:react/react_dom.dart' as react_dom;
+import 'package:test/test.dart';
 
 import './utils/nested_component.dart';
 import './utils/test_js_component.dart';
@@ -91,7 +89,7 @@ main() {
 
       test('simulates a click on a component with additional event data', () {
         var flag = false;
-        react.SyntheticMouseEvent event;
+        SyntheticMouseEvent event;
         var renderedInstance = render((Dom.div()
           ..onClick = (evt) {
             flag = true;
@@ -843,7 +841,9 @@ main() {
         test('by its mount node', () {
           var mountNode = new DivElement();
           var ref;
-          react_dom.render(react.div({'ref': ((instance) => ref = instance)}), mountNode);
+          react_dom.render((Dom.div()
+            ..ref = ((instance) => ref = instance)
+          )(), mountNode);
           expect(ref, isNotNull);
 
           unmount(mountNode);
@@ -861,7 +861,9 @@ main() {
         test('a non-mounted React instance', () {
           var mountNode = new DivElement();
           var ref;
-          var instance = react_dom.render(react.div({'ref': ((instance) => ref = instance)}), mountNode);
+          var instance = react_dom.render((Dom.div()
+            ..ref = ((instance) => ref = instance)
+          )(), mountNode);
           react_dom.unmountComponentAtNode(mountNode);
 
           expect(ref, isNull);
