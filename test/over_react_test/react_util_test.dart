@@ -21,8 +21,8 @@ import 'package:react/react_client.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
-import './utils/test_js_component.dart';
 import './utils/nested_component.dart';
+import './utils/test_js_component.dart';
 
 /// Main entry point for ReactUtil testing
 main() {
