@@ -18,7 +18,7 @@ import 'package:react/react_client.dart';
 import 'package:react/react_client/react_interop.dart' show React, ReactClassConfig;
 import 'package:react/react_client/js_interop_helpers.dart';
 
-/// A factory for testing a JS composite component.
+/// A factory for a JS composite component, for use in testing.
 final Function testJsComponentFactory = (() {
   var componentClass = React.createClass(new ReactClassConfig(
     displayName: 'testJsComponent',
