@@ -107,9 +107,9 @@ When coming up with test ID strings:
 
 ## Documentation
 
-You would never skip reading the docs for a new language you are asked to learn, so _please_ don't skip over reading these, either.
+You would never skip reading the docs for a new language you are asked to learn, 
+so _please_ don't skip over reading [our API documentation][api-docs] either.
 
-+ In-depth Dart doc comments for components props and utilities are available, for use when browsing and autocompleting code in an IDE.
 
 ## Contributing
 
@@ -127,5 +127,6 @@ The `over_react_test` library adheres to [Semantic Versioning](http://semver.org
 
 
 
+[api-docs]: https://www.dartdocs.org/documentation/over_react_test/1.0.0/over_react_test/over_react_test-library.html
 [contributing-docs]: https://github.com/Workiva/over_react/blob/master/.github/CONTRIBUTING.md
 [over-react]: https://github.com/Workiva/over_react
