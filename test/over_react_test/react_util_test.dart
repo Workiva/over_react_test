@@ -20,7 +20,6 @@ import 'package:react/react_dom.dart' as react_dom;
 import 'package:test/test.dart';
 
 import './utils/nested_component.dart';
-import './utils/test_js_component.dart';
 
 /// Main entry point for ReactUtil testing
 main() {

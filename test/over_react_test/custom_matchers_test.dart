@@ -18,8 +18,6 @@ import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
-import './utils/test_js_component.dart';
-
 /// Main entry point for CustomMatchers testing
 main() {
   group('CustomMatcher', () {
