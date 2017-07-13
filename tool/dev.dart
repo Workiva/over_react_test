@@ -29,8 +29,6 @@ main(List<String> args) async {
     ..platforms = [
       'content-shell',
     ]
-    // Prevent test load timeouts.
-    ..concurrency = 1
     ..unitTests = [
       'test/over_react_test.dart',
     ];
