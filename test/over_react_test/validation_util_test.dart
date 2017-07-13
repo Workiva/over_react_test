@@ -12,44 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:html';
-
-import 'package:react/react_dom.dart' as react_dom;
+import 'package:over_react/over_react.dart';
 import 'package:over_react_test/over_react_test.dart';
 import 'package:test/test.dart';
-
-import './utils/test_validation_util_component.dart';
 
 /// Main entry point for `validation_util.dart` testing.
 main() {
   group('ValidationUtil:', () {
-    DivElement mountNode;
-
     setUp(() {
       startRecordingValidationWarnings();
-
-      mountNode = new DivElement();
-      document.body.append(mountNode);
     });
 
     tearDown(() {
       stopRecordingValidationWarnings();
-
-      tearDownAttachedNodes();
-      unmount(mountNode);
-      mountNode.remove();
-
-      mountNode = null;
     });
 
     group('startRecordingValidationWarnings()', () {
       test('begins recording validation warnings, appending them to `_validationWarnings` as expected', () {
-        react_dom.render(TestValidationWarnings()(), mountNode);
+        assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
         expect(getValidationWarnings().single, 'message1');
 
-        react_dom.render((TestValidationWarnings()..emitSecondWarning = true)(), mountNode);
+        assert(ValidationUtil.warn('message2'));
 
         expect(getValidationWarnings(), hasLength(2));
         expect(getValidationWarnings(), equals(['message1', 'message2']));
@@ -58,14 +43,14 @@ main() {
 
     group('stopRecordingValidationWarnings()', () {
       test('halts the recording of validation warnings and clears the list of warnings as expected', () {
-        react_dom.render(TestValidationWarnings()(), mountNode);
+        assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
         expect(getValidationWarnings().single, 'message1');
 
         stopRecordingValidationWarnings();
 
-        react_dom.render((TestValidationWarnings()..emitSecondWarning = true)(), mountNode);
+        assert(ValidationUtil.warn('message2'));
 
         expect(getValidationWarnings(), isNull);
       });
@@ -73,13 +58,14 @@ main() {
 
     group('verifyValidationWarning() works as expected', () {
       test('when a single warning has been emitted', () {
-        react_dom.render(TestValidationWarnings()(), mountNode);
+        assert(ValidationUtil.warn('message1'));
 
         verifyValidationWarning('message1');
       });
 
       test('when multiple warnings have been emitted', () {
-        react_dom.render((TestValidationWarnings()..emitSecondWarning = true)(), mountNode);
+        assert(ValidationUtil.warn('message1'));
+        assert(ValidationUtil.warn('message2'));
 
         verifyValidationWarning('message1');
         verifyValidationWarning(contains('message2'));
@@ -88,13 +74,14 @@ main() {
 
     group('rejectValidationWarning() works as expected', () {
       test('when a single warning has been emitted', () {
-        react_dom.render(TestValidationWarnings()(), mountNode);
+        assert(ValidationUtil.warn('message1'));
 
         rejectValidationWarning('nope');
       });
 
       test('when multiple warnings have been emitted', () {
-        react_dom.render((TestValidationWarnings()..emitSecondWarning = true)(), mountNode);
+        assert(ValidationUtil.warn('message1'));
+        assert(ValidationUtil.warn('message2'));
 
         rejectValidationWarning(contains('non-existent warning message'));
       });
@@ -102,7 +89,7 @@ main() {
 
     group('clearValidationWarnings()', () {
       test('clears the list of warnings as expected', () {
-        react_dom.render(TestValidationWarnings()(), mountNode);
+        assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
         expect(getValidationWarnings().single, 'message1');
@@ -111,7 +98,7 @@ main() {
 
         expect(getValidationWarnings(), isEmpty);
 
-        react_dom.render((TestValidationWarnings()..emitSecondWarning = true)(), mountNode);
+        assert(ValidationUtil.warn('message2'));
 
         expect(getValidationWarnings(), hasLength(1));
         expect(getValidationWarnings().single, 'message2');
