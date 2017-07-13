@@ -387,7 +387,9 @@ main() {
         });
 
         tearDown(() {
-          allAttachedNodes.forEach((node) => node.remove());
+          for (var node in allAttachedNodes) {
+            node.remove();
+          }
           allAttachedNodes.clear();
         });
 
