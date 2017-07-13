@@ -285,6 +285,7 @@ const Matcher isFocused = const _IsFocused();
 final Matcher throwsAssertionError = throwsA(anyOf(
   hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
   hasToStringValue(contains('AssertionError')),
+  hasToStringValue(contains('Failed assertion')),
 ));
 
 /// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.

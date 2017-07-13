@@ -433,6 +433,10 @@ main() {
       });
     });
 
+    test('throwsAssertionError', () {
+      expect(() {assert(true == false);}, throwsAssertionError);
+    });
+
     test('throwsPropError', () {
       expect(() => throw new PropError('propName', 'message'), throwsPropError('propName', 'message'));
     });
