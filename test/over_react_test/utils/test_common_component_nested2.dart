@@ -12,33 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:dart_dev/dart_dev.dart' show dev, config;
+import 'package:over_react/over_react.dart';
 
-main(List<String> args) async {
-  const directories = const <String>[
-    'lib/',
-    'test/',
-    'tool/',
-  ];
+@Factory()
+UiFactory<TestCommonNested2Props> TestCommonNested2;
 
-  config.analyze.entryPoints = directories;
-  config.copyLicense.directories = directories;
+@Props()
+class TestCommonNested2Props extends UiProps {}
 
-  config.test
-    ..pubServe = true
-    ..platforms = [
-      'content-shell',
-    ]
-    ..unitTests = [
-      'test/over_react_test.dart',
-    ];
-
-  config.coverage
-    ..html = false
-    ..pubServe = true
-    ..reportOn = [
-      'lib/'
-    ];
-
-  await dev(args);
+@Component()
+class TestCommonNested2Component extends UiComponent<TestCommonNested2Props> {
+  @override
+  render() {
+    return (Dom.div()
+      ..addProps(copyUnconsumedDomProps())
+    )(props.children);
+  }
 }

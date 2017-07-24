@@ -18,7 +18,7 @@ import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
-/// Main entry point for DomUtil testing
+/// Main entry point for TestJacket testing
 main() {
   group('mount: renders the given instance', () {
     group('attached to the document', () {

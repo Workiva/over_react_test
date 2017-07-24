@@ -12,33 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:dart_dev/dart_dev.dart' show dev, config;
+import 'package:over_react/over_react.dart';
+import 'package:test/test.dart';
+import 'package:over_react_test/over_react_test.dart';
 
-main(List<String> args) async {
-  const directories = const <String>[
-    'lib/',
-    'test/',
-    'tool/',
-  ];
+import './utils/test_common_component.dart';
 
-  config.analyze.entryPoints = directories;
-  config.copyLicense.directories = directories;
-
-  config.test
-    ..pubServe = true
-    ..platforms = [
-      'content-shell',
-    ]
-    ..unitTests = [
-      'test/over_react_test.dart',
-    ];
-
-  config.coverage
-    ..html = false
-    ..pubServe = true
-    ..reportOn = [
-      'lib/'
-    ];
-
-  await dev(args);
+/// Main entry point for [commonComponentTests] testing
+main() {
+  group('commonComponentTests', () {
+    // TODO: Improve / expand upon these tests.
+    group('should pass when the correct unconsumed props are specified', () {
+      commonComponentTests(TestCommon, unconsumedPropKeys: [
+        const $PropKeys(PropsThatShouldBeForwarded),
+      ]);
+    });
+  });
 }
