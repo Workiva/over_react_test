@@ -21,7 +21,11 @@ import 'dart:html';
 ])
 import 'dart:mirrors';
 
-import 'package:over_react/over_react.dart';
+import 'package:over_react/over_react.dart'
+    show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin,
+         PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent;
+import 'package:over_react/component_base.dart' as component_base;
+import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
@@ -83,6 +87,16 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestRequiredProps: true,
   dynamic childrenFactory()
 }) {
+  // Do not run common component tests in dart2js due to https://github.com/dart-lang/sdk/issues/28864.
+  // TODO: Remove when we bump to Dart 1.23.0
+  var isJs = true;
+  assert(() {
+    isJs = false;
+
+    return true;
+  });
+  if (isJs) return;
+
   childrenFactory ??= _defaultChildrenFactory;
 
   Iterable flatten(Iterable iterable) =>
@@ -297,6 +311,8 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
             excludesClasses('blacklisted-class-1 blacklisted-class-2')
         )
     ));
+
+    unmount(renderedInstance);
   });
 
   test('adds custom classes to one and only one element', () {
@@ -308,6 +324,8 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
     var descendantsWithCustomClass = react_test_utils.scryRenderedDOMComponentsWithClass(renderedInstance, customClass);
 
     expect(descendantsWithCustomClass, hasLength(1));
+
+    unmount(renderedInstance);
   });
 }
 
@@ -366,13 +384,13 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 ///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  var renderedInstance = render(factory()(childrenFactory()), autoTearDown: false);
-  var consumedProps = (getDartComponent(renderedInstance) as UiComponent).consumedProps; // ignore: avoid_as
-  unmount(renderedInstance);
-
+  var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
+  var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
   var requiredProps = [];
   var nullableProps = [];
   var keyToErrorMessage = {};
+
+  jacket.unmount();
 
   consumedProps.forEach((ConsumedProps consumedProps) {
     consumedProps.props.forEach((PropDescriptor prop) {
@@ -458,11 +476,11 @@ Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
       return;
     }
 
-    Type owner = (decl.owner as ClassMirror).reflectedType; // ignore: avoid_as
+    Type owner = (decl.owner as ClassMirror).reflectedType;
     if (owner != Object &&
-        owner != UiProps &&
-        owner != PropsMapViewMixin &&
-        owner != MapViewMixin &&
+        owner != component_base.UiProps &&
+        owner != component_base.PropsMapViewMixin &&
+        owner != component_base.MapViewMixin &&
         owner != MapView &&
         owner != ReactPropsMixin &&
         owner != DomPropsMixin &&
@@ -480,7 +498,7 @@ Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
   return definition.keys.toSet();
 }
 
-/// Return the components to which [UiComponent.props] have been forwarded.
+/// Return the components to which `props` have been forwarded.
 ///
 /// > Identified using the [forwardedPropBeacon] prop key.
 List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRendered: false}) {
@@ -503,6 +521,12 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRen
         flattenChildren(List _children) {
           _children.forEach((_child) {
             if (_child != null && isValidElement(_child)) {
+              getProps(_child).forEach((propKey, propValue) {
+                // Some props may be of type Function, and will produce interop errors if passed into isValidElement
+                if (propKey != 'children' && propValue is! Function && isValidElement(propValue)) {
+                  getTargets(propValue);
+                }
+              });
               getTargets(_child);
             }  else if (_child is List) {
               flattenChildren(_child);
@@ -524,7 +548,7 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRen
   }
 
   if (forwardingTargets.length != expectedTargetCount) {
-    throw new ArgumentError('Unexpected number of forwarding targets: ${forwardingTargets.length}.');
+    throw new StateError('Unexpected number of forwarding targets: ${forwardingTargets.length}.');
   }
   return forwardingTargets;
 }
