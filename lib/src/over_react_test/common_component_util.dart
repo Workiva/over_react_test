@@ -169,6 +169,8 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       'other-null': null
     };
 
+    const String testId = 'testIdThatShouldBeForwarded';
+
     const String key = 'testKeyThatShouldNotBeForwarded';
     const String ref = 'testRefThatShouldNotBeForwarded';
 
@@ -196,6 +198,7 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       ..addProps(propsThatShouldNotGetForwarded)
       ..addProps(extraProps)
       ..addProps(otherProps)
+      ..addTestId(testId)
       ..key = key
       ..ref = ref
     )(childrenFactory());
@@ -223,6 +226,10 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       extraProps.forEach((key, value) {
         expect(actualProps, containsPair(key, value));
       });
+
+      // Check that the added testId is part of the final testId string.
+      expect(actualProps[defaultTestIdKey], contains(testId),
+          reason: '$defaultTestIdKey was not forwarded or was forwarded and then overridden.');
 
       var ambiguousProps = {};
 
