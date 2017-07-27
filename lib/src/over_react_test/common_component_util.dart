@@ -21,9 +21,7 @@ import 'dart:html';
 ])
 import 'dart:mirrors';
 
-import 'package:over_react/over_react.dart'
-    show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
-         PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent, requiredProp;
+import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client.dart';
