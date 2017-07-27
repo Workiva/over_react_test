@@ -22,8 +22,8 @@ import 'dart:html';
 import 'dart:mirrors';
 
 import 'package:over_react/over_react.dart'
-    show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin,
-         PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent;
+    show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
+         PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent, requiredProp;
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client.dart';
@@ -454,7 +454,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
 //
 // ********************************************************
 
-/// Returns all the keys found within [UiComponent.props] on a component definition, using reflection.
+/// Returns all the keys found within `props` on a component definition, using reflection.
 Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
   var definition = factory();
   InstanceMirror definitionMirror = reflect(definition);
