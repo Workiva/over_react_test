@@ -87,16 +87,6 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestRequiredProps: true,
   dynamic childrenFactory()
 }) {
-  // Do not run common component tests in dart2js due to https://github.com/dart-lang/sdk/issues/28864.
-  // TODO: Remove when we bump to Dart 1.23.0
-  var isJs = true;
-  assert(() {
-    isJs = false;
-
-    return true;
-  });
-  if (isJs) return;
-
   childrenFactory ??= _defaultChildrenFactory;
 
   Iterable flatten(Iterable iterable) =>
