@@ -389,6 +389,18 @@ main() {
       group('(shallow-rendered component)', () {
         sharedTests(shallow: true);
       });
+
+      test('returns correctly when passed a react.Component', () {
+        var component = renderAndGetComponent(Wrapper()(
+          (Test()
+            ..addTestId('value')
+            ..addProp('data-name', 'target')
+          )()
+        ));
+
+        var descendant = getByTestId(component, 'value');
+        expect(descendant, hasProp('data-name', 'target'));
+      });
     });
 
     group('queryByTestId returns the topmost Element that has the appropriate value for the', () {
