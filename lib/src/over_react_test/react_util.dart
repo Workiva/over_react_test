@@ -240,7 +240,9 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-/* [1] */ getByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+/* [1] */ getByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+  if (root is react.Component) root = root.jsThis;
+
   if (isValidElement(root)) {
     return _getByTestIdShallow(root, value, key: key);
   }
@@ -300,7 +302,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///     getComponentRootDomByTestId(renderedInstance, 'value'); // returns the `outer` `<div>`
 ///
 /// Related: [queryByTestId].
-Element getComponentRootDomByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+Element getComponentRootDomByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   return findDomNode(getByTestId(root, value, key: key));
 }
 
@@ -331,7 +333,7 @@ Element getComponentRootDomByTestId(/* [1] */ root, String value, {String key: d
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+Element queryByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   return findDomNode(root).querySelector('[$key~="$value"]');
 }
 
@@ -366,14 +368,14 @@ Element queryByTestId(/* [1] */ root, String value, {String key: defaultTestIdKe
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+List<Element> queryAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   return findDomNode(root).querySelectorAll('[$key~="$value"]');
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-react.Component getComponentByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+react.Component getComponentByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getDartComponent(instance);
@@ -385,7 +387,7 @@ react.Component getComponentByTestId(/* [1] */ root, String value, {String key: 
 /// Returns the props of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Map getPropsByTestId(/* [1] */ root, String value, {String key: defaultTestIdKey}) {
+Map getPropsByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getProps(instance);
