@@ -55,7 +55,7 @@ import './react_util.dart';
 /// > Optionally, set [ignoreDomProps] to false if you want to test the forwarding of keys found within [DomProps].
 ///
 /// > __[shouldTestRequiredProps]__ - whether [testRequiredProps] will be called. __Note__: All required props must be
-/// provided by [factory] in order.
+/// provided by [factory].
 ///
 /// > __[shouldTestClassNameMerging]__ - whether [testClassNameMerging] will be called.
 ///
@@ -384,7 +384,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 ///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
-/// __Note__: All required props must be provided by [factory] in order.
+/// __Note__: All required props must be provided by [factory].
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   var keyToErrorMessage = {};
   var nullableProps = [];
