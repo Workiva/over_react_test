@@ -17,6 +17,7 @@ import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
 import './utils/test_common_component.dart';
+import './utils/test_common_component_required_props.dart';
 
 /// Main entry point for [commonComponentTests] testing
 main() {
@@ -26,6 +27,14 @@ main() {
       commonComponentTests(TestCommon, unconsumedPropKeys: [
         const $PropKeys(PropsThatShouldBeForwarded),
       ]);
+    });
+
+    group('should pass when the correct required props are specified', () {
+      commonComponentTests(() => TestCommonRequired()..bar = true,
+          shouldTestRequiredProps: true,
+          shouldTestClassNameMerging: false,
+          shouldTestClassNameOverrides: false,
+          shouldTestPropForwarding: false);
     });
   });
 }
