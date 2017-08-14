@@ -54,7 +54,8 @@ import './react_util.dart';
 /// >
 /// > Optionally, set [ignoreDomProps] to false if you want to test the forwarding of keys found within [DomProps].
 ///
-/// > __[shouldTestRequiredProps]__ - whether [testRequiredProps] will be called.
+/// > __[shouldTestRequiredProps]__ - whether [testRequiredProps] will be called. __Note__: All required props must be
+/// provided by [factory].
 ///
 /// > __[shouldTestClassNameMerging]__ - whether [testClassNameMerging] will be called.
 ///
@@ -333,31 +334,33 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
 ///
 /// > Related: [testClassNameMerging]
 void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  /// Render a component without any overrides to get the classes added by the component.
-  var reactInstanceWithoutOverrides = render(
-      (factory()
-        ..addProp(forwardedPropBeacon, true)
-      )(childrenFactory()),
-      autoTearDown: false
-  );
-
   Set<String> classesToOverride;
   var error;
 
-  // Catch and rethrow getForwardingTargets-related errors so we can use classesToOverride in the test description,
-  // but still fail the test if something goes wrong.
-  try {
-    classesToOverride = getForwardingTargets(reactInstanceWithoutOverrides)
-        .map((target) => findDomNode(target).classes)
-        .expand((CssClassSet classSet) => classSet)
-        .toSet();
-  } catch(e) {
-    error = e;
-  }
+  setUp(() {
+    /// Render a component without any overrides to get the classes added by the component.
+    var reactInstanceWithoutOverrides = render(
+        (factory()
+          ..addProp(forwardedPropBeacon, true)
+        )(childrenFactory()),
+        autoTearDown: false
+    );
 
-  unmount(reactInstanceWithoutOverrides);
+    // Catch and rethrow getForwardingTargets-related errors so we can use classesToOverride in the test description,
+    // but still fail the test if something goes wrong.
+    try {
+      classesToOverride = getForwardingTargets(reactInstanceWithoutOverrides)
+          .map((target) => findDomNode(target).classes)
+          .expand((CssClassSet classSet) => classSet)
+          .toSet();
+    } catch(e) {
+      error = e;
+    }
 
-  test('can override added class names: $classesToOverride', () {
+    unmount(reactInstanceWithoutOverrides);
+  });
+
+  test('can override added class names', () {
     if (error != null) {
       throw error;
     }
@@ -373,74 +376,72 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
     Iterable<Element> forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
     expect(forwardingTargetNodes, everyElement(
         hasExactClasses('')
-    ));
+    ), reason: '$classesToOverride not overridden');
   });
 }
 
 /// Common test for verifying that props annotated as a [requiredProp] are validated correctly.
 ///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
+///
+/// __Note__: All required props must be provided by [factory].
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
-  var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
-  var requiredProps = [];
-  var nullableProps = [];
   var keyToErrorMessage = {};
+  var nullableProps = [];
+  var requiredProps = [];
 
-  jacket.unmount();
+  setUp(() {
+    var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
+    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
+    jacket.unmount();
 
-  consumedProps.forEach((ConsumedProps consumedProps) {
-    consumedProps.props.forEach((PropDescriptor prop) {
-      if (prop.isRequired) {
-        requiredProps.add(prop.key);
-      } else if (prop.isNullable) {
-        nullableProps.add(prop.key);
-      }
+    consumedProps.forEach((ConsumedProps consumedProps) {
+      consumedProps.props.forEach((PropDescriptor prop) {
+        if (prop.isRequired) {
+          requiredProps.add(prop.key);
+        } else if (prop.isNullable) {
+          nullableProps.add(prop.key);
+        }
 
-      keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
+        keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
+      });
     });
   });
 
-  group('throws when the required prop', () {
+  test('throws when the required prop is not set or is null', () {
     requiredProps.forEach((String propKey) {
       final reactComponentFactory = factory().componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
 
       // Props that are defined in the default props map will never not be set.
       if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
-        test('$propKey is not set', () {
-          var badRenderer = () => render((factory()
-            ..remove(propKey)
-          )(childrenFactory()));
-
-          expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]));
-        });
-      }
-
-      test('$propKey is set to null', () {
-        var propsToAdd = {propKey: null};
         var badRenderer = () => render((factory()
-          ..addAll(propsToAdd)
+          ..remove(propKey)
         )(childrenFactory()));
 
-        expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]));
-      });
-    });
-  });
+        expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: '$propKey is not set');
+      }
 
-  nullableProps.forEach((String propKey) {
-    test('throws when the the required, nullable prop $propKey is not set', () {
-      var badRenderer = () => render((factory()..remove(propKey)(childrenFactory())));
-
-      expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]));
-    });
-
-    test('does not throw when the required, nullable prop $propKey is set to null', () {
       var propsToAdd = {propKey: null};
       var badRenderer = () => render((factory()
         ..addAll(propsToAdd)
       )(childrenFactory()));
 
-      expect(badRenderer, returnsNormally);
+      expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: '$propKey is set to null');
+    });
+  });
+
+  test('nullable props', () {
+    nullableProps.forEach((String propKey) {
+      var badRenderer = () => render((factory()..remove(propKey)(childrenFactory())));
+
+      expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: 'should throw when the required, nullable prop $propKey is not set');
+
+      var propsToAdd = {propKey: null};
+      badRenderer = () => render((factory()
+        ..addAll(propsToAdd)
+      )(childrenFactory()));
+
+      expect(badRenderer, returnsNormally, reason: 'does not throw when the required, nullable prop $propKey is set to null');
     });
   });
 }
