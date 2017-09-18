@@ -40,8 +40,14 @@ Future triggerTransitionEnd(Element element) {
     jsEvent = new JsObject.fromBrowserObject(jsDocument.callMethod('createEvent', ['Event']));
   }
 
-  // Need to use webkitTransitionEnd in Edge. See https://github.com/dart-lang/sdk/issues/26972
-  var eventName = (browser.isInternetExplorer && browser.version.major > 11) ? 'webkitTransitionEnd' : 'transitionend';
+  var eventName;
+  if ((browser.isChrome && browser.version.major >= 61) ||
+      (browser.isInternetExplorer && browser.version.major > 11)) {
+    // Need to use webkitTransitionEnd in Edge and Chrome>=61. See https://github.com/dart-lang/sdk/issues/26972
+    eventName  = 'webkitTransitionEnd';
+  } else {
+    eventName = 'transitionend';
+  }
 
   jsEvent.callMethod('initEvent', [eventName, true, true]);
 
