@@ -18,11 +18,13 @@ import 'dart:js';
 
 import 'package:platform_detect/platform_detect.dart';
 
+const Duration _defaultTriggerTimeout = const Duration(seconds: 3);
+
 /// Dispatches a `transitionend` event when the CSS transition of the [element]
 /// is complete. Returns a [Future] that completes after the event has been dispatched.
 ///
 /// Used for testing components that rely on a `transitionend` event.
-Future triggerTransitionEnd(Element element) {
+Future triggerTransitionEnd(Element element, {Duration timeout: _defaultTriggerTimeout}) {
   Future eventFiredFuture = element.onTransitionEnd.first;
 
   // Use JS interop to construct a native TransitionEvent since Dart doesn't allow instantiating them directly.
@@ -40,14 +42,21 @@ Future triggerTransitionEnd(Element element) {
     jsEvent = new JsObject.fromBrowserObject(jsDocument.callMethod('createEvent', ['Event']));
   }
 
-  // Need to use webkitTransitionEnd in Edge. See https://github.com/dart-lang/sdk/issues/26972
-  var eventName = (browser.isInternetExplorer && browser.version.major > 11) ? 'webkitTransitionEnd' : 'transitionend';
+  var eventName;
+  if ((browser.isChrome && browser.version.major >= 61) ||
+      (browser.isInternetExplorer && browser.version.major > 11)) {
+    // Need to use webkitTransitionEnd in Edge and Chrome>=61. See https://github.com/dart-lang/sdk/issues/26972
+    eventName  = 'webkitTransitionEnd';
+  } else {
+    eventName = 'transitionend';
+  }
 
   jsEvent.callMethod('initEvent', [eventName, true, true]);
 
   jsElement.callMethod('dispatchEvent', [jsEvent]);
 
-  return eventFiredFuture;
+  return eventFiredFuture.timeout(timeout,
+      onTimeout: () => new Future.error('Failed to trigger transitionend'));
 }
 
 /// Dispatches a `click` event to the specified [target].
@@ -65,10 +74,10 @@ void triggerDocumentClick(Element target) {
 ///
 /// Verifies that the [target] element is not a detached node.
 ///
-/// This is neccessary because IE 11 `focus` events are async.
+/// This is necessary because IE 11 `focus` events are async.
 ///
 /// See: <https://connect.microsoft.com/IE/feedback/details/2238257/ie11-focus-change-delayed-when-using-the-focus-method>.
-Future triggerFocus(Element target) {
+Future triggerFocus(Element target, {Duration timeout: _defaultTriggerTimeout}) {
   if (!document.documentElement.contains(target)) {
     throw new ArgumentError.value(target, 'target', 'Target should be attached to the document.');
   }
@@ -78,5 +87,6 @@ Future triggerFocus(Element target) {
 
   target.focus();
 
-  return completer.future;
+  return completer.future.timeout(timeout,
+      onTimeout: () => new Future.error('Failed to focus; try ensuring that your browser window is at the foreground'));
 }

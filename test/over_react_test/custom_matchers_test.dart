@@ -269,7 +269,7 @@ main() {
       });
 
       group('fails when the props are different in a', () {
-        final failMessagePattern = new RegExp(r"Which: has props/attributes map with value .* which is different. Expected: test +Actual: different");
+        final failMessagePattern = new RegExp(r"Which: has props/attributes map with value .* is different. Expected: test +Actual: different");
 
         group('ReactElement', () {
           test('(DOM)', () {
