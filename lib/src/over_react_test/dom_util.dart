@@ -16,8 +16,6 @@ import 'dart:async';
 import 'dart:html';
 import 'dart:js';
 
-import 'package:platform_detect/platform_detect.dart';
-
 const Duration _defaultTriggerTimeout = const Duration(seconds: 3);
 
 /// Dispatches a `transitionend` event when the CSS transition of the [element]
@@ -42,14 +40,7 @@ Future triggerTransitionEnd(Element element, {Duration timeout: _defaultTriggerT
     jsEvent = new JsObject.fromBrowserObject(jsDocument.callMethod('createEvent', ['Event']));
   }
 
-  var eventName;
-  if ((browser.isChrome && browser.version.major >= 61) ||
-      (browser.isInternetExplorer && browser.version.major > 11)) {
-    // Need to use webkitTransitionEnd in Edge and Chrome>=61. See https://github.com/dart-lang/sdk/issues/26972
-    eventName  = 'webkitTransitionEnd';
-  } else {
-    eventName = 'transitionend';
-  }
+  var eventName = Element.transitionEndEvent.getEventType(element);
 
   jsEvent.callMethod('initEvent', [eventName, true, true]);
 
