@@ -58,8 +58,8 @@ test('my test' () {
   var sampleBuilder = Sample();
   var sampleReactElement = sampleBuilder(); // Or var sample = sampleBuilder();
   var instance = render(sampleInstance);
-  SampleComponent sampleDartInstance = getDartComponent(renderedInstance);
-  var sampleNode = findDomNode(renderedInstance);
+  SampleComponent sampleDartInstance = getDartComponent(instance);
+  var sampleNode = findDomNode(instance);
 });
 ```
 
