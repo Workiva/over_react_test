@@ -1,7 +1,7 @@
 language: dart
 dist: precise
 dart:
-  - "1.23.0"
+  - "1.24.2"
 with_content_shell: true
 before_install:
   - export DISPLAY=:99.0
@@ -11,6 +11,7 @@ before_install:
   - sleep 3 # give xvfb some time to start
 script:
   - pub run dart_dev analyze
+  - pub run dependency_validator -i coverage
   - pub run dart_dev test
   - ./tool/generate_coverage.sh
   - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov
