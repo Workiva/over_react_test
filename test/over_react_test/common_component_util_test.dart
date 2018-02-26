@@ -35,6 +35,6 @@ main() {
           shouldTestClassNameMerging: false,
           shouldTestClassNameOverrides: false,
           shouldTestPropForwarding: false);
-    });
+    }, testOn: '!js');
   });
 }
