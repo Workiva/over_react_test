@@ -1,10 +1,45 @@
 # OverReact Test Changelog
 
+## 1.3.1
+
+__Bugs Fixed__
+
+* [#25]: Make `triggerTransitionEnd` work in content-shell _(regression introduced via [#23])_.
+
+## 1.3.0
+
+__Misc__
+
+* [#23]: Make `triggerTransitionEnd` work in Chrome 61.
+
+## 1.2.2
+
+__Misc__
+
+* [#20]: Add docs.yaml.
+* [#21]: Widen `react` dependency range to pull in memory leak fixes.
+
+## 1.2.1
+
+__Bugs Fixed__
+
+* [#18]: Do not do anything outside of test blocks in `commonComponentTests`.
+
+## 1.2.0
+
+__New Features__
+
+* [#16]: Support passing in components in `getByTestId`.
+
+__Misc__
+
+* [#15]: Test that `testId` is forwarded in `commonComponentTests`.
+
 ## 1.1.1
 
 __Bugs Fixed__
 
-* Sync common component test src with the lib it originated from.
+* [#14]: Sync common component test src with the lib it originated from.
 
 ## 1.1.0
 
@@ -16,11 +51,17 @@ __New Features__
 
 __Misc__
 
-* [#8]: Update prop error message to make it more DDC friendly
+* [#8]: Update prop error message to make it more DDC friendly.
 
 ## 1.0.0
 
-Initial public release of library.
+Initial public release of the library.
+
+* [#1]: Split out test_utils into its own package.
+* [#2]: Set up travis and codecov for OSS.
+* [#3]: Add test ID naming conventions.
+* [#4]: Add initial aviary.yaml file.
+* [#5]: Update dart doc badge.
 
 
 
