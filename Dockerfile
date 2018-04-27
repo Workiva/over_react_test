@@ -16,6 +16,7 @@ ADD . /build/
 RUN echo "Starting the script sections" && \
 		dart --version && \
 		pub get && \
+        pub run dependency_validator -i coverage && \
 		echo "Script sections completed"
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
 FROM scratch
