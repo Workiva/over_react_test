@@ -13,9 +13,22 @@ ARG GIT_MERGE_HEAD
 ARG GIT_MERGE_BRANCH
 WORKDIR /build/
 ADD . /build/
+# Expose env vars for git ssh access
+ARG GIT_SSH_KEY
+ARG KNOWN_HOSTS_CONTENT
+# Install SSH keys for git ssh access
+RUN mkdir /root/.ssh
+RUN echo "$KNOWN_HOSTS_CONTENT" > "/root/.ssh/known_hosts"
+RUN echo "$GIT_SSH_KEY" > "/root/.ssh/id_rsa"
+RUN chmod 700 /root/.ssh/
+RUN chmod 600 /root/.ssh/id_rsa
+RUN echo "Setting up ssh-agent for git-based dependencies"
+RUN eval "$(ssh-agent -s)" && \
+    ssh-add /root/.ssh/id_rsa
 RUN echo "Starting the script sections" && \
 		dart --version && \
 		pub get && \
+		pub run dart_dev test && \
 		echo "Script sections completed"
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
 FROM scratch
