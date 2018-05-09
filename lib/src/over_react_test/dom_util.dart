@@ -23,7 +23,7 @@ const Duration _defaultTriggerTimeout = const Duration(seconds: 3);
 ///
 /// Used for testing components that rely on a `transitionend` event.
 Future triggerTransitionEnd(Element element, {Duration timeout: _defaultTriggerTimeout}) {
-  Future eventFiredFuture = element.onTransitionEnd.first;
+  var eventFiredFuture = element.onTransitionEnd.first;
 
   // Use JS interop to construct a native TransitionEvent since Dart doesn't allow instantiating them directly.
   // TODO: move this to JS so we can use TransitionEvent constructor
@@ -31,7 +31,7 @@ Future triggerTransitionEnd(Element element, {Duration timeout: _defaultTriggerT
   var jsElement = new JsObject.fromBrowserObject(element);
   var jsDocument = new JsObject.fromBrowserObject(document);
 
-  var jsEvent;
+  JsObject jsEvent;
   try {
     // Dartium requires it actually to be a `TransitionEvent`, not `Event`.
     jsEvent = new JsObject.fromBrowserObject(jsDocument.callMethod('createEvent', ['TransitionEvent']));

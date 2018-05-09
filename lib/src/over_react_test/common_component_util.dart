@@ -387,8 +387,8 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// __Note__: All required props must be provided by [factory].
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   var keyToErrorMessage = {};
-  var nullableProps = [];
-  var requiredProps = [];
+  var nullableProps = <String>[];
+  var requiredProps = <String>[];
 
   setUp(() {
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
