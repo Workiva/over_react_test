@@ -55,6 +55,29 @@ main() {
     });
   });
 
+  group('triggerDocumentMouseEvent correctly dispatches an event', () {
+    var flag;
+
+    setUp((){
+      flag = false;
+    });
+
+    test('when the target is attached to the document', () {
+      var renderedInstance = renderAttachedToDocument((Dom.div()..onMouseDown = ((_) => flag = true))());
+
+      triggerDocumentMouseEvent(findDomNode(renderedInstance), 'mousedown');
+
+      expect(flag, isTrue);
+    });
+
+    test('and throws when the target is not attached to the document', () {
+      var renderedInstance = render((Dom.div()..onMouseDown = ((_) => flag = true))());
+
+      expect(() => triggerDocumentMouseEvent(findDomNode(renderedInstance), 'mousedown'), throwsArgumentError);
+      expect(flag, isFalse);
+    });
+  });
+
   group('triggerFocus correctly dispatches a focus event', () {
     var flag;
 
