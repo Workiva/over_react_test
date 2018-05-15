@@ -54,11 +54,18 @@ Future triggerTransitionEnd(Element element, {Duration timeout: _defaultTriggerT
 ///
 /// Verifies that the [target] element is not a detached node.
 void triggerDocumentClick(Element target) {
+  triggerDocumentMouseEvent(target, 'click');
+}
+
+/// Dispatches a [MouseEvent] of type [event] to the specified [target].
+///
+/// Verifies that the [target] element is not a detached node.
+void triggerDocumentMouseEvent(Element target, String event) {
   if (!document.documentElement.contains(target)) {
     throw new ArgumentError.value(target, 'target', 'Target should be attached to the document.');
   }
 
-  target.dispatchEvent(new MouseEvent('click'));
+  target.dispatchEvent(new MouseEvent(event));
 }
 
 /// Focuses the [target] and returns a [Future] when that `focus` event is fired.
