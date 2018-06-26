@@ -27,7 +27,7 @@ main(List<String> args) async {
   config.test
     ..pubServe = true
     ..platforms = [
-      'content-shell',
+      'dartium',
     ]
     ..unitTests = [
       'test/over_react_test.dart',
