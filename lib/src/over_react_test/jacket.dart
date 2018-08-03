@@ -100,7 +100,7 @@ class TestJacket<T extends react.Component> {
     return over_react.findDomNode(_renderedInstance);
   }
 
-  /// Returns the native Dart compoentn associated with the mounted React component instance, or null if the component
+  /// Returns the native Dart component associated with the mounted React component instance, or null if the component
   /// is not Dart based.
   T getDartInstance() {
     return over_react.getDartComponent(_renderedInstance) as T;
