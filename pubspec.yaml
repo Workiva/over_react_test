@@ -8,14 +8,14 @@ environment:
   sdk: ">=1.24.2 <2.0.0"
 dependencies:
   js: ^0.6.1
-  matcher: ">=0.11.0 <0.13.0"
-  over_react: ^1.23.0
+  matcher: ^0.12.1+4
+  over_react: ^1.25.0
   react: ">=3.7.0 <5.0.0"
   test: ^0.12.32+1
 dev_dependencies:
   coverage: ">=0.7.2 <0.11.0"
-  dart_dev: ^1.7.7
-  dependency_validator: ^1.1.0
+  dart_dev: ^1.9.6
+  dependency_validator: ^1.2.2
 transformers:
   - over_react
   - test/pub_serve:

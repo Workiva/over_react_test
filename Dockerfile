@@ -23,6 +23,7 @@ RUN chmod 600 /root/.ssh/id_rsa
 RUN echo "Setting up ssh-agent for git-based dependencies"
 RUN eval "$(ssh-agent -s)" && \
 	ssh-add /root/.ssh/id_rsa
+ENV DARTIUM_EXPIRATION_TIME=1577836800
 WORKDIR /build/
 ADD . /build/
 RUN echo "Starting the script sections" && \
@@ -30,5 +31,7 @@ RUN echo "Starting the script sections" && \
 		pub get && \
         pub run dependency_validator -i coverage && \
 		echo "Script sections completed"
+ARG BUILD_ARTIFACTS_AUDIT=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
+ARG BUILD_ARTIFACTS_DART-DEPENDENCIES=/build/pubspec.lock
 FROM scratch
