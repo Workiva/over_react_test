@@ -12,4 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export 'src/over_react_test/closet/speed_jacket.dart';
 export 'src/over_react_test/closet/test_jacket.dart';
