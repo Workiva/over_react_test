@@ -221,22 +221,21 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 ///     var renderedInstance = render(Dom.div()(
 ///         // Div1
-///         (Dom.div()..addTestId('first-div'))()
+///       (Dom.div()..addTestId('first'))(),
 ///
 ///         Dom.div()(
 ///           // Div2
 ///           (Dom.div()
-///             ..addTestId('second-div')
-///             ..addTestId('nested-div')
-///           )()
-///         )
-///       )
-///     );
+///           ..addTestId('second')
+///           ..addTestId('other-id')
+///         )(),
+///       ),
+///     ));
 ///
-///     var firstDiv = getByTestId(renderedInstance, 'first-div'); // Returns Div1
-///     var secondDiv = getByTestId(renderedInstance, 'second-div'); // Returns Div2
-///     var nestedDiv = getByTestId(renderedInstance, 'nested-div'); // Returns Div2
-///     var nonexistentDiv = getByTestId(renderedInstance, 'nonexistent-div'); // Returns null
+///     var first  = getByTestId(renderedInstance, 'first');    // Returns the `Div1` element
+///     var second = getByTestId(renderedInstance, 'second');   // Returns the `Div2` element
+///     var other  = getByTestId(renderedInstance, 'other-id'); // Returns the `Div2` element
+///     var nonexistent = getByTestId(renderedInstance, 'nonexistent'); // Returns `null`
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
