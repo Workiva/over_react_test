@@ -403,6 +403,217 @@ main() {
       });
     });
 
+    group('getAllByTestId returns', () {
+      sharedTests({bool shallow}) {
+        testSpecificRender(ReactElement instance) =>
+            shallow ? renderShallow(instance) : render(instance);
+
+        group('a list containing the single descendant that have the appropriate value for the `data-test-id` prop key when it is a', () {
+          const String targetFlagProp = 'data-name';
+
+          const Map testProps = const {
+            'data-test-id': 'value',
+            'data-name': 'target',
+          };
+
+          test('DOM component', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Dom.div()..addProps(testProps))(),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'value');
+            expect(descendants, [hasProp(targetFlagProp, 'target')]);
+          });
+
+          test('Dart component', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Test()..addProps(testProps))(),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'value');
+            expect(descendants, [hasProp(targetFlagProp, 'target')]);
+          });
+
+          test('JS composite component', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              testJsComponentFactory(testProps),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'value');
+            expect(descendants, [hasProp(targetFlagProp, 'target')]);
+          });
+        });
+
+        test('all descendants that have the appropriate value for the `data-test-id` prop key', () {
+          var renderedInstance = testSpecificRender(Wrapper()(
+            (Dom.div()
+              ..addTestId('value')
+              ..addProp('data-name', 'First Descendant')
+            )(),
+            Dom.div()(
+              (Dom.div()
+                ..addTestId('value')
+                ..addProp('data-name', 'Nested Descendant')
+              )(),
+            ),
+          ));
+
+          var descendants = getAllByTestId(renderedInstance, 'value');
+          expect(descendants, [
+            hasProp('data-name', 'First Descendant'),
+            hasProp('data-name', 'Nested Descendant'),
+          ]);
+        });
+
+        test('all descendants that has the appropriate value for the custom prop key', () {
+          var renderedInstance = testSpecificRender(Wrapper()(
+            (Dom.div()
+              ..addTestId('value', key: 'data-custom-id')
+              ..addProp('data-name', 'First Descendant')
+            )(),
+            Dom.div()(
+              (Dom.div()
+                ..addTestId('value', key: 'data-custom-id')
+                ..addProp('data-name', 'Nested Descendant')
+              )(),
+            ),
+          ));
+
+          var descendants = getAllByTestId(renderedInstance, 'value', key: 'data-custom-id');
+          expect(descendants, [
+            hasProp('data-name', 'First Descendant'),
+            hasProp('data-name', 'Nested Descendant'),
+          ]);
+        });
+
+        test('the topmost descendant that has the `data-test-id` prop set to \'null\' when the user searches for \'null\'', () {
+          var renderedInstance = testSpecificRender(Wrapper()(
+            (Dom.div()
+              ..addTestId('null')
+              ..addProp('data-name', 'First Descendant')
+            )(),
+            Dom.div()(
+              (Dom.div()
+                ..addTestId('null')
+                ..addProp('data-name', 'Nested Descendant')
+              )(),
+            ),
+          ));
+
+          var descendants = getAllByTestId(renderedInstance, 'null');
+          expect(descendants, [
+            hasProp('data-name', 'First Descendant'),
+            hasProp('data-name', 'Nested Descendant'),
+          ]);
+        });
+
+        group('the topmost descendant that has the appropriate value for the `data-test-id` prop key, an additional testId is added, and then', () {
+          test('the first testId is passed in', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Dom.div()
+                ..addTestId('testId1')
+                ..addTestId('testId2')
+                ..addProp('data-name', 'Nested Descendant')
+              )(
+                Dom.div()('Nested Descendant 2'),
+              ),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'testId1');
+            expect(descendants, [hasProp('data-name', 'Nested Descendant')]);
+          });
+
+          test('the new testId is passed in', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Dom.div()
+                ..addTestId('testId1')
+                ..addTestId('testId2')
+                ..addProp('data-name', 'Nested Descendant')
+              )(
+                Dom.div()('Nested Descendant 2'),
+              ),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'testId2');
+            expect(descendants, [hasProp('data-name', 'Nested Descendant')]);
+          });
+        });
+
+        group('the topmost descendant that has the appropriate value for a custom prop key and', () {
+          test('the first testId is passed in', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Dom.div()
+                ..addTestId('testId1', key: 'data-custom-id')
+                ..addTestId('testId2', key: 'data-custom-id')
+                ..addProp('data-name', 'Nested Descendant')
+              )(),
+              Dom.div()('Nested Descendant 2'),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'testId1', key: 'data-custom-id');
+            expect(descendants, [hasProp('data-name', 'Nested Descendant')]);
+          });
+
+          test('the new testId is passed in', () {
+            var renderedInstance = testSpecificRender(Wrapper()(
+              (Dom.div()
+                ..addTestId('testId1', key: 'data-custom-id')
+                ..addTestId('testId2', key: 'data-custom-id')
+                ..addProp('data-name', 'Nested Descendant')
+              )(),
+              Dom.div()('Nested Descendant 2'),
+            ));
+
+            var descendants = getAllByTestId(renderedInstance, 'testId2', key: 'data-custom-id');
+            expect(descendants, [hasProp('data-name', 'Nested Descendant')]);
+          });
+        });
+
+        test('an empty list if no descendant has the appropriate value for the `data-test-id` prop key', () {
+          var renderedInstance = testSpecificRender(Wrapper()());
+
+          var descendants = getAllByTestId(renderedInstance, 'value');
+          expect(descendants, isEmpty);
+        });
+
+        test('an empty list if the user searches for a test ID of \'null\' when no test ID is set', () {
+          var renderedInstance = testSpecificRender(Wrapper()());
+
+          var descendants = getAllByTestId(renderedInstance, 'null');
+          expect(descendants, isEmpty);
+        });
+
+        test('an empty list if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
+          var renderedInstance = testSpecificRender(Wrapper()(
+            (Test()..addTestId('null'))(),
+          ));
+
+          var descendants = getAllByTestId(renderedInstance, null);
+          expect(descendants, isEmpty);
+        });
+      }
+
+      group('(rendered component)', () {
+        sharedTests(shallow: false);
+      });
+
+      group('(shallow-rendered component)', () {
+        sharedTests(shallow: true);
+      });
+
+      test('returns correctly when passed a react.Component', () {
+        var component = renderAndGetComponent(Wrapper()(
+          (Test()
+            ..addTestId('value')
+            ..addProp('data-name', 'target')
+          )(),
+        ));
+
+        var descendants = getAllByTestId(component, 'value');
+        expect(descendants, [hasProp('data-name', 'target')]);
+      });
+    });
+
     group('queryByTestId returns the topmost Element that has the appropriate value for the', () {
       group('`data-test-id` html attribute key', () {
         test('', () {
