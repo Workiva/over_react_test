@@ -17,6 +17,7 @@ import 'dart:html';
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_dom.dart' as react_dom;
+import 'package:react/react_test_utils.dart' as rtu;
 import 'package:test/test.dart';
 
 import './utils/nested_component.dart';
@@ -611,6 +612,71 @@ main() {
 
         var descendants = getAllByTestId(component, 'value');
         expect(descendants, [hasProp('data-name', 'target')]);
+      });
+    });
+
+    group('getAllComponentsByTestId returns only the Dart components with the matching test ID', () {
+      void sharedExpectations(
+        List<dynamic> allByTestId,
+        List<WrapperComponent> allComponentsByTestId,
+      ) {
+        final isCompositeCOmponentMatcher = predicate(rtu.isCompositeComponent, 'is composite component');
+
+        expect(allByTestId, [
+          allOf(hasProp('data-name', 'Wrapper'), isCompositeCOmponentMatcher),
+          // The Wrapper should render a div with the same test ID
+          allOf(hasProp('data-name', 'Wrapper'), const isInstanceOf<Element>()),
+          allOf(hasProp('data-name', 'div'), const isInstanceOf<Element>()),
+          allOf(hasProp('data-name', 'js'), isCompositeCOmponentMatcher),
+        ], reason: 'test setup sanity check');
+
+        expect(allComponentsByTestId, [
+          const isInstanceOf<WrapperComponent>()
+        ]);
+      }
+
+      test('', () {
+        var renderedInstance = render((Wrapper()
+          ..addTestId('foo')
+          ..addProp('data-name', 'Wrapper')
+        )(
+          (Dom.div()
+            ..addTestId('foo')
+            ..addProp('data-name', 'div')
+          )(),
+          testJsComponentFactory(domProps()
+            ..addTestId('foo')
+            ..addProp('data-name', 'js')
+          ),
+        ));
+
+        sharedExpectations(
+          getAllByTestId(renderedInstance, 'foo'),
+          getAllComponentsByTestId<WrapperComponent>(renderedInstance, 'foo'),
+        );
+      });
+
+      test('when a custom test ID is provided', () {
+        const customTestIdKey = 'data-custom-test-id';
+
+        var renderedInstance = render((Wrapper()
+          ..addTestId('foo', key: customTestIdKey)
+          ..addProp('data-name', 'Wrapper')
+        )(
+          (Dom.div()
+            ..addTestId('foo', key: customTestIdKey)
+            ..addProp('data-name', 'div')
+          )(),
+          testJsComponentFactory(domProps()
+            ..addTestId('foo', key: customTestIdKey)
+            ..addProp('data-name', 'js')
+          ),
+        ));
+
+        sharedExpectations(
+          getAllByTestId(renderedInstance, 'foo', key: customTestIdKey),
+          getAllComponentsByTestId<WrapperComponent>(renderedInstance, 'foo', key: customTestIdKey),
+        );
       });
     });
 

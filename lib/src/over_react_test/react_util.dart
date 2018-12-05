@@ -249,6 +249,11 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// This is similar to [getByTestId], which returns only the first matching descendant.
 ///
+/// > __Note: when using with components that forward props (like test IDs), this will return both the__
+/// > __Dart components and the components they renders, since they will both have the same test ID.__
+/// >
+/// > If you want to get only Dart components, use [getAllComponentsByTestId].
+///
 /// This method works for:
 ///
 /// * `ReactComponent` render trees (output of [render])
@@ -296,6 +301,32 @@ List/* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaul
     return _hasTestId(props, key, value);
   }));
 }
+
+/// Similar to [getAllByTestId], but filters out results that aren't Dart components.
+///
+/// This is useful when the Dart component you're targeting forwards props.
+///
+/// For example, given a usage of a component that forwards its props to the rendered DOM:
+///    // Dart Input
+///    (ForwardsProps()
+///      ..addTestId('foo')
+///    )()
+///    // HTML output
+///    '<div class="forwards-props" data-test-id="foo" />'
+///
+///    // This returns [
+///    //   `Instance of 'JsObject'`, (the JS component)
+///    //   `Element:<div class="forwards-props" data-test-id="foo" />`,
+///    // ]
+///    getAllByTestId(root, 'foo')
+///
+///    // This returns [ `<Instance of 'ForwardsPropsComponent'>` ]
+///    getAllComponentsByTestId(root, 'foo')
+List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key: defaultTestIdKey}) =>
+    getAllByTestId(root, value, key: key)
+        .map(getDartComponent)
+        .where((component) => component != null)
+        .toList();
 
 /// Returns the [Element] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
