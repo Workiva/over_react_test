@@ -220,59 +220,113 @@ bool _hasTestId(Map props, String key, String value) {
 /// __Example:__
 ///
 ///     var renderedInstance = render(Dom.div()(
-///         // Div1
-///         (Dom.div()..addTestId('first-div'))()
+///       // Div1
+///       (Dom.div()..addTestId('first'))(),
 ///
-///         Dom.div()(
-///           // Div2
-///           (Dom.div()
-///             ..addTestId('second-div')
-///             ..addTestId('nested-div')
-///           )()
-///         )
-///       )
-///     );
+///       Dom.div()(
+///         // Div2
+///         (Dom.div()
+///           ..addTestId('second')
+///           ..addTestId('other-id')
+///         )(),
+///       ),
+///     ));
 ///
-///     var firstDiv = getByTestId(renderedInstance, 'first-div'); // Returns Div1
-///     var secondDiv = getByTestId(renderedInstance, 'second-div'); // Returns Div2
-///     var nestedDiv = getByTestId(renderedInstance, 'nested-div'); // Returns Div2
-///     var nonexistentDiv = getByTestId(renderedInstance, 'nonexistent-div'); // Returns null
+///     var first  = getByTestId(renderedInstance, 'first');    // Returns the `Div1` element
+///     var second = getByTestId(renderedInstance, 'second');   // Returns the `Div2` element
+///     var other  = getByTestId(renderedInstance, 'other-id'); // Returns the `Div2` element
+///     var nonexistent = getByTestId(renderedInstance, 'nonexistent'); // Returns `null`
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
 /* [1] */ getByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+  final results = getAllByTestId(root, value, key: key);
+  return results.isEmpty ? null : results.first;
+}
+
+/// Returns all descendants of [root] with a [key] test ID prop value set to a
+/// space-delimited string containing [value].
+///
+/// This is similar to [getByTestId], which returns only the first matching descendant.
+///
+/// > __Note: when using with components that forward props (like test IDs), this will return both the__
+/// > __Dart components and the components they renders, since they will both have the same test ID.__
+/// >
+/// > If you want to get only Dart components, use [getAllComponentsByTestId].
+///
+/// This method works for:
+///
+/// * `ReactComponent` render trees (output of [render])
+/// * [ReactElement] trees (output of [renderShallow]/`Component.render`)
+///
+/// __Example:__
+///
+///     var renderedInstance = render(Dom.div()(
+///       // Div1
+///       (Dom.div()
+///         ..addTestId('first')
+///         ..addTestId('shared-id')
+///       )(),
+///
+///       Dom.div()(
+///         // Div2
+///         (Dom.div()
+///           ..addTestId('second')
+///           ..addTestId('other-id')
+///           ..addTestId('shared-id')
+///         )(),
+///       ),
+///     ));
+///
+///     var allFirsts  = getAllByTestId(renderedInstance, 'first');    // Returns `[Div1]`
+///     var allSeconds = getAllByTestId(renderedInstance, 'second');   // Returns `[Div2]`
+///     var allOthers  = getAllByTestId(renderedInstance, 'other-id'); // Returns `[Div2]`
+///     var allShared  = getAllByTestId(renderedInstance, 'other-id'); // Returns `[Div1, Div2]`
+///     var allNonexistents = getAllByTestId(renderedInstance, 'nonexistent'); // Returns `null`
+///
+/// It is recommended that, instead of setting this [key] prop manually, you should use the
+/// [UiProps.addTestId] method so the prop is only set in a test environment.
+List/* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {
-    return _getByTestIdShallow(root, value, key: key);
+    return _getAllByTestIdShallow(root, value, key: key);
   }
 
-  bool first = false;
-
-  var results = react_test_utils.findAllInRenderedTree(root, allowInterop((descendant) {
-    if (first) {
-      return false;
-    }
-
+  return react_test_utils.findAllInRenderedTree(root, allowInterop((descendant) {
     var props = react_test_utils.isDOMComponent(descendant)
-      ? findDomNode(descendant).attributes
-      : getProps(descendant);
+        ? findDomNode(descendant).attributes
+        : getProps(descendant);
 
-    bool hasValue = _hasTestId(props, key, value);
-
-    if (hasValue) {
-      first = true;
-    }
-
-    return hasValue;
+    return _hasTestId(props, key, value);
   }));
-
-  if (results.isEmpty) {
-    return null;
-  } else {
-    return results.single;
-  }
 }
+
+/// Similar to [getAllByTestId], but filters out results that aren't Dart components.
+///
+/// This is useful when the Dart component you're targeting forwards props.
+///
+/// For example, given a usage of a component that forwards its props to the rendered DOM:
+///    // Dart Input
+///    (ForwardsProps()
+///      ..addTestId('foo')
+///    )()
+///    // HTML output
+///    '<div class="forwards-props" data-test-id="foo" />'
+///
+///    // This returns [
+///    //   `Instance of 'JsObject'`, (the JS component)
+///    //   `Element:<div class="forwards-props" data-test-id="foo" />`,
+///    // ]
+///    getAllByTestId(root, 'foo')
+///
+///    // This returns [ `<Instance of 'ForwardsPropsComponent'>` ]
+///    getAllComponentsByTestId(root, 'foo')
+List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key: defaultTestIdKey}) =>
+    getAllByTestId(root, value, key: key)
+        .map(getDartComponent)
+        .where((component) => component != null)
+        .toList();
 
 /// Returns the [Element] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
@@ -396,7 +450,7 @@ Map getPropsByTestId(dynamic root, String value, {String key: defaultTestIdKey})
   return null;
 }
 
-ReactElement _getByTestIdShallow(ReactElement root, String value, {String key: defaultTestIdKey}) {
+List<ReactElement> _getAllByTestIdShallow(ReactElement root, String value, {String key: defaultTestIdKey}) {
   Iterable flattenChildren(dynamic children) sync* {
     if (children is Iterable) {
       yield* children.expand(flattenChildren);
@@ -404,6 +458,8 @@ ReactElement _getByTestIdShallow(ReactElement root, String value, {String key: d
       yield children;
     }
   }
+
+  final matchingDescendants = <ReactElement>[];
 
   var breadthFirstDescendants = new Queue()..add(root);
   while (breadthFirstDescendants.isNotEmpty) {
@@ -414,13 +470,13 @@ ReactElement _getByTestIdShallow(ReactElement root, String value, {String key: d
 
     var props = getProps(descendant);
     if (_hasTestId(props, key, value)) {
-      return descendant;
+      matchingDescendants.add(descendant);
     }
 
     breadthFirstDescendants.addAll(flattenChildren(props['children']));
   }
 
-  return null;
+  return matchingDescendants;
 }
 
 /// Returns all descendants of a component that contain the specified prop key.
