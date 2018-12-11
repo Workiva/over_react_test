@@ -21,6 +21,9 @@ import 'package:test/test.dart';
 
 import './utils/nested_component.dart';
 
+// ignore: uri_does_not_exist, uri_has_not_been_generated
+part 'react_util_test.over_react.g.dart';
+
 /// Main entry point for ReactUtil testing
 main() {
   group('ReactUtil', () {
@@ -895,13 +898,21 @@ main() {
 }
 
 @Factory()
-UiFactory<TestProps> Test;
+// ignore: undefined_identifier
+UiFactory<TestProps> Test = $Test;
 
 @Props()
-class TestProps extends UiProps {}
+class _$TestProps extends UiProps {}
 
 @Component()
 class TestComponent extends UiComponent<TestProps> {
   @override
   render() => (Dom.div()..addProp('isRenderResult', true))();
+}
+
+// AF-#### This will be removed once the transition to Dart 2 is complete.
+// ignore: mixin_of_non_class, undefined_class
+class TestProps extends _$TestProps with _$TestPropsAccessorsMixin {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForTestProps;
 }

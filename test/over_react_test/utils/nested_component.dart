@@ -14,11 +14,15 @@
 
 import 'package:over_react/over_react.dart';
 
+// ignore: uri_does_not_exist, uri_has_not_been_generated
+part 'nested_component.over_react.g.dart';
+
 @Factory()
-UiFactory<NestedProps> Nested;
+// ignore: undefined_identifier
+UiFactory<NestedProps> Nested = $Nested;
 
 @Props()
-class NestedProps extends UiProps {}
+class _$NestedProps extends UiProps {}
 
 @Component()
 class NestedComponent extends UiComponent<NestedProps> {
@@ -31,4 +35,11 @@ class NestedComponent extends UiComponent<NestedProps> {
       )()
     );
   }
+}
+
+// AF-#### This will be removed once the transition to Dart 2 is complete.
+// ignore: mixin_of_non_class, undefined_class
+class NestedProps extends _$NestedProps with _$NestedPropsAccessorsMixin {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForNestedProps;
 }

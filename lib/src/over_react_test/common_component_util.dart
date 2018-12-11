@@ -16,10 +16,9 @@ import 'dart:collection';
 import 'dart:html';
 // Tell dart2js that this library only needs to reflect types annotated with `Props`.
 // This speeds up compilation and makes JS output much smaller.
-@MirrorsUsed(metaTargets: const [
-  'over_react.component_declaration.annotations.Props'
-])
-import 'dart:mirrors';
+//@MirrorsUsed(metaTargets: const [
+//  'over_react.component_declaration.annotations.Props'
+//])
 
 import 'package:over_react/over_react.dart'
     show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
@@ -194,7 +193,7 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       if (ignoreDomProps) {
         // Remove DomProps because they should be forwarded.
-        const $PropKeys(DomPropsMixin).forEach(propsThatShouldNotGetForwarded.remove);
+        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
       }
 
     var shallowRenderer = react_test_utils.createRenderer();
@@ -455,43 +454,43 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
 /// Returns all the keys found within `props` on a component definition, using reflection.
 Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
   var definition = factory();
-  InstanceMirror definitionMirror = reflect(definition);
-
-  Map<Symbol, MethodMirror> members;
-
-  // instanceMembers is not implemented for the DDC and will throw is this test is loaded even if it's not run.
-  try {
-    members = definitionMirror.type.instanceMembers;
-  } catch(e) {
-    members = {};
-  }
-
-  // Use prop getters on the props class to infer the prop keys for the component.
-  // Set all props to null to create key-value pairs for each prop, and then return those keys.
-  members.values.forEach((MethodMirror decl) {
-    // Filter out all members except concrete instance getters.
-    if (!decl.isGetter || decl.isSynthetic || decl.isStatic) {
-      return;
-    }
-
-    Type owner = (decl.owner as ClassMirror).reflectedType;
-    if (owner != Object &&
-        owner != component_base.UiProps &&
-        owner != component_base.PropsMapViewMixin &&
-        owner != component_base.MapViewMixin &&
-        owner != MapView &&
-        owner != ReactPropsMixin &&
-        owner != DomPropsMixin &&
-        owner != CssClassPropsMixin &&
-        owner != UbiquitousDomPropsMixin
-    ) {
-      // Some of the getters won't correspond to props, and won't have setters.
-      // Catch resultant exceptions and move on.
-      try {
-        definitionMirror.setField(decl.simpleName, null);
-      } catch(_) {}
-    }
-  });
+//  InstanceMirror definitionMirror = reflect(definition);
+//
+//  Map<Symbol, MethodMirror> members;
+//
+//  // instanceMembers is not implemented for the DDC and will throw is this test is loaded even if it's not run.
+//  try {
+//    members = definitionMirror.type.instanceMembers;
+//  } catch(e) {
+//    members = {};
+//  }
+//
+//  // Use prop getters on the props class to infer the prop keys for the component.
+//  // Set all props to null to create key-value pairs for each prop, and then return those keys.
+//  members.values.forEach((MethodMirror decl) {
+//    // Filter out all members except concrete instance getters.
+//    if (!decl.isGetter || decl.isSynthetic || decl.isStatic) {
+//      return;
+//    }
+//
+//    Type owner = (decl.owner as ClassMirror).reflectedType;
+//    if (owner != Object &&
+//        owner != component_base.UiProps &&
+//        owner != component_base.PropsMapViewMixin &&
+//        owner != component_base.MapViewMixin &&
+//        owner != MapView &&
+//        owner != ReactPropsMixin &&
+//        owner != DomPropsMixin &&
+//        owner != CssClassPropsMixin &&
+//        owner != UbiquitousDomPropsMixin
+//    ) {
+//      // Some of the getters won't correspond to props, and won't have setters.
+//      // Catch resultant exceptions and move on.
+//      try {
+//        definitionMirror.setField(decl.simpleName, null);
+//      } catch(_) {}
+//    }
+//  });
 
   return definition.keys.toSet();
 }

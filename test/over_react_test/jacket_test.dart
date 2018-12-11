@@ -18,6 +18,9 @@ import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
+// ignore: uri_does_not_exist, uri_has_not_been_generated
+part 'jacket_test.over_react.g.dart';
+
 /// Main entry point for TestJacket testing
 main() {
   group('mount: renders the given instance', () {
@@ -208,15 +211,16 @@ main() {
 }
 
 @Factory()
-UiFactory<SampleProps> Sample;
+// ignore: undefined_identifier
+UiFactory<SampleProps> Sample = $Sample;
 
 @Props()
-class SampleProps extends UiProps {
+class _$SampleProps extends UiProps {
   bool foo;
 }
 
 @State()
-class SampleState extends UiState {
+class _$SampleState extends UiState {
   bool bar;
 }
 
@@ -232,4 +236,18 @@ class SampleComponent extends UiStatefulComponent<SampleProps, SampleState> {
   render() {
     return Dom.div()();
   }
+}
+
+// AF-#### This will be removed once the transition to Dart 2 is complete.
+// ignore: mixin_of_non_class, undefined_class
+class SampleState extends _$SampleState with _$SampleStateAccessorsMixin {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const StateMeta meta = $metaForSampleState;
+}
+
+// AF-#### This will be removed once the transition to Dart 2 is complete.
+// ignore: mixin_of_non_class, undefined_class
+class SampleProps extends _$SampleProps with _$SamplePropsAccessorsMixin {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForSampleProps;
 }

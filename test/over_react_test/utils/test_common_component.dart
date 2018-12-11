@@ -16,18 +16,22 @@ import 'package:over_react/over_react.dart';
 
 import './test_common_component_nested.dart';
 
+// ignore: uri_does_not_exist, uri_has_not_been_generated
+part 'test_common_component.over_react.g.dart';
+
 @Factory()
-UiFactory<TestCommonProps> TestCommon;
+// ignore: undefined_identifier
+UiFactory<TestCommonProps> TestCommon = $TestCommon;
 
 @Props()
-class TestCommonProps extends UiProps with PropsThatShouldBeForwarded, PropsThatShouldNotBeForwarded {}
+class _$TestCommonProps extends UiProps with PropsThatShouldBeForwarded, PropsThatShouldNotBeForwarded {}
 
 @Component(subtypeOf: TestCommonNestedComponent)
 class TestCommonComponent extends UiComponent<TestCommonProps> {
   @override
   get consumedProps => const [
-    const $Props(TestCommonProps),
-    const $Props(PropsThatShouldNotBeForwarded)
+    TestCommonProps.meta,
+    PropsThatShouldNotBeForwarded.meta
   ];
 
   @override
@@ -41,6 +45,9 @@ class TestCommonComponent extends UiComponent<TestCommonProps> {
 
 @PropsMixin()
 abstract class PropsThatShouldBeForwarded {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForPropsThatShouldBeForwarded;
+
   Map get props;
 
   bool foo;
@@ -48,7 +55,17 @@ abstract class PropsThatShouldBeForwarded {
 
 @PropsMixin()
 abstract class PropsThatShouldNotBeForwarded {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForPropsThatShouldNotBeForwarded;
+
   Map get props;
 
   bool bar;
+}
+
+// AF-#### This will be removed once the transition to Dart 2 is complete.
+// ignore: mixin_of_non_class, undefined_class
+class TestCommonProps extends _$TestCommonProps with _$TestCommonPropsAccessorsMixin {
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = $metaForTestCommonProps;
 }

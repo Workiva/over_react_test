@@ -25,7 +25,7 @@ main() {
     // TODO: Improve / expand upon these tests.
     group('should pass when the correct unconsumed props are specified', () {
       commonComponentTests(TestCommon, unconsumedPropKeys: [
-        const $PropKeys(PropsThatShouldBeForwarded),
+        PropsThatShouldBeForwarded.meta.keys,
       ]);
     });
 
