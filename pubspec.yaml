@@ -13,10 +13,28 @@ dependencies:
   react: ">=3.7.0 <5.0.0"
   test: any #^0.12.32+1
 dev_dependencies:
-  coverage: ">=0.7.2 <0.11.0"
-  dart_dev: ^1.9.6
-  dependency_validator: ^1.2.2
-transformers:
-  - over_react
-  - test/pub_serve:
-      $include: test/**_test{.*,}.dart
+  build_runner: any #^0.10.0
+  coverage: ">=0.10.0 <0.12.4"
+  dart_dev: ">=1.7.7 <3.0.0"
+  dependency_validator: ^1.1.0
+  build_test: any
+  build_web_compilers: any
+  transformer_utils: any
+#transformers:
+#  - over_react
+#  - test/pub_serve:
+#      $include: test/**_test{.*,}.dart
+
+dependency_overrides:
+  over_react:
+    git:
+      url: git@github.com:Workiva/over_react.git
+      ref: ca45e3783180d6a928ad7d38145b4e66a388b2f7 # from builder_generate_public_class
+  transformer_utils:
+    git:
+      url: git@github.com:workiva/dart_transformer_utils.git
+      ref: cc2200ab8e6fb408899b64e53b4aedb0ac69ca5f # from dart2_compat
+  built_redux:
+    git:
+      url: git@github.com:corwinsheahan-wf/built_redux.git
+      ref: 9c9580242e8af6b905ef26c452600dca2195a98b # from bump_build_runner
