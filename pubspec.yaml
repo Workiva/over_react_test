@@ -19,6 +19,7 @@ dev_dependencies:
   dependency_validator: ^1.1.0
   build_test: any
   build_web_compilers: any
+  transformer_utils: any
 #transformers:
 #  - over_react
 #  - test/pub_serve:
@@ -26,8 +27,15 @@ dev_dependencies:
 
 dependency_overrides:
   over_react:
-    path: /Users/corwinsheahan/workspaces/repos/over_react
-  builder_utils:
-    path: /Users/corwinsheahan/workspaces/repos/over_react/dart_builder_utils
-
+    git:
+      url: git@github.com:Workiva/over_react.git
+      ref: ca45e3783180d6a928ad7d38145b4e66a388b2f7 # from builder_generate_public_class
+  transformer_utils:
+    git:
+      url: git@github.com:workiva/dart_transformer_utils.git
+      ref: cc2200ab8e6fb408899b64e53b4aedb0ac69ca5f # from dart2_compat
+  built_redux:
+    git:
+      url: git@github.com:corwinsheahan-wf/built_redux.git
+      ref: 9c9580242e8af6b905ef26c452600dca2195a98b # from bump_build_runner
 

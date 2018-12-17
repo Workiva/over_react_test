@@ -24,7 +24,7 @@ part 'test_common_component.over_react.g.dart';
 UiFactory<TestCommonProps> TestCommon = $TestCommon;
 
 @Props()
-class _$TestCommonProps extends UiProps with PropsThatShouldBeForwarded, PropsThatShouldNotBeForwarded {}
+class _$TestCommonProps extends UiProps with PropsThatShouldBeForwarded, $PropsThatShouldBeForwarded, PropsThatShouldNotBeForwarded, $PropsThatShouldNotBeForwarded {}
 
 @Component(subtypeOf: TestCommonNestedComponent)
 class TestCommonComponent extends UiComponent<TestCommonProps> {
