@@ -16,7 +16,6 @@ import 'dart:html';
 
 import 'package:over_react/over_react.dart' as over_react;
 import 'package:react/react.dart' as react;
-import 'package:react/react_client.dart' show ReactElement;
 import 'package:react/react_client/react_interop.dart' show ReactComponent;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 
@@ -44,7 +43,7 @@ import 'package:over_react_test/src/over_react_test/react_util.dart' as react_ut
 /// To render into a node attached to document.body, as opposed to a detached node, set [attachedToDocument] to true.
 ///
 /// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
-TestJacket<T> mount<T extends react.Component>(ReactElement reactElement, {
+TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElement, {
     Element mountNode,
     bool attachedToDocument: false,
     bool autoTearDown: true
@@ -63,21 +62,21 @@ class TestJacket<T extends react.Component> {
   final bool attachedToDocument;
   final bool autoTearDown;
 
-  TestJacket._(ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
+  TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
       : this.mountNode = mountNode ?? (new DivElement()
           ..style.height = '800px'
           ..style.width= '800px') {
     _render(reactElement);
   }
 
-  void _render(ReactElement reactElement) {
+  void _render(over_react.ReactElement reactElement) {
     _renderedInstance = attachedToDocument
         ? react_util.renderAttachedToDocument(reactElement, container: mountNode, autoTearDown: autoTearDown)
         : react_util.render(reactElement, container: mountNode, autoTearDown: autoTearDown);
   }
 
   /// Rerenders the [reactElement] into the same [mountNode].
-  void rerender(ReactElement reactElement) {
+  void rerender(over_react.ReactElement reactElement) {
     _render(reactElement);
   }
 
