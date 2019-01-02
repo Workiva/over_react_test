@@ -194,7 +194,7 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       if (ignoreDomProps) {
         // Remove DomProps because they should be forwarded.
-        const $PropKeys(DomPropsMixin).forEach(propsThatShouldNotGetForwarded.remove);
+        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
       }
 
     var shallowRenderer = react_test_utils.createRenderer();

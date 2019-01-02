@@ -161,8 +161,8 @@ class _HasPropMatcher extends CustomMatcher {
   static bool _useDomAttributes(item) => react_test_utils.isDOMComponent(item);
 
   static bool _isValidDomPropKey(propKey) => (
-      const $PropKeys(DomPropsMixin).contains(propKey) ||
-      const $PropKeys(SvgPropsMixin).contains(propKey) ||
+      DomPropsMixin.meta.keys.contains(propKey) ||
+      SvgPropsMixin.meta.keys.contains(propKey) ||
       (propKey is String && (
           propKey.startsWith('data-') ||
           propKey.startsWith('aria-'))
