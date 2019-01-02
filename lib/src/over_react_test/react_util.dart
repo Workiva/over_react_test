@@ -324,7 +324,7 @@ List/* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaul
 ///    getAllComponentsByTestId(root, 'foo')
 List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key: defaultTestIdKey}) =>
     getAllByTestId(root, value, key: key)
-        .map(getDartComponent)
+        .map((element) => getDartComponent<T>(element)) // ignore: unnecessary_lambdas
         .where((component) => component != null)
         .toList();
 

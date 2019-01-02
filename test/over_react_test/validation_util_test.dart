@@ -19,10 +19,12 @@ import 'package:test/test.dart';
 /// Main entry point for `validation_util.dart` testing.
 main() {
   group('ValidationUtil:', () {
+    // ignore: unnecessary_lambdas
     setUp(() {
       startRecordingValidationWarnings();
     });
 
+    // ignore: unnecessary_lambdas
     tearDown(() {
       stopRecordingValidationWarnings();
     });
