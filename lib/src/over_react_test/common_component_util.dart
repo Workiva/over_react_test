@@ -22,7 +22,7 @@ import 'dart:html';
 import 'dart:mirrors';
 
 import 'package:over_react/over_react.dart'
-    show $PropKeys, BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
+    show BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
          PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent, requiredProp, defaultTestIdKey;
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
@@ -194,7 +194,7 @@ void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       if (ignoreDomProps) {
         // Remove DomProps because they should be forwarded.
-        const $PropKeys(DomPropsMixin).forEach(propsThatShouldNotGetForwarded.remove);
+        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
       }
 
     var shallowRenderer = react_test_utils.createRenderer();
