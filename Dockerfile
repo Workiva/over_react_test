@@ -29,7 +29,7 @@ ADD . /build/
 RUN echo "Starting the script sections" && \
 		dart --version && \
 		pub get && \
-        pub run dependency_validator -i coverage && \
+				pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers && \
 		echo "Script sections completed"
 ARG BUILD_ARTIFACTS_AUDIT=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
