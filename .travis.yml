@@ -13,7 +13,7 @@ before_install:
   - sleep 3 # give xvfb some time to start
 script:
   - pub run dart_dev analyze
-  - pub run dependency_validator -i coverage
+  - pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers
   - pub run dart_dev test
   - ./tool/generate_coverage.sh
   - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.lcov

@@ -14,12 +14,6 @@
 
 import 'dart:collection';
 import 'dart:html';
-// Tell dart2js that this library only needs to reflect types annotated with `Props`.
-// This speeds up compilation and makes JS output much smaller.
-@MirrorsUsed(metaTargets: const [
-  'over_react.component_declaration.annotations.Props'
-])
-import 'dart:mirrors';
 
 import 'package:over_react/over_react.dart'
     show BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
@@ -96,14 +90,15 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   unconsumedPropKeys = flatten(unconsumedPropKeys).toList();
   skippedPropKeys = flatten(skippedPropKeys).toList();
 
-  if (shouldTestPropForwarding) {
-    testPropForwarding(factory, childrenFactory,
-        unconsumedPropKeys: unconsumedPropKeys,
-        ignoreDomProps: ignoreDomProps,
-        skippedPropKeys: skippedPropKeys,
-        nonDefaultForwardingTestProps: nonDefaultForwardingTestProps
-    );
-  }
+// TODO: Uncomment this as part of AF-3700: https://jira.atl.workiva.net/browse/AF-3700
+//  if (shouldTestPropForwarding) {
+//    testPropForwarding(factory, childrenFactory,
+//        unconsumedPropKeys: unconsumedPropKeys,
+//        ignoreDomProps: ignoreDomProps,
+//        skippedPropKeys: skippedPropKeys,
+//        nonDefaultForwardingTestProps: nonDefaultForwardingTestProps
+//    );
+//  }
   if (shouldTestClassNameMerging) {
     testClassNameMerging(factory, childrenFactory);
   }
@@ -151,142 +146,144 @@ void expectCleanTestSurfaceAtEnd() {
 /// Common test for verifying that unconsumed props are forwarded as expected.
 ///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
-void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
-    List unconsumedPropKeys: const [],
-    bool ignoreDomProps: true,
-    List skippedPropKeys: const [],
-    Map nonDefaultForwardingTestProps: const {}
-}) {
-  test('forwards unconsumed props as expected', () {
-    const Map extraProps = const {
-      // Add this so we find the right component(s) with [getForwardingTargets] later.
-      forwardedPropBeacon: true,
-
-      'data-true': true,
-      'aria-true': true,
-
-      'data-null': null,
-      'aria-null': null
-    };
-
-    const Map otherProps = const {
-      'other-true': true,
-      'other-null': null
-    };
-
-    const String testId = 'testIdThatShouldBeForwarded';
-
-    const String key = 'testKeyThatShouldNotBeForwarded';
-    const String ref = 'testRefThatShouldNotBeForwarded';
-
-    /// Get defaults from a ReactElement to account for default props and any props added by the factory.
-    Map defaultProps = new Map.from(getProps(factory()()))
-      ..remove('children');
-
-    // TODO: Account for alias components.
-    Map propsThatShouldNotGetForwarded = {}
-      ..addAll(new Map.fromIterable(getComponentPropKeys(factory), value: (_) => null))
-      // Add defaults afterwards so that components don't blow up when they have unexpected null props.
-      ..addAll(defaultProps)
-      ..addAll(nonDefaultForwardingTestProps);
-
-      unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
-
-      if (ignoreDomProps) {
-        // Remove DomProps because they should be forwarded.
-        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
-      }
-
-    var shallowRenderer = react_test_utils.createRenderer();
-
-    var instance = (factory()
-      ..addProps(propsThatShouldNotGetForwarded)
-      ..addProps(extraProps)
-      ..addProps(otherProps)
-      ..addTestId(testId)
-      ..key = key
-      ..ref = ref
-    )(childrenFactory());
-
-    shallowRenderer.render(instance);
-    var result = shallowRenderer.getRenderOutput();
-
-    var forwardingTargets = getForwardingTargets(result, shallowRendered: true);
-
-    for (var forwardingTarget in forwardingTargets) {
-      Map actualProps = getProps(forwardingTarget);
-
-      // If the forwarding target is a DOM element it will should not have invalid DOM props forwarded to it.
-      if (isDomElement(forwardingTarget)) {
-        otherProps.forEach((key, value) {
-          expect(actualProps, isNot(containsPair(key, value)));
-        });
-      } else {
-        otherProps.forEach((key, value) {
-          expect(actualProps, containsPair(key, value));
-        });
-      }
-
-      // Expect the target to have all forwarded props.
-      extraProps.forEach((key, value) {
-        expect(actualProps, containsPair(key, value));
-      });
-
-      // Check that the added testId is part of the final testId string.
-      expect(actualProps[defaultTestIdKey], contains(testId),
-          reason: '$defaultTestIdKey was not forwarded or was forwarded and then overridden.');
-
-      var ambiguousProps = {};
-
-      Set propKeysThatShouldNotGetForwarded = propsThatShouldNotGetForwarded.keys.toSet();
-      // Don't test any keys specified by skippedPropKeys.
-      propKeysThatShouldNotGetForwarded.removeAll(skippedPropKeys);
-
-      Set unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded);
-
-      /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
-      if (isDartComponent(forwardingTarget)) {
-        // ignore: avoid_as
-        var forwardingTargetDefaults = ((forwardingTarget as ReactElement).type as ReactClass).dartDefaultProps;
-
-        var commonForwardedAndDefaults = propKeysThatShouldNotGetForwarded
-            .intersection(forwardingTargetDefaults.keys.toSet());
-
-        /// Don't count these as unexpected keys in later assertions; we'll verify them within this block.
-        unexpectedKeys.removeAll(commonForwardedAndDefaults);
-
-        commonForwardedAndDefaults.forEach((propKey) {
-          var defaultTargetValue = forwardingTargetDefaults[propKey];
-          var potentiallyForwardedValue = propsThatShouldNotGetForwarded[propKey];
-
-          if (defaultTargetValue != potentiallyForwardedValue) {
-            /// If the potentially forwarded value and the default are different,
-            /// we can tell whether it was forwarded.
-            expect(actualProps, isNot(containsPair(propKey, potentiallyForwardedValue)),
-                reason: 'The `$propKey` prop was forwarded when it should not have been');
-          } else {
-            /// ...otherwise, we can't be certain that the value isn't being forwarded.
-            ambiguousProps[propKey] = defaultTargetValue;
-          }
-        });
-      }
-
-      expect(unexpectedKeys, isEmpty, reason: 'Should filter out all consumed props');
-
-      if (ambiguousProps.isNotEmpty) {
-        fail(unindent(
-            '''
-            Encountered ambiguous forwarded props; some unconsumed props coincide with defaults on the forwarding target, and cannot be automatically tested.
-
-            Try either:
-              - specifying `nonDefaultForwardingTestProps` as a Map with valid prop values that are different than the following: $ambiguousProps
-              - specifying `skippedPropKeys` with the following prop keys and testing their forwarding manually: ${ambiguousProps.keys.toList()}
-            '''
-        ));
-      }
-    }
-  });
-}
+///
+// TODO: Uncomment this as part of AF-3700: https://jira.atl.workiva.net/browse/AF-3700
+//void testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
+//    List unconsumedPropKeys: const [],
+//    bool ignoreDomProps: true,
+//    List skippedPropKeys: const [],
+//    Map nonDefaultForwardingTestProps: const {}
+//}) {
+//  test('forwards unconsumed props as expected', () {
+//    const Map extraProps = const {
+//      // Add this so we find the right component(s) with [getForwardingTargets] later.
+//      forwardedPropBeacon: true,
+//
+//      'data-true': true,
+//      'aria-true': true,
+//
+//      'data-null': null,
+//      'aria-null': null
+//    };
+//
+//    const Map otherProps = const {
+//      'other-true': true,
+//      'other-null': null
+//    };
+//
+//    const String testId = 'testIdThatShouldBeForwarded';
+//
+//    const String key = 'testKeyThatShouldNotBeForwarded';
+//    const String ref = 'testRefThatShouldNotBeForwarded';
+//
+//    /// Get defaults from a ReactElement to account for default props and any props added by the factory.
+//    Map defaultProps = new Map.from(getProps(factory()()))
+//      ..remove('children');
+//
+//    // TODO: Account for alias components.
+//    Map propsThatShouldNotGetForwarded = {}
+//      ..addAll(new Map.fromIterable(getComponentPropKeys(factory), value: (_) => null))
+//      // Add defaults afterwards so that components don't blow up when they have unexpected null props.
+//      ..addAll(defaultProps)
+//      ..addAll(nonDefaultForwardingTestProps);
+//
+//      unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
+//
+//      if (ignoreDomProps) {
+//        // Remove DomProps because they should be forwarded.
+//        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
+//      }
+//
+//    var shallowRenderer = react_test_utils.createRenderer();
+//
+//    var instance = (factory()
+//      ..addProps(propsThatShouldNotGetForwarded)
+//      ..addProps(extraProps)
+//      ..addProps(otherProps)
+//      ..addTestId(testId)
+//      ..key = key
+//      ..ref = ref
+//    )(childrenFactory());
+//
+//    shallowRenderer.render(instance);
+//    var result = shallowRenderer.getRenderOutput();
+//
+//    var forwardingTargets = getForwardingTargets(result, shallowRendered: true);
+//
+//    for (var forwardingTarget in forwardingTargets) {
+//      Map actualProps = getProps(forwardingTarget);
+//
+//      // If the forwarding target is a DOM element it will should not have invalid DOM props forwarded to it.
+//      if (isDomElement(forwardingTarget)) {
+//        otherProps.forEach((key, value) {
+//          expect(actualProps, isNot(containsPair(key, value)));
+//        });
+//      } else {
+//        otherProps.forEach((key, value) {
+//          expect(actualProps, containsPair(key, value));
+//        });
+//      }
+//
+//      // Expect the target to have all forwarded props.
+//      extraProps.forEach((key, value) {
+//        expect(actualProps, containsPair(key, value));
+//      });
+//
+//      // Check that the added testId is part of the final testId string.
+//      expect(actualProps[defaultTestIdKey], contains(testId),
+//          reason: '$defaultTestIdKey was not forwarded or was forwarded and then overridden.');
+//
+//      var ambiguousProps = {};
+//
+//      Set propKeysThatShouldNotGetForwarded = propsThatShouldNotGetForwarded.keys.toSet();
+//      // Don't test any keys specified by skippedPropKeys.
+//      propKeysThatShouldNotGetForwarded.removeAll(skippedPropKeys);
+//
+//      Set unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded);
+//
+//      /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
+//      if (isDartComponent(forwardingTarget)) {
+//        // ignore: avoid_as
+//        var forwardingTargetDefaults = ((forwardingTarget as ReactElement).type as ReactClass).dartDefaultProps;
+//
+//        var commonForwardedAndDefaults = propKeysThatShouldNotGetForwarded
+//            .intersection(forwardingTargetDefaults.keys.toSet());
+//
+//        /// Don't count these as unexpected keys in later assertions; we'll verify them within this block.
+//        unexpectedKeys.removeAll(commonForwardedAndDefaults);
+//
+//        commonForwardedAndDefaults.forEach((propKey) {
+//          var defaultTargetValue = forwardingTargetDefaults[propKey];
+//          var potentiallyForwardedValue = propsThatShouldNotGetForwarded[propKey];
+//
+//          if (defaultTargetValue != potentiallyForwardedValue) {
+//            /// If the potentially forwarded value and the default are different,
+//            /// we can tell whether it was forwarded.
+//            expect(actualProps, isNot(containsPair(propKey, potentiallyForwardedValue)),
+//                reason: 'The `$propKey` prop was forwarded when it should not have been');
+//          } else {
+//            /// ...otherwise, we can't be certain that the value isn't being forwarded.
+//            ambiguousProps[propKey] = defaultTargetValue;
+//          }
+//        });
+//      }
+//
+//      expect(unexpectedKeys, isEmpty, reason: 'Should filter out all consumed props');
+//
+//      if (ambiguousProps.isNotEmpty) {
+//        fail(unindent(
+//            '''
+//            Encountered ambiguous forwarded props; some unconsumed props coincide with defaults on the forwarding target, and cannot be automatically tested.
+//
+//            Try either:
+//              - specifying `nonDefaultForwardingTestProps` as a Map with valid prop values that are different than the following: $ambiguousProps
+//              - specifying `skippedPropKeys` with the following prop keys and testing their forwarding manually: ${ambiguousProps.keys.toList()}
+//            '''
+//        ));
+//      }
+//    }
+//  });
+//}
 
 /// Common test for verifying that [DomProps.className]s are merged/blacklisted as expected.
 ///
@@ -453,48 +450,50 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
 // ********************************************************
 
 /// Returns all the keys found within `props` on a component definition, using reflection.
-Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
-  var definition = factory();
-  InstanceMirror definitionMirror = reflect(definition);
-
-  Map<Symbol, MethodMirror> members;
-
-  // instanceMembers is not implemented for the DDC and will throw is this test is loaded even if it's not run.
-  try {
-    members = definitionMirror.type.instanceMembers;
-  } catch(e) {
-    members = {};
-  }
-
-  // Use prop getters on the props class to infer the prop keys for the component.
-  // Set all props to null to create key-value pairs for each prop, and then return those keys.
-  members.values.forEach((MethodMirror decl) {
-    // Filter out all members except concrete instance getters.
-    if (!decl.isGetter || decl.isSynthetic || decl.isStatic) {
-      return;
-    }
-
-    Type owner = (decl.owner as ClassMirror).reflectedType;
-    if (owner != Object &&
-        owner != component_base.UiProps &&
-        owner != component_base.PropsMapViewMixin &&
-        owner != component_base.MapViewMixin &&
-        owner != MapView &&
-        owner != ReactPropsMixin &&
-        owner != DomPropsMixin &&
-        owner != CssClassPropsMixin &&
-        owner != UbiquitousDomPropsMixin
-    ) {
-      // Some of the getters won't correspond to props, and won't have setters.
-      // Catch resultant exceptions and move on.
-      try {
-        definitionMirror.setField(decl.simpleName, null);
-      } catch(_) {}
-    }
-  });
-
-  return definition.keys.toSet();
-}
+///
+// TODO: Uncomment this as part of AF-3700: https://jira.atl.workiva.net/browse/AF-3700
+//Set getComponentPropKeys(BuilderOnlyUiFactory factory) {
+//  var definition = factory();
+//  InstanceMirror definitionMirror = reflect(definition);
+//
+//  Map<Symbol, MethodMirror> members;
+//
+//  // instanceMembers is not implemented for the DDC and will throw is this test is loaded even if it's not run.
+//  try {
+//    members = definitionMirror.type.instanceMembers;
+//  } catch(e) {
+//    members = {};
+//  }
+//
+//  // Use prop getters on the props class to infer the prop keys for the component.
+//  // Set all props to null to create key-value pairs for each prop, and then return those keys.
+//  members.values.forEach((MethodMirror decl) {
+//    // Filter out all members except concrete instance getters.
+//    if (!decl.isGetter || decl.isSynthetic || decl.isStatic) {
+//      return;
+//    }
+//
+//    Type owner = (decl.owner as ClassMirror).reflectedType;
+//    if (owner != Object &&
+//        owner != component_base.UiProps &&
+//        owner != component_base.PropsMapViewMixin &&
+//        owner != component_base.MapViewMixin &&
+//        owner != MapView &&
+//        owner != ReactPropsMixin &&
+//        owner != DomPropsMixin &&
+//        owner != CssClassPropsMixin &&
+//        owner != UbiquitousDomPropsMixin
+//    ) {
+//      // Some of the getters won't correspond to props, and won't have setters.
+//      // Catch resultant exceptions and move on.
+//      try {
+//        definitionMirror.setField(decl.simpleName, null);
+//      } catch(_) {}
+//    }
+//  });
+//
+//  return definition.keys.toSet();
+//}
 
 /// Return the components to which `props` have been forwarded.
 ///
