@@ -212,7 +212,9 @@ main() {
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<SampleProps> Sample = $Sample;
+UiFactory<SampleProps> Sample =
+    // ignore: undefined_identifier
+    _$Sample;
 
 @Props()
 class _$SampleProps extends UiProps {

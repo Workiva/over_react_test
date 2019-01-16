@@ -19,7 +19,9 @@ part 'test_common_component_required_props.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestCommonRequiredProps> TestCommonRequired = $TestCommonRequired;
+UiFactory<TestCommonRequiredProps> TestCommonRequired =
+    // ignore: undefined_identifier
+    _$TestCommonRequired;
 
 @Props()
 class _$TestCommonRequiredProps extends UiProps {
