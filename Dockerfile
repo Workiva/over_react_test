@@ -27,7 +27,7 @@ ENV DARTIUM_EXPIRATION_TIME=1577836800
 WORKDIR /build/
 ADD . /build/
 RUN echo "Starting the script sections" && \
-		dart --version && \
+		dart --version
 		# pub get && \
 		# pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers && \
 		# echo "Script sections completed"
