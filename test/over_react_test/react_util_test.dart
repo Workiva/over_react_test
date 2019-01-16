@@ -1176,7 +1176,9 @@ main() {
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestProps> Test = $Test;
+UiFactory<TestProps> Test =
+    // ignore: undefined_identifier
+    _$Test;
 
 @Props()
 class _$TestProps extends UiProps {}

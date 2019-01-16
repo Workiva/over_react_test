@@ -21,7 +21,9 @@ part 'test_common_component.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestCommonProps> TestCommon = $TestCommon;
+UiFactory<TestCommonProps> TestCommon =
+    // ignore: undefined_identifier
+    _$TestCommon;
 
 @Props()
 class _$TestCommonProps extends UiProps with
@@ -54,7 +56,7 @@ abstract class PropsThatShouldBeForwarded {
   // To ensure the codemod regression checking works properly, please keep this
   // field at the top of the class!
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForPropsThatShouldBeForwarded;
+  static const PropsMeta meta = _$metaForPropsThatShouldBeForwarded;
 
   Map get props;
 
@@ -66,7 +68,7 @@ abstract class PropsThatShouldNotBeForwarded {
   // To ensure the codemod regression checking works properly, please keep this
   // field at the top of the class!
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForPropsThatShouldNotBeForwarded;
+  static const PropsMeta meta = _$metaForPropsThatShouldNotBeForwarded;
 
   Map get props;
 

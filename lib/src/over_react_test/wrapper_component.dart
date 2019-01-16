@@ -22,7 +22,9 @@ part 'wrapper_component.over_react.g.dart';
 /// for compatability with `getByTestId()`.
 @Factory()
 // ignore: undefined_identifier
-UiFactory<UiProps> Wrapper = $Wrapper;
+UiFactory<UiProps> Wrapper =
+    // ignore: undefined_identifier
+    _$Wrapper;
 
 @Props()
 class _$WrapperProps extends UiProps {}

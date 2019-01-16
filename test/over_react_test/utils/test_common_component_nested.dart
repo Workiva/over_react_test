@@ -22,7 +22,9 @@ part 'test_common_component_nested.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestCommonNestedProps> TestCommonNested = $TestCommonNested;
+UiFactory<TestCommonNestedProps> TestCommonNested =
+    // ignore: undefined_identifier
+    _$TestCommonNested;
 
 @Props()
 class _$TestCommonNestedProps extends UiProps with PropsThatShouldBeForwarded {}

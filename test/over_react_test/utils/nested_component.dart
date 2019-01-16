@@ -19,7 +19,9 @@ part 'nested_component.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<NestedProps> Nested = $Nested;
+UiFactory<NestedProps> Nested =
+    // ignore: undefined_identifier
+    _$Nested;
 
 @Props()
 class _$NestedProps extends UiProps {}
