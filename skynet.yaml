@@ -1,0 +1,21 @@
+name: unit
+
+description: Runs the unit tests
+
+contact: The "TBD" slack room.
+
+# https://github.com/Workiva/skynet-images/tree/dart2-chrome
+image: "drydock.workiva.net/workiva/skynet-images:1591215"
+
+size: large
+
+timeout: long
+
+run:
+  on-pull-request: true
+  when-branch-name-is:
+    - master
+
+scripts:
+  - pub get
+  - xvfb-run -s '-screen 0 1024x768x24' pub run dart_dev test -p chrome
