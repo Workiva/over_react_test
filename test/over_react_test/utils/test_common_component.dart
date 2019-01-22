@@ -79,5 +79,5 @@ abstract class PropsThatShouldNotBeForwarded {
 // ignore: mixin_of_non_class, undefined_class
 class TestCommonProps extends _$TestCommonProps with _$TestCommonPropsAccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForTestCommonProps;
+  static const PropsMeta meta = _$metaForTestCommonProps;
 }

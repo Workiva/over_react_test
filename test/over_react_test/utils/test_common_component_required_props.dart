@@ -48,5 +48,5 @@ class TestCommonRequiredComponent extends UiComponent<TestCommonRequiredProps> {
 // ignore: mixin_of_non_class, undefined_class
 class TestCommonRequiredProps extends _$TestCommonRequiredProps with _$TestCommonRequiredPropsAccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForTestCommonRequiredProps;
+  static const PropsMeta meta = _$metaForTestCommonRequiredProps;
 }

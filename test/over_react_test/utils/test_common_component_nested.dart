@@ -43,5 +43,5 @@ class TestCommonNestedComponent extends UiComponent<TestCommonNestedProps> {
 // ignore: mixin_of_non_class, undefined_class
 class TestCommonNestedProps extends _$TestCommonNestedProps with _$TestCommonNestedPropsAccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForTestCommonNestedProps;
+  static const PropsMeta meta = _$metaForTestCommonNestedProps;
 }
