@@ -43,5 +43,5 @@ class NestedComponent extends UiComponent<NestedProps> {
 // ignore: mixin_of_non_class, undefined_class
 class NestedProps extends _$NestedProps with _$NestedPropsAccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = $metaForNestedProps;
+  static const PropsMeta meta = _$metaForNestedProps;
 }
