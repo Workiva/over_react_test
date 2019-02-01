@@ -22,9 +22,7 @@ part 'wrapper_component.over_react.g.dart';
 /// for compatability with `getByTestId()`.
 @Factory()
 // ignore: undefined_identifier
-UiFactory<UiProps> Wrapper =
-    // ignore: undefined_identifier
-    _$Wrapper;
+UiFactory<UiProps> Wrapper = _$Wrapper;
 
 @Props()
 class _$WrapperProps extends UiProps {}
@@ -37,7 +35,4 @@ class WrapperComponent extends UiComponent<WrapperProps> {
 
 // AF-3369 This will be removed once the transition to Dart 2 is complete.
 // ignore: mixin_of_non_class, undefined_class
-class WrapperProps extends _$WrapperProps with _$WrapperPropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForWrapperProps;
-}
+

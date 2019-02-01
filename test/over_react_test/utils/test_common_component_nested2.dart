@@ -19,9 +19,7 @@ part 'test_common_component_nested2.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestCommonNested2Props> TestCommonNested2 =
-    // ignore: undefined_identifier
-    _$TestCommonNested2;
+UiFactory<TestCommonNested2Props> TestCommonNested2 = _$TestCommonNested2;
 
 @Props()
 class _$TestCommonNested2Props extends UiProps {}
@@ -38,7 +36,4 @@ class TestCommonNested2Component extends UiComponent<TestCommonNested2Props> {
 
 // AF-3369 This will be removed once the transition to Dart 2 is complete.
 // ignore: mixin_of_non_class, undefined_class
-class TestCommonNested2Props extends _$TestCommonNested2Props with _$TestCommonNested2PropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForTestCommonNested2Props;
-}
+

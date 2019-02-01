@@ -21,9 +21,7 @@ part 'test_common_component.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
-UiFactory<TestCommonProps> TestCommon =
-    // ignore: undefined_identifier
-    _$TestCommon;
+UiFactory<TestCommonProps> TestCommon = _$TestCommon;
 
 @Props()
 class _$TestCommonProps extends UiProps with
@@ -52,11 +50,9 @@ class TestCommonComponent extends UiComponent<TestCommonProps> {
 }
 
 @PropsMixin()
-abstract class PropsThatShouldBeForwarded {
+abstract class _$PropsThatShouldBeForwarded {
   // To ensure the codemod regression checking works properly, please keep this
   // field at the top of the class!
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForPropsThatShouldBeForwarded;
 
   Map get props;
 
@@ -64,11 +60,9 @@ abstract class PropsThatShouldBeForwarded {
 }
 
 @PropsMixin()
-abstract class PropsThatShouldNotBeForwarded {
+abstract class _$PropsThatShouldNotBeForwarded {
   // To ensure the codemod regression checking works properly, please keep this
   // field at the top of the class!
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForPropsThatShouldNotBeForwarded;
 
   Map get props;
 
@@ -77,7 +71,4 @@ abstract class PropsThatShouldNotBeForwarded {
 
 // AF-3369 This will be removed once the transition to Dart 2 is complete.
 // ignore: mixin_of_non_class, undefined_class
-class TestCommonProps extends _$TestCommonProps with _$TestCommonPropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForTestCommonProps;
-}
+
