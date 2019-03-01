@@ -38,7 +38,7 @@ main() {
       var renderedInstance;
 
       tearDown(() {
-        expect(renderedInstance.isMounted(), isFalse, reason: 'The React instance should have been unmounted.');
+        expect(findDomNode(renderedInstance), throwsArgumentError, reason: 'The React instance should have been unmounted.');
 
         expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
       });
@@ -75,7 +75,7 @@ main() {
 
       tearDownAttachedNodes();
 
-      expect(renderedInstance.isMounted(), isFalse, reason: 'The React instance should have been unmounted.');
+      expect(findDomNode(renderedInstance), throwsArgumentError, reason: 'The React instance should have been unmounted.');
 
       expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
     });
@@ -1123,10 +1123,7 @@ main() {
         test('by its rendered instance', () {
           var mountNode = new DivElement();
           var instance = react_dom.render(Wrapper()(), mountNode);
-          expect(instance.isMounted(), isTrue);
-
-          unmount(instance);
-          expect(instance.isMounted(), isFalse);
+          expect(react_dom.unmountComponentAtNode(mountNode), isTrue);
         });
 
         test('by its mount node', () {

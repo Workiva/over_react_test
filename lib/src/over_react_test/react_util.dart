@@ -96,9 +96,11 @@ void unmount(dynamic instanceOrContainerNode) {
       react_test_utils.isCompositeComponent(instanceOrContainerNode) ||
       react_test_utils.isDOMComponent(instanceOrContainerNode)
   ) {
-    if (!instanceOrContainerNode.isMounted()) return;
-
-    containerNode = findDomNode(instanceOrContainerNode)?.parent;
+    try {
+      containerNode = findDomNode(instanceOrContainerNode)?.parent;
+    } catch(e) {
+      return;
+    }
   } else {
     throw new ArgumentError(
         '`instanceOrNode` must be null, a ReactComponent instance, or an Element. Was: $instanceOrContainerNode.'

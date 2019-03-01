@@ -61,6 +61,7 @@ class TestJacket<T extends react.Component> {
   final Element mountNode;
   final bool attachedToDocument;
   final bool autoTearDown;
+  bool _isMounted;
 
   TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
       : this.mountNode = mountNode ?? (new DivElement()
@@ -70,6 +71,7 @@ class TestJacket<T extends react.Component> {
   }
 
   void _render(over_react.ReactElement reactElement) {
+    _isMounted = true;
     _renderedInstance = attachedToDocument
         ? react_util.renderAttachedToDocument(reactElement, container: mountNode, autoTearDown: autoTearDown)
         : react_util.render(reactElement, container: mountNode, autoTearDown: autoTearDown);
@@ -105,6 +107,11 @@ class TestJacket<T extends react.Component> {
     return over_react.getDartComponent(_renderedInstance) as T;
   }
 
+  /// Returns if the jacket component is mounted or not.
+  bool isMounted() {
+    return _isMounted;
+  }
+
   /// Update the Dart component's state to the provided [newState] value and force a re-render.
   ///
   /// Optionally accepts a callback that gets called after the component updates.
@@ -118,6 +125,7 @@ class TestJacket<T extends react.Component> {
 
   /// Unmounts the React component instance and cleans up any attached DOM nodes.
   void unmount() {
+    _isMounted = false;
     react_util.unmount(_renderedInstance);
     mountNode?.remove();
     react_util.tearDownAttachedNodes();
