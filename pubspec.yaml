@@ -24,9 +24,3 @@ transformers:
   - over_react
   - test/pub_serve:
       $include: test/**_test{.*,}.dart
-
-
-dependency_overrides:
-  over_react:
-    path: /Users/kealjones/.publink/over_react
-
