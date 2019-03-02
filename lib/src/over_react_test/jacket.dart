@@ -66,15 +66,21 @@ class TestJacket<T extends react.Component> {
   TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
       : this.mountNode = mountNode ?? (new DivElement()
           ..style.height = '800px'
-          ..style.width= '800px') {
+          ..style.width = '800px') {
     _render(reactElement);
   }
 
   void _render(over_react.ReactElement reactElement) {
     _isMounted = true;
     _renderedInstance = attachedToDocument
-        ? react_util.renderAttachedToDocument(reactElement, container: mountNode, autoTearDown: autoTearDown)
-        : react_util.render(reactElement, container: mountNode, autoTearDown: autoTearDown);
+        ? react_util.renderAttachedToDocument(reactElement,
+            container: mountNode,
+            autoTearDown: autoTearDown,
+            autoTearDownCallback: unmount)
+        : react_util.render(reactElement,
+            container: mountNode,
+            autoTearDown: autoTearDown,
+            autoTearDownCallback: unmount);
   }
 
   /// Rerenders the [reactElement] into the same [mountNode].

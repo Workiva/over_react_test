@@ -50,7 +50,10 @@ export 'package:over_react/src/util/react_wrappers.dart';
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false.
-/* [1] */ render(dynamic component, {bool autoTearDown = true, Element container}) {
+/* [1] */ render(dynamic component,
+    {bool autoTearDown = true,
+    Element container,
+    Callback autoTearDownCallback}) {
   var renderedInstance;
   component = component is component_base.UiProps ? component.build() : component;
 
@@ -60,7 +63,11 @@ export 'package:over_react/src/util/react_wrappers.dart';
     renderedInstance = react_dom.render(component, container);
   }
 
-  if (autoTearDown) addTearDown(() => unmount(renderedInstance));
+  if (autoTearDown)
+    addTearDown(() {
+      unmount(renderedInstance);
+      if (autoTearDownCallback != null) autoTearDownCallback();
+    });
 
   return renderedInstance;
 }
@@ -98,7 +105,7 @@ void unmount(dynamic instanceOrContainerNode) {
   ) {
     try {
       containerNode = findDomNode(instanceOrContainerNode)?.parent;
-    } catch(e) {
+    } catch (e) {
       return;
     }
   } else {
@@ -119,7 +126,9 @@ Element renderAndGetDom(dynamic component, {bool autoTearDown: true}) {
 }
 
 /// Renders a React component or builder into a detached node and returns the associtated Dart component.
-react.Component renderAndGetComponent(dynamic component, {bool autoTearDown: true}) => getDartComponent(render(component, autoTearDown: autoTearDown));
+react.Component renderAndGetComponent(dynamic component,
+        {bool autoTearDown: true}) =>
+    getDartComponent(render(component, autoTearDown: autoTearDown));
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
@@ -127,7 +136,10 @@ List<Element> _attachedReactContainers = [];
 /// Renders the component into a node attached to document.body as opposed to a detached node.
 ///
 /// Returns the rendered component.
-/* [1] */ renderAttachedToDocument(dynamic component, {bool autoTearDown = true, Element container}) {
+/* [1] */ renderAttachedToDocument(dynamic component,
+    {bool autoTearDown = true,
+    Element container,
+    Callback autoTearDownCallback}) {
   container ??= new DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
@@ -139,6 +151,7 @@ List<Element> _attachedReactContainers = [];
     addTearDown(() {
       react_dom.unmountComponentAtNode(container);
       container.remove();
+      if (autoTearDownCallback != null) autoTearDownCallback();
     });
   } else {
     _attachedReactContainers.add(container);
@@ -288,7 +301,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-List/* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {

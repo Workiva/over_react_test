@@ -38,7 +38,10 @@ main() {
       var renderedInstance;
 
       tearDown(() {
-        expect(findDomNode(renderedInstance), throwsArgumentError, reason: 'The React instance should have been unmounted.');
+        expect(() => findDomNode(renderedInstance),
+            throwsA(hasToStringValue(contains('findDOMNode was called on an unmounted component'))),
+            reason: 'The React instance should have been unmounted.'
+        );
 
         expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
       });
@@ -75,7 +78,10 @@ main() {
 
       tearDownAttachedNodes();
 
-      expect(findDomNode(renderedInstance), throwsArgumentError, reason: 'The React instance should have been unmounted.');
+      expect(() => findDomNode(renderedInstance),
+      throwsA(hasToStringValue(contains('findDOMNode was called on an unmounted component'))),
+          reason: 'The React instance should have been unmounted.'
+      );
 
       expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
     });
