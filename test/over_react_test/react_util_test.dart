@@ -39,7 +39,10 @@ main() {
 
       tearDown(() {
         expect(() => findDomNode(renderedInstance),
-            throwsA(hasToStringValue(contains('findDOMNode was called on an unmounted component'))),
+            throwsA(anyOf(
+                hasToStringValue(contains('unmounted component')),
+                hasToStringValue(contains('Invariant Violation'))
+            )),
             reason: 'The React instance should have been unmounted.'
         );
 
@@ -79,7 +82,10 @@ main() {
       tearDownAttachedNodes();
 
       expect(() => findDomNode(renderedInstance),
-      throwsA(hasToStringValue(contains('findDOMNode was called on an unmounted component'))),
+          throwsA(anyOf(
+              hasToStringValue(contains('unmounted component')),
+              hasToStringValue(contains('Invariant Violation'))
+          )),
           reason: 'The React instance should have been unmounted.'
       );
 
