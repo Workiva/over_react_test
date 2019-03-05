@@ -61,7 +61,7 @@ class TestJacket<T extends react.Component> {
   final Element mountNode;
   final bool attachedToDocument;
   final bool autoTearDown;
-  bool _isMounted;
+  bool _isMounted = false;
 
   TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
       : this.mountNode = mountNode ?? (new DivElement()
@@ -114,9 +114,7 @@ class TestJacket<T extends react.Component> {
   }
 
   /// Returns if the jacket component is mounted or not.
-  bool isMounted() {
-    return _isMounted;
-  }
+  bool get isMounted => _isMounted;
 
   /// Update the Dart component's state to the provided [newState] value and force a re-render.
   ///

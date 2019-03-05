@@ -49,7 +49,8 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// Renders a React component or builder into a detached node and returns the component instance.
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
-/// [autoTearDown] to false.
+/// [autoTearDown] to false. If [autoTearDown] is set to true once it will, if provided, call [autoTearDownCallback]
+/// once the component has been unmounted.
 /* [1] */ render(dynamic component,
     {bool autoTearDown = true,
     Element container,
@@ -78,9 +79,12 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// [autoTearDown] to false.
 ///
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
-ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true}) {
+ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true, Callback autoTearDownCallback}) {
   var renderer = react_test_utils.createRenderer();
-  if (autoTearDown) addTearDown(() => renderer.unmount());
+  if (autoTearDown) addTearDown(() {
+    renderer.unmount();
+    if (autoTearDownCallback != null) autoTearDownCallback();
+  });
   renderer.render(instance);
   return renderer.getRenderOutput();
 }
@@ -121,14 +125,14 @@ void unmount(dynamic instanceOrContainerNode) {
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false.
-Element renderAndGetDom(dynamic component, {bool autoTearDown: true}) {
-  return findDomNode(render(component, autoTearDown: autoTearDown));
+Element renderAndGetDom(dynamic component, {bool autoTearDown: true, Callback autoTearDownCallback}) {
+  return findDomNode(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
 }
 
 /// Renders a React component or builder into a detached node and returns the associtated Dart component.
 react.Component renderAndGetComponent(dynamic component,
-        {bool autoTearDown: true}) =>
-    getDartComponent(render(component, autoTearDown: autoTearDown));
+        {bool autoTearDown: true, Callback autoTearDownCallback}) =>
+    getDartComponent(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
