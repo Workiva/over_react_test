@@ -34,7 +34,7 @@ main() {
 
         tearDown(() {
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isFalse);
+          expect(jacket.isMounted, isFalse);
 
           jacket = null;
         });
@@ -44,14 +44,14 @@ main() {
           jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode);
 
           expect(document.body.children[0], mountNode);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()(), attachedToDocument: true);
 
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(document.body.children[0].children[0], jacket.getNode());
         });
       });
@@ -65,29 +65,34 @@ main() {
 
         tearDown(() {
           expect(document.body.children, isNotEmpty);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
 
           jacket.unmount();
 
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isFalse);
+          expect(jacket.isMounted, isFalse);
 
           jacket = null;
         });
 
         test('with the given container', () {
           var mountNode = new DivElement();
-          jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode, autoTearDown: false);
+          jacket = mount(Sample()(),
+              attachedToDocument: true,
+              mountNode: mountNode,
+              autoTearDown: false
+          );
 
           expect(document.body.children[0], mountNode);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
-          jacket = mount(Sample()(), attachedToDocument: true, autoTearDown: false);
+          jacket =
+              mount(Sample()(), attachedToDocument: true, autoTearDown: false);
 
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(document.body.children[0].children[0], jacket.getNode());
         });
       });
@@ -103,7 +108,7 @@ main() {
 
         tearDown(() {
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isFalse);
+          expect(jacket.isMounted, isFalse);
 
           jacket = null;
         });
@@ -113,14 +118,14 @@ main() {
           jacket = mount(Sample()(), mountNode: mountNode);
 
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()());
 
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
         });
       });
 
@@ -133,12 +138,12 @@ main() {
 
         tearDown(() {
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
 
           jacket.unmount();
 
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isFalse);
+          expect(jacket.isMounted, isFalse);
 
           jacket = null;
         });
@@ -148,7 +153,7 @@ main() {
           jacket = mount(Sample()(), mountNode: mountNode, autoTearDown: false);
 
           expect(document.body.children.isEmpty, isTrue);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
           expect(mountNode.children[0], jacket.getNode());
         });
 
@@ -156,7 +161,7 @@ main() {
           jacket = mount(Sample()(), autoTearDown: false);
 
           expect(document.body.children, isEmpty);
-          expect(jacket.getInstance().isMounted(), isTrue);
+          expect(jacket.isMounted, isTrue);
         });
       });
     });
@@ -201,11 +206,11 @@ main() {
     });
 
     test('unmount', () {
-      expect(jacket.getInstance().isMounted(), isTrue);
+      expect(jacket.isMounted, isTrue);
 
       jacket.unmount();
 
-      expect(jacket.getInstance().isMounted(), isFalse);
+      expect(jacket.isMounted, isFalse);
     });
   });
 }
