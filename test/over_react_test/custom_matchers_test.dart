@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'dart:html';
+import 'dart:svg';
 
 import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
@@ -86,6 +87,13 @@ main() {
 
         test('the element has the exact classes (specified as an Iterable)', () {
           testElement.className = 'class1 class2';
+          shouldPass(testElement, hasExactClasses(['class1', 'class2']));
+        });
+
+        test('the element has the exact classes and is an SvgElement', () {
+          // Test workaround for https://github.com/dart-lang/sdk/issues/36200.
+          // This may be removed when the workaround is removed.
+          testElement = new SvgElement.svg('<svg class="class1 class2"/>');
           shouldPass(testElement, hasExactClasses(['class1', 'class2']));
         });
       });
