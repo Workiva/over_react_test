@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'dart:html';
+import 'dart:svg';
 
 import 'package:over_react/over_react.dart';
 import 'package:matcher/matcher.dart';
@@ -53,8 +54,20 @@ class ClassNameMatcher extends Matcher {
   }
 
   @override
-  bool matches(covariant String className, Map matchState) {
-    Iterable actualClasses = getClassIterable(className);
+  bool matches(className, Map matchState) {
+    // There's a bug in DDC where, though the docs say `className` should
+    // return `String`, it will return `AnimatedString` for `SvgElement`s. See
+    // https://github.com/dart-lang/sdk/issues/36200.
+    String castClassName;
+    if (className is String) {
+      castClassName = className;
+    } else if (className is AnimatedString) {
+      castClassName = className.baseVal;
+    } else {
+      throw new ArgumentError.value(className, 'Must be a string type');
+    }
+
+    Iterable actualClasses = getClassIterable(castClassName);
     Set missingClasses = expectedClasses.difference(actualClasses.toSet());
     Set unwantedClasses = unexpectedClasses.intersection(actualClasses.toSet());
 
