@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      over_react|overReactBuilder:
+        generate_for:
+          include:
+            - "lib/src/over_react_test/wrapper_component.dart"
+            - "test/over_react_test/**.dart"
+      
+      build_web_compilers|entrypoint:
+        generate_for:
+          include:
+            - "test/over_react_test.dart"
