@@ -207,11 +207,11 @@ final _EventSimulatorAlias mouseUp = react_test_utils.Simulate.mouseUp;
 
 /// Helper function to simulate mouseEnter events.
 final _EventSimulatorAlias mouseEnter = (componentOrNode, [Map eventData = const {}]) =>
-    Simulate._mouseEnter(componentOrNode, jsify(eventData));
+    Simulate._mouseEnter(componentOrNode, jsifyAndAllowInterop(eventData));
 
 /// Helper function to simulate mouseLeave events.
 final _EventSimulatorAlias mouseLeave = (componentOrNode, [Map eventData = const {}]) =>
-    Simulate._mouseLeave(componentOrNode, jsify(eventData));
+    Simulate._mouseLeave(componentOrNode, jsifyAndAllowInterop(eventData));
 
 @JS('React.addons.TestUtils.Simulate')
 abstract class Simulate {
