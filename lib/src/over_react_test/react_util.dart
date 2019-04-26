@@ -24,8 +24,8 @@ import 'package:over_react/component_base.dart' as component_base;
 import 'package:react/react.dart' as react;
 import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_client.dart';
-import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_client/react_interop.dart';
+import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
@@ -207,11 +207,11 @@ final _EventSimulatorAlias mouseUp = react_test_utils.Simulate.mouseUp;
 
 /// Helper function to simulate mouseEnter events.
 final _EventSimulatorAlias mouseEnter = (componentOrNode, [Map eventData = const {}]) =>
-    Simulate._mouseEnter(componentOrNode, jsify(eventData));
+    Simulate._mouseEnter(componentOrNode, jsifyAndAllowInterop(eventData));
 
 /// Helper function to simulate mouseLeave events.
 final _EventSimulatorAlias mouseLeave = (componentOrNode, [Map eventData = const {}]) =>
-    Simulate._mouseLeave(componentOrNode, jsify(eventData));
+    Simulate._mouseLeave(componentOrNode, jsifyAndAllowInterop(eventData));
 
 @JS('React.addons.TestUtils.Simulate')
 abstract class Simulate {

@@ -15,8 +15,8 @@
 import 'package:js/js.dart';
 import 'package:react/react.dart' as react show div;
 import 'package:react/react_client.dart';
-import 'package:react/react_client/react_interop.dart' show React, ReactClassConfig;
 import 'package:react/react_client/js_interop_helpers.dart';
+import 'package:react/react_client/react_interop.dart' show React, ReactClassConfig;
 
 /// A factory for a JS composite component, for use in testing.
 final Function testJsComponentFactory = (() {
@@ -28,6 +28,6 @@ final Function testJsComponentFactory = (() {
   var reactFactory = React.createFactory(componentClass);
 
   return ([props = const {}, children]) {
-    return reactFactory(jsify(props), listifyChildren(children));
+    return reactFactory(jsifyAndAllowInterop(props), listifyChildren(children));
   };
 })();
