@@ -1,3 +1,4 @@
+FROM google/dart:2.2 as dart2
 FROM drydock-prod.workiva.net/workiva/smithy-runner-generator:355624 as build
 
 # Build Environment Vars
@@ -26,11 +27,18 @@ RUN eval "$(ssh-agent -s)" && \
 ENV DARTIUM_EXPIRATION_TIME=1577836800
 WORKDIR /build/
 ADD . /build/
+# Use pub from Dart 2 to initially resolve dependencies since it is much more efficient.
+COPY --from=dart2 /usr/lib/dart /usr/lib/dart2
+RUN echo "Running Dart 2 pub get.." && \
+	_PUB_TEST_SDK_VERSION=1.24.3 timeout 5m /usr/lib/dart2/bin/pub get --no-precompile
 RUN echo "Starting the script sections" && \
 		dart --version && \
 		pub get && \
-		pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers && \
-		echo "Script sections completed"
+		pub run dart_dev analyze && \
+		pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers
+RUN echo "Running tests" && \
+        pub run dart_dev test && \
+		echo "Done running tests"
 ARG BUILD_ARTIFACTS_AUDIT=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_DART-DEPENDENCIES=/build/pubspec.lock
