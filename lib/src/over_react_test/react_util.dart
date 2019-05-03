@@ -507,18 +507,14 @@ List findDescendantsWithProp(/* [1] */ root, dynamic propKey) {
       return false;
     }
 
-    if (react_test_utils.isCompositeComponent(descendant)) {
-      if (isDartComponent(descendant)) {
-        // TODO why not just `getProps` for this case?
-        return getDartComponent(descendant).props.containsKey(propKey);
-      } else {
-        return getProps(descendant).containsKey(propKey);
-      }
-    } else if (react_test_utils.isDOMComponent(descendant)) {
-      return findDomNode(descendant).attributes.containsKey(propKey);
+    Map props;
+    if (react_test_utils.isDOMComponent(descendant)) {
+      props = findDomNode(descendant).attributes;
+    } else if (react_test_utils.isCompositeComponent(descendant)) {
+      props = getProps(descendant);
     }
 
-    return false;
+    return props != null && props.containsKey(propKey);
   }));
 
   return descendantsWithProp;
