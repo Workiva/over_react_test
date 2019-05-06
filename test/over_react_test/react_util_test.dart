@@ -607,6 +607,15 @@ main() {
           var descendants = getAllByTestId(renderedInstance, null);
           expect(descendants, isEmpty);
         });
+
+        test('without throwing when text nodes are present in the tree', () {
+          var renderedInstance = render(Wrapper()(
+            Dom.div()(),
+            'I will become a text node',
+          ));
+
+          expect(() => getAllByTestId(renderedInstance, 'data-null'), returnsNormally);
+        });
       }
 
       group('(rendered component)', () {
@@ -1106,28 +1115,39 @@ main() {
       });
     });
 
-    test('findDescendantsWithProp returns the descendants with the specified propKey', () {
-      var renderedInstance = render(Wrapper()([
-        (Dom.div()..addProp('data-name', 'top-level DOM'))(),
-        (Test()..addProp('data-name', 'top-level Dart'))(),
-        testJsComponentFactory({'data-name': 'top-level JS composite'}),
+    group('findDescendantsWithProp', () {
+      test('returns the descendants with the specified propKey', () {
+        var renderedInstance = render(Wrapper()([
+          (Dom.div()..addProp('data-name', 'top-level DOM'))(),
+          (Test()..addProp('data-name', 'top-level Dart'))(),
+          testJsComponentFactory({'data-name': 'top-level JS composite'}),
 
-        Dom.div()([
-          (Dom.div()..addProp('data-name', 'nested DOM'))(),
-          (Test()..addProp('data-name', 'nested Dart'))(),
-          testJsComponentFactory({'data-name': 'nested JS composite'}),
-        ])
-      ]));
+          Dom.div()([
+            (Dom.div()..addProp('data-name', 'nested DOM'))(),
+            (Test()..addProp('data-name', 'nested Dart'))(),
+            testJsComponentFactory({'data-name': 'nested JS composite'}),
+          ])
+        ]));
 
-      var descendants = findDescendantsWithProp(renderedInstance, 'data-name');
-      expect(descendants, [
-        hasProp('data-name', 'top-level DOM'),
-        hasProp('data-name', 'top-level Dart'),
-        hasProp('data-name', 'top-level JS composite'),
-        hasProp('data-name', 'nested DOM'),
-        hasProp('data-name', 'nested Dart'),
-        hasProp('data-name', 'nested JS composite'),
-      ]);
+        var descendants = findDescendantsWithProp(renderedInstance, 'data-name');
+        expect(descendants, [
+          hasProp('data-name', 'top-level DOM'),
+          hasProp('data-name', 'top-level Dart'),
+          hasProp('data-name', 'top-level JS composite'),
+          hasProp('data-name', 'nested DOM'),
+          hasProp('data-name', 'nested Dart'),
+          hasProp('data-name', 'nested JS composite'),
+        ]);
+      });
+
+      test('does not throw when text nodes are present in the tree', () {
+        var renderedInstance = render(Wrapper()(
+          Dom.div()(),
+          'I will become a text node',
+        ));
+
+        expect(() => findDescendantsWithProp(renderedInstance, 'data-null'), returnsNormally);
+      });
     });
 
     group('unmount:', () {

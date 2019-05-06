@@ -313,11 +313,13 @@ List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defau
   }
 
   return react_test_utils.findAllInRenderedTree(root, allowInterop((descendant) {
-    var props = react_test_utils.isDOMComponent(descendant)
-        ? findDomNode(descendant).attributes
-        : getProps(descendant);
-
-    return _hasTestId(props, key, value);
+    Map props;
+    if (react_test_utils.isDOMComponent(descendant)) {
+      props = findDomNode(descendant).attributes;
+    } else if (react_test_utils.isCompositeComponent(descendant)) {
+      props = getProps(descendant);
+    }
+    return props != null && _hasTestId(props, key, value);
   }));
 }
 
@@ -505,16 +507,14 @@ List findDescendantsWithProp(/* [1] */ root, dynamic propKey) {
       return false;
     }
 
-    bool hasProp;
-    if (isDartComponent(descendant)) {
-      hasProp = getDartComponent(descendant).props.containsKey(propKey);
+    Map props;
+    if (react_test_utils.isDOMComponent(descendant)) {
+      props = findDomNode(descendant).attributes;
     } else if (react_test_utils.isCompositeComponent(descendant)) {
-      hasProp = getProps(descendant).containsKey(propKey);
-    } else if (react_test_utils.isDOMComponent(descendant)) {
-      hasProp = findDomNode(descendant).attributes.containsKey(propKey);
+      props = getProps(descendant);
     }
 
-    return hasProp;
+    return props != null && props.containsKey(propKey);
   }));
 
   return descendantsWithProp;
