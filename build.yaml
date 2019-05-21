@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      over_react:
+        enabled: true
+      over_react|overReactBuilder:
+        enabled: false

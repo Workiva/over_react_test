@@ -6,6 +6,11 @@ authors:
   - Workiva UI Platform Team <uip@workiva.com>
 environment:
   sdk: ">=1.24.3 <3.0.0"
+dependency_overrides:
+  over_react:
+    git:
+      url: git@github.com:Workiva/over_react.git
+      ref: experiment/build_to_source
 dependencies:
   js: ^0.6.1+1
   matcher: ^0.12.1+4
