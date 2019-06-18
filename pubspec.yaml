@@ -27,7 +27,9 @@ transformers:
 
 dependency_overrides:
   over_react:
-    path: '/Users/sydneyjodon/Documents/GitHub/over_react'
+    git:
+      url: https://github.com/Workiva/over_react
+      ref: CPLAT-6157-pointer-event-simulator-alias
   react:
     git:
       url: https://github.com/cleandart/react-dart.git
