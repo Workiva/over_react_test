@@ -31,9 +31,6 @@ RUN echo "Starting the script sections" && \
 		pub get && \
 		pub run dart_dev analyze && \
 		pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers
-RUN echo "Running tests" && \
-        pub run dart_dev test && \
-		echo "Done running tests"
 ARG BUILD_ARTIFACTS_AUDIT=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_BUILD=/build/pubspec.lock
 ARG BUILD_ARTIFACTS_DART-DEPENDENCIES=/build/pubspec.lock
