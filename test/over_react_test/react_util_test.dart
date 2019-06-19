@@ -202,7 +202,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerCancel simulates a mouseLeave on a component', () {
+    test('pointerCancel simulates a pointerCancel on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerCancel = (evt) => flag = true)());
 
@@ -211,7 +211,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerDown simulates a mouseLeave on a component', () {
+    test('pointerDown simulates a pointerDown on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerDown = (evt) => flag = true)());
 
@@ -220,7 +220,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerEnter simulates a mouseLeave on a component', () {
+    test('pointerEnter simulates a pointerEnter on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerEnter = (evt) => flag = true)());
 
@@ -229,7 +229,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerLeave simulates a mouseLeave on a component', () {
+    test('pointerLeave simulates a pointerLeave on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerLeave = (evt) => flag = true)());
 
@@ -238,7 +238,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerMove simulates a mouseLeave on a component', () {
+    test('pointerMove simulates a pointerMove on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerMove = (evt) => flag = true)());
 
@@ -247,7 +247,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerOver simulates a mouseLeave on a component', () {
+    test('pointerOver simulates a pointerOver on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerOver = (evt) => flag = true)());
 
@@ -256,7 +256,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerOut simulates a mouseLeave on a component', () {
+    test('pointerOut simulates a pointerOut on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerOut = (evt) => flag = true)());
 
@@ -265,7 +265,7 @@ main() {
       expect(flag, isTrue);
     });
 
-    test('pointerUp simulates a mouseLeave on a component', () {
+    test('pointerUp simulates a pointerUp on a component', () {
       var flag = false;
       var renderedInstance = render((Dom.div()..onPointerUp = (evt) => flag = true)());
 
