@@ -1,4 +1,4 @@
-FROM google/dart:2.2.2
+FROM google/dart:2.2
 
 # Expose env vars for git ssh access
 ARG GIT_SSH_KEY
