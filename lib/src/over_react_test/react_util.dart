@@ -213,6 +213,38 @@ final _EventSimulatorAlias mouseEnter = (componentOrNode, [Map eventData = const
 final _EventSimulatorAlias mouseLeave = (componentOrNode, [Map eventData = const {}]) =>
     Simulate._mouseLeave(componentOrNode, jsifyAndAllowInterop(eventData));
 
+/// Helper function to simulate pointerCancel events.
+final _EventSimulatorAlias pointerCancel = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerCancel(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerDown events.
+final _EventSimulatorAlias pointerDown = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerDown(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerEnter events.
+final _EventSimulatorAlias pointerEnter = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerEnter(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerLeave events.
+final _EventSimulatorAlias pointerLeave = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerLeave(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerMove events.
+final _EventSimulatorAlias pointerMove = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerMove(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerOver events.
+final _EventSimulatorAlias pointerOver = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerOver(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerOut events.
+final _EventSimulatorAlias pointerOut = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerOut(componentOrNode, jsifyAndAllowInterop(eventData));
+
+/// Helper function to simulate pointerUp events.
+final _EventSimulatorAlias pointerUp = (componentOrNode, [Map eventData = const {}]) =>
+    Simulate._pointerUp(componentOrNode, jsifyAndAllowInterop(eventData));
+
 @JS('React.addons.TestUtils.Simulate')
 abstract class Simulate {
   @JS('mouseEnter')
@@ -220,6 +252,30 @@ abstract class Simulate {
 
   @JS('mouseLeave')
   external static void _mouseLeave(dynamic target, [eventData]);
+
+  @JS('pointerCancel')
+  external static void _pointerCancel(dynamic target, [eventData]);
+
+  @JS('pointerDown')
+  external static void _pointerDown(dynamic target, [eventData]);
+
+  @JS('pointerEnter')
+  external static void _pointerEnter(dynamic target, [eventData]);
+
+  @JS('pointerLeave')
+  external static void _pointerLeave(dynamic target, [eventData]);
+
+  @JS('pointerMove')
+  external static void _pointerMove(dynamic target, [eventData]);
+
+  @JS('pointerOver')
+  external static void _pointerOver(dynamic target, [eventData]);
+
+  @JS('pointerOut')
+  external static void _pointerOut(dynamic target, [eventData]);
+
+  @JS('pointerUp')
+  external static void _pointerUp(dynamic target, [eventData]);
 }
 
 /// Returns whether [props] contains [key] with a value set to a space-delimited string containing [value].
