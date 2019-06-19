@@ -29,7 +29,7 @@ dependency_overrides:
  over_react:
    git:
      url: https://github.com/Workiva/over_react
-     ref: 3.1.0-wip
+     ref: CPLAT-6157-pointer-event-simulator-alias
  react:
    git:
      url: https://github.com/cleandart/react-dart.git
