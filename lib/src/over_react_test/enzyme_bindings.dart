@@ -191,7 +191,7 @@ class CommonWrapper<This extends CommonWrapper<This>> {
   /// Gets the instance of the component being rendered as the root node passed into shallow().
   ///
   /// NOTE: can only be called on a wrapper instance that is also the root instance.
-  external C instance();
+  external C instance<C>();
 
   /// Forces a re-render. Useful to run before checking the render output if something external may be updating
   /// the state of the component somewhere.
@@ -221,7 +221,7 @@ class CommonWrapper<This extends CommonWrapper<This>> {
   /// @param fn A mapping function to be run for every node in the collection, the results of which will be mapped
   ///              to the returned array. Should expect a ShallowWrapper as the first argument, and will be run
   ///              with a context of the original instance.
-  external List<V> map<V>(V Function(This wrapper, int index) fn);
+  external List/*<V>*/ map<V>(V Function(This wrapper, int index) fn);
 
   /// Applies the provided reducing function to every node in the wrapper to reduce to a single value. Each node
   /// is passed in as a ShallowWrapper, and is processed from left to right.
@@ -352,11 +352,11 @@ class CommonWrapper<This extends CommonWrapper<This>> {
 //}
 //
 //// tslint:disable-next-line no-empty-interface
-class ReactWrapper<P, S, C, This extends ReactWrapper<P, S, C, This>> extends CommonWrapper<P, S, C, ReactWrapper<P, S, C, This>> {
+class ReactWrapper extends CommonWrapper<ReactWrapper> {
 //    constructor(dynamic /* JSX.Element | JSX.Element[ */] nodes, root?: ReactWrapper<dynamic, dynamic>, options?: MountRendererProps);
 
-  external This unmount();
-  external This mount();
+  external ReactWrapper unmount();
+  external ReactWrapper mount();
 
 //    /**
 //     * Returns a wrapper of the node that matches the provided reference name.
@@ -481,7 +481,7 @@ class MountRendererOptions {
 /////**
 //// * Mounts and renders a react component into the document and provides a testing wrapper around it.
 //// */
-external ReactWrapper mount<C>(ReactElement node, [Map options]);
+external ReactWrapper mount<C>(ReactElement node, [MountRendererOptions options]);
 ////export function mount<P>(ReactElement<P> node, options?: MountRendererProps): ReactWrapper<P, any>;
 ////export function mount<P, S>(ReactElement<P> node, options?: MountRendererProps): ReactWrapper<P, S>;
 ////
