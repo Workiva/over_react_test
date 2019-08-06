@@ -127,6 +127,6 @@ The `over_react_test` library adheres to [Semantic Versioning](http://semver.org
 
 
 
-[api-docs]: https://www.dartdocs.org/documentation/over_react_test/1.0.0/over_react_test/over_react_test-library.html
+[api-docs]: https://pub.dev/documentation/over_react_test/latest/over_react_test/over_react_test-library.html
 [contributing-docs]: https://github.com/Workiva/over_react/blob/master/.github/CONTRIBUTING.md
 [over-react]: https://github.com/Workiva/over_react
