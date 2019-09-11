@@ -28,9 +28,9 @@ transformers:
 dependency_overrides:
   react:
     git:
-      url: git@github.com:cleandart/react-dart.git
+      url: https://github.com/cleandart/react-dart.git
       ref: CPLAT-2275-regression-test-Component2
   over_react:
     git:
-      url: git@github.com:Workiva/over_react.git
+      url: https://github.com/Workiva/over_react.git
       ref: CPLAT-2275-regression-test-Component2
