@@ -30,7 +30,7 @@ ADD . /build/
 # Use pub from Dart 2 to initially resolve dependencies since it is much more efficient.
 COPY --from=dart2 /usr/lib/dart /usr/lib/dart2
 RUN echo "Running Dart 2 pub get.." && \
-	_PUB_TEST_SDK_VERSION=1.24.3 timeout 5m /usr/lib/dart2/bin/pub get --no-precompile
+	_PUB_TEST_SDK_VERSION=2.4.1 timeout 5m /usr/lib/dart2/bin/pub get --no-precompile
 RUN echo "Starting the script sections" && \
 		dart --version && \
 		pub get && \
