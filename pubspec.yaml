@@ -29,8 +29,8 @@ dependency_overrides:
   react:
     git:
       url: https://github.com/cleandart/react-dart.git
-      ref: CPLAT-2275-regression-test-Component2
+      ref: 5.1.0-wip
   over_react:
     git:
       url: https://github.com/Workiva/over_react.git
-      ref: CPLAT-2275-regression-test-Component2
+      ref: 3.1.0-wip
