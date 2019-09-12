@@ -438,7 +438,9 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         consoleErrors.add(message);
         originalConsoleError.apply([message], thisArg: self);
       });
-      final reactComponentFactory = factory().componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
+
+      final reactComponentFactory = factory().componentFactory as
+          ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       requiredProps.forEach((String propKey) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
@@ -450,17 +452,20 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
           expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
           expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
               reason: '$propKey is not set');
-        } else {
-          var propsToAdd = {propKey: null};
-
-          mount((factory()
-            ..addAll(propsToAdd)
-          )(childrenFactory()));
-
-          expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-          expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-              reason: '$propKey is not set');
         }
+
+        context['console']['error'] = originalConsoleError;
+
+        var propsToAdd = {propKey: null};
+
+        mount((factory()
+          ..addAll(propsToAdd)
+        )(childrenFactory()));
+
+        expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
+        expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
+            reason: '$propKey is not set');
+
 
         context['console']['error'] = originalConsoleError;
       });
