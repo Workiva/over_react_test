@@ -31,7 +31,7 @@ main() {
             customErrorMessage: 'foo cannot be null');
       });
 
-      test('when passed with incorrect children', () {
+      test('when passed incorrect children', () {
         var component = (Sample()..foo = true);
         var children = [(Dom.div()..key = 1)(), Dom.div(Dom.div()..key = 2)()];
 
@@ -54,7 +54,7 @@ main() {
       var component = (Sample()..shouldThrowOnRender = true);
 
       testPropTypesWithError(componentProps: component, errorMatcher: throwsA
-        (anything),
+        (hasToStringValue(contains('Bad state'))),
           customErrorMessage: 'That will break stuff');
     });
   });
@@ -127,7 +127,7 @@ class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {
     if (!props.shouldThrowOnRender) {
       return Dom.div()(props.children);
     } else {
-      throw new Error();
+      throw new StateError('Bad state');
     }
   }
 }
