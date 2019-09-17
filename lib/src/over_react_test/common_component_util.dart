@@ -465,8 +465,6 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
               reason: '$propKey is not set');
         }
 
-        context['console']['error'] = originalConsoleError;
-
         var propsToAdd = {propKey: null};
 
         mount((factory()
