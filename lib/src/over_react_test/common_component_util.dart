@@ -440,49 +440,49 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   } else {
     test('logs the correct errors when the required prop is not set or is '
         'null', () {
-        PropTypes.resetWarningCache();
+      PropTypes.resetWarningCache();
 
-        List<String> consoleErrors = [];
-        JsFunction originalConsoleError = context['console']['error'];
-        context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
-          consoleErrors.add(message);
-          originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
-              thisArg: self);
-        });
+      List<String> consoleErrors = [];
+      JsFunction originalConsoleError = context['console']['error'];
+      context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
+        consoleErrors.add(message);
+        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
+            thisArg: self);
+      });
 
-        final reactComponentFactory = factory().componentFactory as
-        ReactDartComponentFactoryProxy2; // ignore: avoid_as
+      final reactComponentFactory = factory().componentFactory as
+      ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
-        requiredProps.forEach((String propKey) {
-          if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
-
-            mount((factory()
-              ..remove(propKey)
-            )(childrenFactory()));
-
-            expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-            expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-                reason: '$propKey is not set');
-          }
-
-          context['console']['error'] = originalConsoleError;
-
-          var propsToAdd = {propKey: null};
+      requiredProps.forEach((String propKey) {
+        if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
 
           mount((factory()
-            ..addAll(propsToAdd)
+            ..remove(propKey)
           )(childrenFactory()));
 
           expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
           expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
               reason: '$propKey is not set');
+        }
 
-          consoleErrors = [];
-          PropTypes.resetWarningCache();
-        });
+        context['console']['error'] = originalConsoleError;
 
-        addTearDown(() => context['console']['error'] = originalConsoleError);
+        var propsToAdd = {propKey: null};
+
+        mount((factory()
+          ..addAll(propsToAdd)
+        )(childrenFactory()));
+
+        expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
+        expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
+            reason: '$propKey is not set');
+
+        consoleErrors = [];
+        PropTypes.resetWarningCache();
       });
+
+      addTearDown(() => context['console']['error'] = originalConsoleError);
+    });
   }
 
   test('nullable props', () {
