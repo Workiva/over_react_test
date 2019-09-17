@@ -37,7 +37,8 @@ main() {
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
-            shouldTestPropForwarding: false);
+            shouldTestPropForwarding: false,
+        );
       });
 
     group('when passed a UiComponent2', () {
@@ -47,7 +48,8 @@ main() {
           shouldTestClassNameMerging: false,
           shouldTestClassNameOverrides: false,
           shouldTestPropForwarding: false,
-          useComponent2Tests: true);
+          isComponent2: true,
+      );
       });
     });
   });
