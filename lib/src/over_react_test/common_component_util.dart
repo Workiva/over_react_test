@@ -409,8 +409,10 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   });
 
   test('throws when the required prop is not set or is null', () {
+    Function(String propKey) propTest;
+
     if (!useComponent2Tests) {
-      requiredProps.forEach((String propKey) {
+      propTest = (String propKey) {
         final reactComponentFactory = factory().componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
 
         // Props that are defined in the default props map will never not be set.
@@ -428,34 +430,17 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         )(childrenFactory()));
 
         expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: '$propKey is set to null');
-      });
+      };
     } else {
-      PropTypes.resetWarningCache();
+      propTest = (String propKey) {
+        final reactComponentFactory = factory().componentFactory as
+        ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
-      List<String> consoleErrors = [];
-      JsFunction originalConsoleError = context['console']['error'];
-
-      context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
-        consoleErrors.add(message);
-        originalConsoleError.apply([message], thisArg: self);
-      });
-
-      final reactComponentFactory = factory().componentFactory as
-          ReactDartComponentFactoryProxy2; // ignore: avoid_as
-
-      requiredProps.forEach((String propKey) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
-
-          mount((factory()
-            ..remove(propKey)
-          )(childrenFactory()));
-
-          expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-          expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-              reason: '$propKey is not set');
+          testPropTypesWithUiProps(componentProps: factory()..remove(propKey),
+              childProps: childrenFactory,
+              customErrorMessage:keyToErrorMessage[propKey]);
         }
-
-        context['console']['error'] = originalConsoleError;
 
         var propsToAdd = {propKey: null};
 
@@ -463,14 +448,13 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
           ..addAll(propsToAdd)
         )(childrenFactory()));
 
-        expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-        expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-            reason: '$propKey is not set');
-
-
-        context['console']['error'] = originalConsoleError;
-      });
+        testPropTypesWithUiProps(componentProps: factory()..addAll(propsToAdd),
+            childProps: childrenFactory,
+            customErrorMessage:keyToErrorMessage[propKey]);
+      };
     }
+
+    requiredProps.forEach(propTest);
   });
 
   test('nullable props', () {
