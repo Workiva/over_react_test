@@ -1,4 +1,4 @@
-// Copyright 2017 Workiva Inc.
+// Copyright 2019 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,45 @@ import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
 // ignore: uri_has_not_been_generated
-part 'prop_type_util_test.over_react.g.dart';
+part 'prop_type_utils_test.over_react.g.dart';
 
-/// Main entry point for TestJacket testing
+/// Main entry point for prop_type_utils testing
 main() {
+  group('testPropTypesWithUiProps() should pass (and catch console errors)', () {
+      test('when passed invalid props with no children', () {
+        var component = (Sample()..foo = null);
 
+        testPropTypesWithUiProps(componentProps: component,
+            customErrorMessage: 'foo cannot be null');
+      });
+
+      test('when passed with incorrect children', () {
+        var component = (Sample()..foo = true);
+        var children = [(Dom.div()..key = 1)(), Dom.div(Dom.div()..key = 2)()];
+
+        testPropTypesWithUiProps(componentProps: component, childProps: children,
+            customErrorMessage: 'There can only be one child');
+      });
+
+      test('when there is a re-render', () {
+        var jacket = mount(Sample()());
+        var component = (Sample()..foo = null);
+
+        testPropTypesWithUiProps(componentProps: component,
+            customErrorMessage: 'foo cannot be null', mountNode: jacket.mountNode);
+    });
+  });
+
+  group('testPropTypesWithError() should pass (and catch console errors) when '
+      'passed', () {
+    test('props that cause an error', () {
+      var component = (Sample()..shouldThrowOnRender = true);
+
+      testPropTypesWithError(componentProps: component, errorMatcher: throwsA
+        (anything),
+          customErrorMessage: 'That will break stuff');
+    });
+  });
 }
 
 @Factory()
@@ -35,6 +69,8 @@ _$Sample;
 @Props()
 class _$SampleProps extends UiProps {
   bool foo;
+
+  bool shouldThrowOnRender;
 }
 
 @State()
@@ -45,14 +81,54 @@ class _$SampleState extends UiState {
 @Component2()
 class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {
   @override
-  Map getDefaultProps() => (newProps()..foo = false);
+  get propTypes => {
+    getPropKey((SampleProps props) => props.foo, typedPropsFactory):
+        (props, propName, componentName, location, propFullName) {
+      if (props.foo == null) {
+        return new PropError.value(
+            props.foo, 'foo', 'foo cannot be null');
+      }
+
+      return null;
+    },
+    getPropKey((SampleProps props) => props.shouldThrowOnRender, typedPropsFactory):
+        (props, propName, componentName, location, propFullName) {
+      if (props.shouldThrowOnRender == true) {
+        return new PropError.value(
+            props.shouldThrowOnRender, 'shouldThrowOnRender', 'That will '
+            'break stuff.');
+      }
+
+      return null;
+    },
+    getPropKey((SampleProps props) => props.children, typedPropsFactory):
+        (props, propName, componentName, location, propFullName) {
+      if (props.children.length > 1) {
+        return new PropError.value(
+            props.children, 'children', 'There can only be one child.');
+      }
+
+      return null;
+    },
+  };
+
 
   @override
-  Map getInitialState() => (newState()..bar = false);
+  get defaultProps => (newProps()
+    ..foo = false
+    ..shouldThrowOnRender = false
+  );
+
+  @override
+  get initialState => (newState()..bar = false);
 
   @override
   render() {
-    return Dom.div()();
+    if (!props.shouldThrowOnRender) {
+      return Dom.div()(props.children);
+    } else {
+      throw new Error();
+    }
   }
 }
 

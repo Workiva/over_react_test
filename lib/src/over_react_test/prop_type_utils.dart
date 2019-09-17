@@ -24,7 +24,11 @@ void testPropTypesWithUiProps(
   dynamic componentFactory = componentProps();
 
   if (childProps != null) {
-    componentFactory = componentProps(childProps());
+    if (childProps is List) {
+      componentProps(childProps);
+    } else {
+      componentFactory = componentProps(childProps());
+    }
   }
 
   if (mountNode != null) {
@@ -72,44 +76,6 @@ void testPropTypesWithError(
   expect(() {
     mount(componentFactory, attachedToDocument: true);
   }, errorMatcher);
-
-  expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-
-  if (customErrorMessage != null) {
-    expect(consoleErrors[0].contains(customErrorMessage), isTrue);
-  }
-
-  context['console']['error'] = originalConsoleError;
-}
-
-/// Validates `propTypes` of a component by taking in a factory and mounting it, checking the console for expected
-/// errors.
-///
-/// Similar to [testPropTypesWithUiProps], but takes in an already created component factory.
-void testPropTypes({
-  @required dynamic factory,
-  dynamic childComponent,
-  String customErrorMessage,
-  Element mountNode,
-}) {
-  PropTypes.resetWarningCache();
-
-  List<String> consoleErrors = [];
-  JsFunction originalConsoleError = context['console']['error'];
-  context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
-    consoleErrors.add(message);
-    originalConsoleError.apply([message], thisArg: self);
-  });
-
-  if (mountNode == null) {
-    if (childComponent != null) {
-      mount(factory(childComponent));
-    } else {
-      mount(factory, attachedToDocument: true);
-    }
-  } else {
-    mount(factory, attachedToDocument: true, mountNode: mountNode);
-  }
 
   expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
 
