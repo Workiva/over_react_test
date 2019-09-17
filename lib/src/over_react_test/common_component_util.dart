@@ -434,7 +434,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       List<String> consoleErrors = [];
       JsFunction originalConsoleError = context['console']['error'];
-      context['console']['error'] = new JsFunction.withThis((self, message) {
+      context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
         originalConsoleError.apply([message], thisArg: self);
       });
