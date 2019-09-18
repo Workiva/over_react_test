@@ -56,6 +56,29 @@ main() {
             willThrow: true);
       });
   });
+
+  group('propTypesRerenderTest() should pass (and catch console errors)', () {
+    group('when passed invalid props with no children', () {
+      var goodComponent = (Sample()..foo = true);
+      var badComponent = (Sample()..foo = null);
+
+      propTypesRerenderTest(componentWithNoWarnings: goodComponent,
+          componentWithWarnings: badComponent,
+          customErrorMessage: 'foo cannot be null');
+    });
+
+    group('when passed incorrect children', () {
+      var goodComponent = (Sample()..foo = true);
+      var childrenOfBadComponent = [(Dom.div()..key = 1)(), Dom.div(Dom.div()
+        ..key = 2)()];
+      var badComponent = (Sample()..foo = null);
+
+      propTypesRerenderTest(componentWithNoWarnings: goodComponent,
+          componentWithWarnings: badComponent,
+          componentWithWarningsChildren: childrenOfBadComponent,
+          customErrorMessage: 'foo cannot be null');
+    });
+  });
 }
 
 @Factory()
