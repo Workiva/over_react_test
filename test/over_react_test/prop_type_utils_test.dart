@@ -45,18 +45,16 @@ main() {
 
         testPropTypesWithUiProps(componentProps: component,
             customErrorMessage: 'foo cannot be null', mountNode: jacket.mountNode);
-    });
-  });
+      });
 
-  group('testPropTypesWithError() should pass (and catch console errors) when '
-      'passed', () {
-    test('props that cause an error', () {
-      var component = (Sample()..shouldThrowOnRender = true);
+      test('props that cause an error', () {
+        var component = (Sample()..shouldThrowOnRender = true);
 
-      testPropTypesWithError(componentProps: component, errorMatcher: throwsA
-        (hasToStringValue(contains('Bad state'))),
-          customErrorMessage: 'That will break stuff');
-    });
+        testPropTypesWithUiProps(componentProps: component, errorMatcher: throwsA
+          (hasToStringValue(contains('Bad state'))),
+            customErrorMessage: 'That will break stuff',
+            willThrow: true);
+      });
   });
 }
 
