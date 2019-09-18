@@ -18,6 +18,7 @@ import 'package:over_react_test/over_react_test.dart';
 
 import './utils/test_common_component.dart';
 import './utils/test_common_component_required_props.dart';
+import './utils/test_common_component_required_props_commponent2.dart';
 
 /// Main entry point for [commonComponentTests] testing
 main() {
@@ -30,11 +31,26 @@ main() {
     });
 
     group('should pass when the correct required props are specified', () {
-      commonComponentTests(() => TestCommonRequired()..bar = true,
+      group('when passed a UiComponent', () {
+
+        commonComponentTests(() => TestCommonRequired()..bar = true,
+            shouldTestRequiredProps: true,
+            shouldTestClassNameMerging: false,
+            shouldTestClassNameOverrides: false,
+            shouldTestPropForwarding: false,
+        );
+      });
+
+    group('when passed a UiComponent2', () {
+
+      commonComponentTests(() => TestCommonRequired2()..bar = true,
           shouldTestRequiredProps: true,
           shouldTestClassNameMerging: false,
           shouldTestClassNameOverrides: false,
-          shouldTestPropForwarding: false);
+          shouldTestPropForwarding: false,
+          isComponent2: true,
+      );
+      });
     });
   });
 }

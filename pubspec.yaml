@@ -24,3 +24,13 @@ transformers:
   - over_react
   - test/pub_serve:
       $include: test/**_test{.*,}.dart
+
+dependency_overrides:
+  react:
+    git:
+      url: https://github.com/cleandart/react-dart.git
+      ref: 5.1.0-wip
+  over_react:
+    git:
+      url: https://github.com/Workiva/over_react.git
+      ref: 3.1.0-wip
