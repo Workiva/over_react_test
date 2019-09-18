@@ -81,7 +81,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestClassNameOverrides: true,
   bool ignoreDomProps: true,
   bool shouldTestRequiredProps: true,
-  bool useComponent2Tests = false,
+  bool isComponent2 = false,
   dynamic childrenFactory()
 }) {
   childrenFactory ??= _defaultChildrenFactory;
@@ -108,7 +108,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
     testClassNameOverrides(factory, childrenFactory);
   }
   if (shouldTestRequiredProps) {
-    testRequiredProps(factory, childrenFactory, useComponent2Tests);
+    testRequiredProps(factory, childrenFactory, isComponent2);
   }
 }
 
@@ -385,7 +385,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 ///
 /// __Note__: All required props must be provided by [factory].
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
-    useComponent2Tests) {
+    isComponent2) {
   var keyToErrorMessage = {};
   var nullableProps = <String>[];
   var requiredProps = <String>[];
@@ -411,7 +411,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   test('throws when the required prop is not set or is null', () {
     Function(String propKey) propTest;
 
-    if (!useComponent2Tests) {
+    if (!isComponent2) {
       propTest = (String propKey) {
         final reactComponentFactory = factory().componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
 
