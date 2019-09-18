@@ -463,6 +463,9 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
           expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
           expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
               reason: '$propKey is not set');
+
+          consoleErrors = [];
+          PropTypes.resetWarningCache();
         }
 
         var propsToAdd = {propKey: null};
