@@ -439,7 +439,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
           testPropTypesWithUiProps(componentProps: factory()..remove(propKey),
               childProps: childrenFactory,
-              customErrorMessage:keyToErrorMessage[propKey]);
+              customErrorMessageList: [keyToErrorMessage[propKey]]);
         }
 
         var propsToAdd = {propKey: null};
@@ -450,7 +450,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
         testPropTypesWithUiProps(componentProps: factory()..addAll(propsToAdd),
             childProps: childrenFactory,
-            customErrorMessage:keyToErrorMessage[propKey]);
+            customErrorMessageList: [keyToErrorMessage[propKey]]);
       };
     }
 

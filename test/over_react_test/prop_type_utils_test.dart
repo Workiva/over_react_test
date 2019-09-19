@@ -28,7 +28,7 @@ main() {
         var component = (Sample()..foo = null);
 
         testPropTypesWithUiProps(componentProps: component,
-            customErrorMessage: 'foo cannot be null');
+            customErrorMessageList: ['foo cannot be null']);
       });
 
       test('when passed incorrect children', () {
@@ -36,7 +36,7 @@ main() {
         var children = [(Dom.div()..key = 1)(), Dom.div(Dom.div()..key = 2)()];
 
         testPropTypesWithUiProps(componentProps: component, childProps: children,
-            customErrorMessage: 'There can only be one child');
+            customErrorMessageList: ['There can only be one child']);
       });
 
       test('when there is a re-render', () {
@@ -44,16 +44,26 @@ main() {
         var component = (Sample()..foo = null);
 
         testPropTypesWithUiProps(componentProps: component,
-            customErrorMessage: 'foo cannot be null', mountNode: jacket.mountNode);
+            customErrorMessageList: ['foo cannot be null'], mountNode: jacket
+                .mountNode);
       });
 
-      test('props that cause an error', () {
+      test('hen passed props that cause an error', () {
         var component = (Sample()..shouldThrowOnRender = true);
 
         testPropTypesWithUiProps(componentProps: component, errorMatcher: throwsA
           (hasToStringValue(contains('Bad state'))),
-            customErrorMessage: 'That will break stuff',
+            customErrorMessageList: ['That will break stuff'],
             willThrow: true);
+      });
+
+      test('when more than one prop is bad', () {
+        var component = (Sample()..foo = null);
+        var children = [(Dom.div()..key = 1)(), Dom.div(Dom.div()..key = 2)()];
+
+        testPropTypesWithUiProps(componentProps: component, childProps: children,
+            customErrorMessageList: ['There can only be one child',
+                'foo cannot be null']);
       });
   });
 
@@ -62,8 +72,8 @@ main() {
       var goodComponent = (Sample()..foo = true);
       var badComponent = (Sample()..foo = null);
 
-      propTypesRerenderTest(componentWithNoWarnings: goodComponent,
-          componentWithWarnings: badComponent,
+      propTypesRerenderTest(firstComponent: goodComponent,
+          secondComponent: badComponent,
           customErrorMessage: 'foo cannot be null');
     });
 
@@ -73,10 +83,34 @@ main() {
         ..key = 2)()];
       var badComponent = (Sample()..foo = null);
 
-      propTypesRerenderTest(componentWithNoWarnings: goodComponent,
-          componentWithWarnings: badComponent,
-          componentWithWarningsChildren: childrenOfBadComponent,
+      propTypesRerenderTest(firstComponent: goodComponent,
+          secondComponent: badComponent,
+          secondComponentChildren: childrenOfBadComponent,
           customErrorMessage: 'foo cannot be null');
+    });
+
+    group('when expecting no errors', () {
+      var goodComponent = (Sample()..foo = true);
+
+      propTypesRerenderTest(firstComponent: goodComponent,
+          secondComponent: goodComponent,
+          shouldErrorOnReRender: false);
+    });
+  });
+
+  group('validateNoPropTypeErrors() should pass (and catch no errors)', () {
+    test('when passed valid props with no children', () {
+      var goodComponent = (Sample()..foo = true);
+
+      validateNoPropTypeErrors(componentProps: goodComponent);
+    });
+
+    test('when passed correct children', () {
+      var goodComponent = (Sample()..foo = true);
+      var childOfGoodComponent = [(Dom.div()..key = 1)()];
+
+      validateNoPropTypeErrors(componentProps: goodComponent,
+          childProps: childOfGoodComponent);
     });
   });
 }
