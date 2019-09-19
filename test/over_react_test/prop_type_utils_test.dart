@@ -62,8 +62,9 @@ main() {
         var children = [(Dom.div()..key = 1)(), Dom.div(Dom.div()..key = 2)()];
 
         testPropTypesWithUiProps(componentProps: component, childProps: children,
-            customErrorMessageList: ['There can only be one child',
-                'foo cannot be null']);
+            customErrorMessageList: ['foo cannot be null',
+                'There can only be one child',
+                ]);
       });
   });
 

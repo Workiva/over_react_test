@@ -11,6 +11,12 @@ import 'package:test/test.dart';
 /// Tests the prop types of a component by calling the props, adding children if necessary, and checking the console
 /// for expected log output.
 ///
+/// By default the test will validate that the console error count matches an
+/// inferred expected count (inferred via the length of
+/// customErrorMessageList and whether or not the `render()` will throw).
+/// This is useful for simple tests, but may be turned off for complex
+/// componentry tests where the console may log unrelated messages.
+///
 /// If a Component's `render()` will throw because it is relying on a prop
 /// that was not passed in correctly, that can be caught by setting
 /// `willThrow` to true and passing in the expected Error Matcher.
@@ -25,6 +31,7 @@ void testPropTypesWithUiProps(
       dynamic childProps,
       List<String> customErrorMessageList = const [],
       Element mountNode,
+      bool shouldCheckConsoleErrorCount = true,
       bool willThrow = false,
       Matcher errorMatcher,
     }) {
@@ -38,6 +45,8 @@ void testPropTypesWithUiProps(
   });
 
   var componentFactory = _getComponentFactory(componentProps, childProps);
+  var errorCount = willThrow ? customErrorMessageList.length + 1
+      : customErrorMessageList.length;
 
   if (mountNode != null) {
     expect(() => mount(componentFactory, attachedToDocument: true,
@@ -48,15 +57,24 @@ void testPropTypesWithUiProps(
         willThrow ? errorMatcher : returnsNormally);
   }
 
-  expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-  expect(consoleErrors.length, customErrorMessageList.length);
+  expect(consoleErrors, isNotEmpty, reason: 'PropTypes should have outputted a '
+      'warning.');
+
+  if (shouldCheckConsoleErrorCount) {
+    expect(consoleErrors.length, errorCount, reason: 'The console error '
+        'count should match the number of errors expected (inferred via the '
+        'customErrorMessageList length and whether or not the render will '
+        'throw).');
+  }
 
   if (customErrorMessageList.isNotEmpty) {
     if (customErrorMessageList.length == 1) {
       expect(consoleErrors[0].contains(customErrorMessageList.first), isTrue);
     } else {
       for (var i = 0; i < customErrorMessageList.length; i++) {
-        consoleErrors[i].contains(customErrorMessageList[i]);
+        expect(consoleErrors[i].contains(customErrorMessageList[i]), isTrue,
+            reason: 'Error message not found in that console error. Ensure '
+                'the order of custom error messages matches the log order.');
       }
     }
   }
@@ -113,14 +131,14 @@ void propTypesRerenderTest({@required UiProps firstComponent,
 
     if (shouldErrorOnReRender) {
 
-      expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-
+      expect(consoleErrors, isNotEmpty, reason: 'PropTypes should have outputted a '
+          'warning.');
       if (customErrorMessage != null) {
         expect(consoleErrors[0].contains(customErrorMessage), isTrue);
       }
     } else {
       expect(consoleErrors, isEmpty,
-          reason: 'should not have outputted a warning');
+          reason: 'PropTypes should not have outputted a warning.');
     }
   });
 }
@@ -142,7 +160,7 @@ void validateNoPropTypeErrors({@required UiProps componentProps, dynamic childPr
   mount(componentFactory, attachedToDocument: true);
 
   expect(consoleErrors, isEmpty,
-      reason: 'should not have outputted a warning');
+      reason: 'PropTypes should not have outputted a warning.');
 
   addTearDown(() => context['console']['error'] = originalConsoleError);
 }
