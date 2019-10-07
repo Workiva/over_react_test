@@ -450,19 +450,31 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
             thisArg: self);
       });
 
+      // Because Component2's propTypes do not stop the component from
+      // rendering with missing required props, an error may need to be caught
+      // on mount to keep the tests running.
+      void wrapInTryCatch(Function callback) {
+        try {
+          callback();
+        } catch (_){}
+      }
+
       final reactComponentFactory = factory().componentFactory as
       ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       requiredProps.forEach((String propKey) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
 
-          mount((factory()
+          wrapInTryCatch(() => mount((factory()
             ..remove(propKey)
-          )(childrenFactory()));
+          )(childrenFactory())));
 
           expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-          expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-              reason: '$propKey is not set');
+
+          if (keyToErrorMessage[propKey] != '') {
+            expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
+                reason: '$propKey is not set');
+          }
 
           consoleErrors = [];
           PropTypes.resetWarningCache();
@@ -470,13 +482,16 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
         var propsToAdd = {propKey: null};
 
-        mount((factory()
-          ..addAll(propsToAdd)
-        )(childrenFactory()));
+        wrapInTryCatch(() => mount((factory()
+            ..addAll(propsToAdd)
+          )(childrenFactory())));
 
         expect(consoleErrors, isNotEmpty, reason: 'should have outputted a warning');
-        expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
-            reason: '$propKey is not set');
+
+        if (keyToErrorMessage[propKey] != '') {
+          expect(consoleErrors, [contains(keyToErrorMessage[propKey])],
+              reason: '$propKey is not set');
+        }
 
         consoleErrors = [];
         PropTypes.resetWarningCache();
