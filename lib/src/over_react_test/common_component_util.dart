@@ -379,8 +379,6 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
   });
 }
 
-
-
 /// Common test for verifying that props annotated as a [requiredProp] are validated correctly.
 ///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
