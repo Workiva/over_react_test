@@ -32,8 +32,9 @@ main() {
 
     group('should pass when the correct required props are specified', () {
       group('when passed a UiComponent', () {
-
-        commonComponentTests(() => TestCommonRequired()..bar = true,
+        commonComponentTests(() => (TestCommonRequired()
+              ..bar = true
+              ..foobar = true),
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
@@ -43,7 +44,9 @@ main() {
 
     group('when passed a UiComponent2', () {
 
-      commonComponentTests(() => TestCommonRequired2()..bar = true,
+      commonComponentTests(() => (TestCommonRequired2()
+            ..bar = true
+            ..foobar = true),
           shouldTestRequiredProps: true,
           shouldTestClassNameMerging: false,
           shouldTestClassNameOverrides: false,

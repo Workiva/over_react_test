@@ -24,6 +24,9 @@ UiFactory<TestCommonRequiredProps2> TestCommonRequired2 =
 
 @Props()
 class _$TestCommonRequiredProps2 extends UiProps {
+  @nullableRequiredProp
+  bool foobar;
+
   @requiredProp
   bool bar;
 }
