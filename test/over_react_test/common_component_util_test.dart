@@ -43,7 +43,6 @@ main() {
       });
 
     group('when passed a UiComponent2', () {
-
       commonComponentTests(() => (TestCommonRequired2()
             ..bar = true
             ..foobar = true),

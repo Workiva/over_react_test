@@ -452,6 +452,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       List<String> consoleErrors = [];
       JsFunction originalConsoleError = context['console']['error'];
+      addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
         originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
@@ -495,13 +496,10 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         consoleErrors = [];
         PropTypes.resetWarningCache();
       });
-
-      addTearDown(() => context['console']['error'] = originalConsoleError);
     });
   }
 
   test('nullable props', () {
-
     if (!isComponent2) {
       nullableProps.forEach((String propKey) {
         var badRenderer = () => render((factory()..remove(propKey))(childrenFactory()));
@@ -520,6 +518,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       List<String> consoleErrors = [];
       JsFunction originalConsoleError = context['console']['error'];
+      addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
         originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
@@ -557,8 +556,6 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         consoleErrors = [];
         PropTypes.resetWarningCache();
       });
-
-      addTearDown(() => context['console']['error'] = originalConsoleError);
     }
   });
 }
