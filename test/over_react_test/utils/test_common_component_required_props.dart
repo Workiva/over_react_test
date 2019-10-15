@@ -31,7 +31,7 @@ class _$TestCommonRequiredProps extends UiProps {
   @requiredProp
   bool bar;
 
-  @requiredProp
+  @nullableRequiredProp
   bool defaultFoo;
 }
 

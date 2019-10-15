@@ -497,16 +497,21 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   test('nullable props', () {
     if (!isComponent2) {
       for (var propKey in nullableProps) {
-        var badRenderer = () => render((factory()..remove(propKey))(childrenFactory()));
+        final reactComponentFactory = factory().componentFactory as
+          ReactDartComponentFactoryProxy; // ignore: avoid_as
+        // Props that are defined in the default props map will never not be set.
+        if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
+          var badRenderer = () => render((factory()..remove(propKey))(childrenFactory()));
 
-        expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: 'should throw when the required, nullable prop $propKey is not set');
+          expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: 'should throw when the required, nullable prop $propKey is not set');
 
-        var propsToAdd = {propKey: null};
-        badRenderer = () => render((factory()
-          ..addAll(propsToAdd)
-        )(childrenFactory()));
+          var propsToAdd = {propKey: null};
+          badRenderer = () => render((factory()
+            ..addAll(propsToAdd)
+          )(childrenFactory()));
 
-        expect(badRenderer, returnsNormally, reason: 'does not throw when the required, nullable prop $propKey is set to null');
+          expect(badRenderer, returnsNormally, reason: 'does not throw when the required, nullable prop $propKey is set to null');
+        }
       }
     } else {
       PropTypes.resetWarningCache();
