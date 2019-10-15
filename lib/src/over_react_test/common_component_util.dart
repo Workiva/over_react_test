@@ -393,7 +393,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   // Because Component2's propTypes do not stop the component from
   // rendering with missing required props, an error may need to be caught
   // on mount to keep the tests running.
-  void wrapInTryCatch(Function callback) {
+  void wrapInTryCatch(void callback()) {
     try {
       callback();
     } catch (_){}
@@ -406,7 +406,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
     consumedProps.forEach((ConsumedProps consumedProps) {
       consumedProps.props.forEach((PropDescriptor prop) {
-         if (prop.isNullable) {
+        if (prop.isNullable) {
           nullableProps.add(prop.key);
         } else if (prop.isRequired) {
           requiredProps.add(prop.key);
@@ -513,7 +513,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
         expect(badRenderer, returnsNormally, reason: 'does not throw when the required, nullable prop $propKey is set to null');
       });
-    } else if (isComponent2) {
+    } else {
       PropTypes.resetWarningCache();
 
       List<String> consoleErrors = [];
@@ -526,7 +526,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       });
 
       final reactComponentFactory = factory().componentFactory as
-      ReactDartComponentFactoryProxy2; // ignore: avoid_as
+          ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       nullableProps.forEach((String propKey) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
