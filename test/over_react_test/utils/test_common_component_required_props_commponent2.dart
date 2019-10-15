@@ -29,6 +29,9 @@ class _$TestCommonRequiredProps2 extends UiProps {
 
   @requiredProp
   bool bar;
+
+  @requiredProp
+  bool defaultFoo;
 }
 
 @Component2()
@@ -38,6 +41,9 @@ class TestCommonRequiredComponent2 extends
   get consumedProps => const [
     TestCommonRequiredProps2.meta,
   ];
+
+  @override
+  Map get defaultProps => (newProps()..defaultFoo = true);
 
   @override
   render() {
