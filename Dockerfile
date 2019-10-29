@@ -15,7 +15,9 @@ ARG GIT_SSH_KEY
 ARG KNOWN_HOSTS_CONTENT
 
 # wget is used to install chrome
-RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # install chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
