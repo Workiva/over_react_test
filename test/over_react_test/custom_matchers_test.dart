@@ -439,6 +439,70 @@ main() {
       });
     });
 
+    group('PropTypeLogMatcher', () {
+      group('when passed a List of logs', () {
+        const defaultLogsValue = ['random log', 'Failed prop type: foo is required', 'nonsense', 'Failed prop type: combination error'];
+        var logs = defaultLogsValue;
+
+        tearDown(() {
+          logs = defaultLogsValue;
+        });
+
+        group('- logsPropTypeWarning -', (){
+          test('simple usage', (){
+            shouldPass(logs, logsPropTypeWarning('foo is required'));
+          });
+
+          test('when passed in a matcher instead of a String', (){
+            shouldPass(logs, logsPropTypeWarning(contains('foo is required')));
+          });
+
+          test('when two logs are the same', (){
+            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required'];
+
+            shouldFail(logs, logsPropTypeWarning('foo is required'),
+                contains('Ensure each expected warning is unique.'));
+          });
+        });
+
+        group('- logsPropTypeWarnings -', (){
+          test('simple usage', (){
+            shouldPass(logs, logsPropTypeWarnings(['foo is required', 'combination error']));
+          });
+
+          test('when passed in a matchers instead of string', (){
+            shouldPass(logs, logsPropTypeWarnings([contains('foo is required'), contains('combination error')]));
+          });
+
+          test('when two expects are the same', (){
+            shouldFail(logs,
+                logsPropTypeWarnings(['foo is required', 'foo is required']),
+                contains('Ensure each expected warning is unique.'));
+          });
+
+          test('when two logs are the same', (){
+            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required', 'Failed prop type: combination error'];
+            shouldFail(logs,
+                logsPropTypeWarnings(['foo is required', 'foo is required', 'combination error']),
+                contains('Ensure each expected warning is unique.')
+            );
+          });
+        });
+
+        group('- logsNoPropTypeWarnings -', (){
+          test('simple usage', (){
+            logs = ['random log', 'random error', 'not a prop type log'];
+
+            shouldPass(logs, logsNoPropTypeWarnings());
+          });
+
+          test('when there are prop type errors', () {
+            shouldFail(logs, logsNoPropTypeWarnings(), contains('expected no prop types warnings but got 2.'));
+          });
+        });
+      });
+    });
+
     test('throwsPropError', () {
       expect(() => throw new PropError('propName', 'message'), throwsPropError('propName', 'message'));
     });

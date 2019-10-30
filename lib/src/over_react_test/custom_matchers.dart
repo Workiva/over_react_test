@@ -337,3 +337,110 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
       ))
   ));
 }
+
+/// PropTypes matcher
+/// TODO name?
+class _PropTypeLogMatcher extends Matcher {
+
+  // can be warning or matcher
+  final _expected;
+
+  final _hasOneWarning;
+
+  final _expectsWarning;
+
+  _PropTypeLogMatcher.logsPropTypeWarning(/*String || Contains*/ this._expected)
+      : _hasOneWarning = true, _expectsWarning = true;
+
+  _PropTypeLogMatcher.logsPropTypeWarnings(/*String || Contains*/ this._expected)
+      : _hasOneWarning = false, _expectsWarning = true;
+
+  _PropTypeLogMatcher.logsNoPropTypeWarnings()
+      : _expected = contains('Failed prop type:'), _hasOneWarning = false, _expectsWarning = false;
+
+//  PropTypeLogMatcher.logsReactWarning(this._expected);
+
+  @override
+  bool matches(/* Function || List*/ dynamic logs, Map matchState) {
+    final List<dynamic> expectedList = _expected is List ? _expected : [_expected];
+    final expectedMatchCount = _expectsWarning ? expectedList.length : 0;
+
+    var hasRedundantMatches = false;
+    var logsCheck = <String, bool>{};
+    var actualMatchCount = 0;
+
+    logs.forEach((warning) => logsCheck.addAll({warning: false}));
+
+    logs.forEach((warning) {
+      expectedList.forEach((expected) {
+        var matcher = expected is Matcher ? expected : contains(expected);
+
+        if (matcher.matches(warning, {})) {
+          if (logsCheck[warning]) {
+            hasRedundantMatches = true;
+          } else {
+            logsCheck[warning] = true;
+          }
+        }
+      });
+    });
+
+    actualMatchCount = (logsCheck.values).where((v) => v).length;
+
+    matchState.addAll({
+      'matchCount': actualMatchCount,
+      'hasRedundantMatches': hasRedundantMatches,
+    });
+
+    return actualMatchCount == expectedMatchCount && !hasRedundantMatches;
+  }
+
+  @override
+  Description describe(Description description) {
+    if (_expectsWarning) {
+      if (_hasOneWarning) {
+        description.add('one prop validation warning');
+      } else {
+        description.add('${_expected.length} prop validation warnings.');
+      }
+    } else {
+      description.add('no prop validation warnings');
+    }
+
+    return description;
+  }
+
+  @override
+  Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
+    var matchCount = matchState['matchCount'];
+    var hasRedundantMatches = matchState['hasRedundantMatches'];
+
+    var description = [];
+
+    if (_expectsWarning) {
+      if (_hasOneWarning) {
+        description.add('expected one prop validation warning but got $matchCount. ');
+      } else {
+        description.add('expected ${_expected.length} prop validation warnings but got $matchCount. ');
+      }
+    } else {
+        description.add('expected no prop types warnings but got $matchCount. ');
+    }
+
+    if (hasRedundantMatches) {
+      description.add('there were multiple warnings matched to a single expected warning. Ensure each expected warning is unique.');
+    }
+
+    mismatchDescription.add(description.join(""));
+
+    return mismatchDescription;
+  }
+}
+
+Matcher logsPropTypeWarning(expected) => _PropTypeLogMatcher.logsPropTypeWarning(expected);
+
+Matcher logsPropTypeWarnings(expected) => _PropTypeLogMatcher.logsPropTypeWarnings(expected);
+
+Matcher logsNoPropTypeWarnings() => _PropTypeLogMatcher.logsNoPropTypeWarnings();
+
+//Matcher logsReactWarning() => PropTypeLogMatcher.logsReactWarning();
