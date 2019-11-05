@@ -19,6 +19,9 @@ import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
+import './helper_components/sample_component.dart';
+import './helper_components/sample_component2.dart';
+
 /// Main entry point for CustomMatchers testing
 main() {
   group('CustomMatcher', () {
@@ -457,6 +460,13 @@ main() {
             shouldPass(logs, logsPropTypeWarning(contains('foo is required')));
           });
 
+          test('when multiple failures occur', (){
+            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: bar is required'];
+
+            shouldFail(logs, logsPropTypeWarning('foo is required'),
+                contains('expected one prop validation warning but got 2'));
+          });
+
           test('when two logs are the same', (){
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required'];
 
@@ -498,6 +508,22 @@ main() {
 
           test('when there are prop type errors', () {
             shouldFail(logs, logsNoPropTypeWarnings(), contains('expected no prop types warnings but got 2.'));
+          });
+        });
+      });
+
+      group('when passed a callback', () {
+        group('that is synchronous', () {
+          group('- logsPropTypeWarning -', (){
+            test('simple usage', (){
+              shouldPass(() => mount(Sample()()), logsPropTypeWarning('foo is required'));
+            });
+
+            test('when two logs are the same', (){
+              shouldFail(() => mount((Sample())(Sample2()(Sample()()))),
+                  logsPropTypeWarning('foo is required'),
+                  contains('Ensure each expected warning is unique.'));
+            });
           });
         });
       });

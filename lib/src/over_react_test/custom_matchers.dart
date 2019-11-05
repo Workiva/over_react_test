@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:developer';
 import 'dart:html';
 import 'dart:svg';
 
@@ -20,6 +21,8 @@ import 'package:matcher/matcher.dart';
 import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
+
+import './prop_type_util.dart';
 
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
@@ -361,25 +364,36 @@ class _PropTypeLogMatcher extends Matcher {
 //  PropTypeLogMatcher.logsReactWarning(this._expected);
 
   @override
-  bool matches(/* Function || List*/ dynamic logs, Map matchState) {
-    final List<dynamic> expectedList = _expected is List ? _expected : [_expected];
+  bool matches(/*Function || List*/ dynamic actual, Map matchState) {
+    final List</*Matcher || String*/ dynamic> expectedList = _expected is List ? _expected : [_expected];
     final expectedMatchCount = _expectsWarning ? expectedList.length : 0;
-
     var hasRedundantMatches = false;
     var logsCheck = <String, bool>{};
     var actualMatchCount = 0;
+    var actualWarnings = <String>[];
 
-    logs.forEach((warning) => logsCheck.addAll({warning: false}));
+    if (actual is List) {
+      actualWarnings = actual;
+    } else if (actual is Function){
+      print('yooo');
+      actualWarnings = recordConsoleLogs(actual);
+    } else {
+      throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a callback.');
+    }
 
-    logs.forEach((warning) {
-      expectedList.forEach((expected) {
-        var matcher = expected is Matcher ? expected : contains(expected);
+    print(actualWarnings);
 
-        if (matcher.matches(warning, {})) {
-          if (logsCheck[warning]) {
+    actualWarnings.forEach((warning) => logsCheck.addAll({warning: false}));
+
+    expectedList.forEach((expectedWarning) {
+      actualWarnings.forEach((actualWarning) {
+        var matcher = expectedWarning is Matcher ? expectedWarning : contains(expectedWarning);
+
+        if (matcher.matches(actualWarning, {})) {
+          if (logsCheck[actualWarning]) {
             hasRedundantMatches = true;
           } else {
-            logsCheck[warning] = true;
+            logsCheck[actualWarning] = true;
           }
         }
       });
@@ -391,7 +405,7 @@ class _PropTypeLogMatcher extends Matcher {
       'matchCount': actualMatchCount,
       'hasRedundantMatches': hasRedundantMatches,
     });
-
+    print(hasRedundantMatches);
     return actualMatchCount == expectedMatchCount && !hasRedundantMatches;
   }
 

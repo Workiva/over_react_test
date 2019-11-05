@@ -16,7 +16,7 @@ import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
-List<String> recordConsoleLogs(Function cb, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
+List<String> recordConsoleLogs(Function() cb, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
   var consoleLogs = <String>[];
 
   // Reset warning cache
@@ -36,7 +36,7 @@ List<String> recordConsoleLogs(Function cb, [_ConsoleConfiguration configuration
     cb();
   } catch (e) {
     // TODO actually handle the error.
-
+    print(e);
   } finally {
     // Swap logs back
     context['console'][configuration.logType] = originalConsole;
