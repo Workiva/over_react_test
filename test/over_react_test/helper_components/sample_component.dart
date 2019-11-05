@@ -75,8 +75,6 @@ class SampleComponent extends UiComponent2<SampleProps> {
 
   @override
   render() {
-
-    print('should render child: ${props.shouldRenderChild}');
     window.console.warn('A second warning');
     if (props.shouldError) {
       throw Error();

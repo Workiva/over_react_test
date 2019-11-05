@@ -367,46 +367,60 @@ class _PropTypeLogMatcher extends Matcher {
   bool matches(/*Function || List*/ dynamic actual, Map matchState) {
     final List</*Matcher || String*/ dynamic> expectedList = _expected is List ? _expected : [_expected];
     final expectedMatchCount = _expectsWarning ? expectedList.length : 0;
-    var hasRedundantMatches = false;
-    var logsCheck = <String, bool>{};
-    var actualMatchCount = 0;
+    final individualExpectedWarningCounts = <int>[];
+    final individualActualWarningCounts = <String, int>{};
+
+    var actualTotalMatchCount = 0;
     var actualWarnings = <String>[];
+    var shouldPrintActualLogs = false;
+    var hasDuplicateExpectedWarnings = false;
+    var hasDuplicateActualWarnings = false;
 
     if (actual is List) {
       actualWarnings = actual;
     } else if (actual is Function){
-      print('yooo');
       actualWarnings = recordConsoleLogs(actual);
+      shouldPrintActualLogs = true;
     } else {
       throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a callback.');
     }
 
-    print(actualWarnings);
-
-    actualWarnings.forEach((warning) => logsCheck.addAll({warning: false}));
-
     expectedList.forEach((expectedWarning) {
+      var numberOfMatches = 0;
+
       actualWarnings.forEach((actualWarning) {
         var matcher = expectedWarning is Matcher ? expectedWarning : contains(expectedWarning);
 
         if (matcher.matches(actualWarning, {})) {
-          if (logsCheck[actualWarning]) {
-            hasRedundantMatches = true;
-          } else {
-            logsCheck[actualWarning] = true;
-          }
+            if(individualActualWarningCounts[actualWarning] != null) {
+              individualActualWarningCounts[actualWarning]++;
+            } else {
+              individualActualWarningCounts.addAll({actualWarning: 1});
+            }
+
+            numberOfMatches++;
         }
       });
+
+      individualExpectedWarningCounts.add(numberOfMatches);
     });
 
-    actualMatchCount = (logsCheck.values).where((v) => v).length;
+    actualTotalMatchCount = individualExpectedWarningCounts.fold(0, (prev, curr) => prev + curr);
+    hasDuplicateExpectedWarnings = (individualExpectedWarningCounts.where((v) => v > 1)).isNotEmpty;
+    hasDuplicateActualWarnings = individualActualWarningCounts.values.where((v) => v > 1).isNotEmpty;
+
 
     matchState.addAll({
-      'matchCount': actualMatchCount,
-      'hasRedundantMatches': hasRedundantMatches,
+      'shouldPrintActualLogs': shouldPrintActualLogs,
+      'actualLogs': actualWarnings,
+      'matchCount': actualTotalMatchCount,
+      'hasDuplicateExpectedWarnings': hasDuplicateExpectedWarnings,
+      'hasDuplicateActualWarnings': hasDuplicateActualWarnings,
     });
-    print(hasRedundantMatches);
-    return actualMatchCount == expectedMatchCount && !hasRedundantMatches;
+
+    return actualTotalMatchCount == expectedMatchCount &&
+        !hasDuplicateExpectedWarnings &&
+        !hasDuplicateActualWarnings;
   }
 
   @override
@@ -426,10 +440,15 @@ class _PropTypeLogMatcher extends Matcher {
 
   @override
   Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
+    var shouldPrintActualLogs = matchState['shouldPrintActualLogs'];
+    var actualLogs = matchState['actualLogs'];
     var matchCount = matchState['matchCount'];
-    var hasRedundantMatches = matchState['hasRedundantMatches'];
+    var hasDuplicateExpectedWarnings = matchState['hasDuplicateExpectedWarnings'];
+    var hasDuplcateActualWarnings = matchState['hasDuplicateActualWarnings'];
 
     var description = [];
+
+    if (shouldPrintActualLogs) description.add('was ${actualLogs.toString()}');
 
     if (_expectsWarning) {
       if (_hasOneWarning) {
@@ -441,8 +460,12 @@ class _PropTypeLogMatcher extends Matcher {
         description.add('expected no prop types warnings but got $matchCount. ');
     }
 
-    if (hasRedundantMatches) {
+    if (hasDuplicateExpectedWarnings) {
       description.add('there were multiple warnings matched to a single expected warning. Ensure each expected warning is unique.');
+    }
+
+    if (hasDuplcateActualWarnings) {
+      description.add('there were multiple expected warnings that matched to a single actual warning. Ensure each expected warning is unique.');
     }
 
     mismatchDescription.add(description.join(""));

@@ -51,8 +51,6 @@ class SampleComponent2 extends UiComponent2<Sample2Props> {
     },
     getPropKey((props) => props.shouldNeverBeNullString, typedPropsFactory):
         (props, propName, _, __, ___) {
-      print('never be null string');
-      print(props.shouldNeverBeNullString);
       if (props.shouldNeverBeNullString == null) {
         return new PropError.value(props.shouldNeverBeNullString, propName);
       }
@@ -77,8 +75,6 @@ class SampleComponent2 extends UiComponent2<Sample2Props> {
 
   @override
   render() {
-
-    print('should render child: ${props.shouldRenderChild}');
     window.console.warn('A second warning');
     if (props.shouldError) {
       throw Error();

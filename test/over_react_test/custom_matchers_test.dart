@@ -444,7 +444,12 @@ main() {
 
     group('PropTypeLogMatcher', () {
       group('when passed a List of logs', () {
-        const defaultLogsValue = ['random log', 'Failed prop type: foo is required', 'nonsense', 'Failed prop type: combination error'];
+        const defaultLogsValue = [
+          'random log',
+          'Failed prop type: foo is required',
+          'nonsense',
+          'Failed prop type: combination error',
+        ];
         var logs = defaultLogsValue;
 
         tearDown(() {
@@ -460,16 +465,27 @@ main() {
             shouldPass(logs, logsPropTypeWarning(contains('foo is required')));
           });
 
+          test('when there are multiple prop validation errors', () {
+            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: shouldAlwaysBeFalse set to true'];
+
+            // The matcher does not care if there are more actual logs then expected.
+            shouldPass(logs, logsPropTypeWarning('foo is required'));
+            shouldPass(logs, logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
+          });
+
           test('when multiple failures occur', (){
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: bar is required'];
 
-            shouldFail(logs, logsPropTypeWarning('foo is required'),
-                contains('expected one prop validation warning but got 2'));
+            shouldPass(logs, logsPropTypeWarning('foo is required'));
           });
 
-          test('when two logs are the same', (){
+          test('when the expected log is not unique', (){
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required'];
 
+            // In the case that there are two similar prop failure errors, the test
+            // should anticipate them and either acknowledge both failures (using
+            // logsPropTypeWarnings) or make their current expectation more specific
+            // by including the namespaced prop name or custom error message.
             shouldFail(logs, logsPropTypeWarning('foo is required'),
                 contains('Ensure each expected warning is unique.'));
           });
@@ -490,8 +506,16 @@ main() {
                 contains('Ensure each expected warning is unique.'));
           });
 
+          // In the case that there are two similar prop failure errors, the test
+          // should anticipate them and either acknowledge both failures (using
+          // logsPropTypeWarnings) or make their current expectation more specific
+          // by including the namespaced prop name or custom error message.
           test('when two logs are the same', (){
-            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required', 'Failed prop type: combination error'];
+            logs = ['random log', 'Failed prop type: foo is required',
+                'Failed prop type: foo is required',
+                'Failed prop type: combination error',
+            ];
+
             shouldFail(logs,
                 logsPropTypeWarnings(['foo is required', 'foo is required', 'combination error']),
                 contains('Ensure each expected warning is unique.')
@@ -519,10 +543,76 @@ main() {
               shouldPass(() => mount(Sample()()), logsPropTypeWarning('foo is required'));
             });
 
-            test('when two logs are the same', (){
-              shouldFail(() => mount((Sample())(Sample2()(Sample()()))),
+            test('when there are multiple prop validation errors', () {
+
+              // The matcher does not care if there are more actual logs then expected.
+              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('foo is required'));
+              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
+            });
+
+            test('with a re-render', () {
+              var jacket = mount(Sample()());
+
+              shouldPass(() => jacket.rerender((Sample()..shouldAlwaysBeFalse = true)()),
+                  logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
+            });
+
+            // In the case that there are two similar prop failure errors, the test
+            // should anticipate them and either acknowledge both failures (using
+            // logsPropTypeWarnings) or make their current expectation more specific
+            // by including the namespaced prop name or custom error message.
+            test('when two actual logs are the same', (){
+              shouldFail(() => mount((Sample())(Sample2()())),
                   logsPropTypeWarning('foo is required'),
                   contains('Ensure each expected warning is unique.'));
+            });
+          });
+
+          group('- logsPropTypeWarnings -', (){
+            test('simple usage', (){
+              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
+                  logsPropTypeWarnings(['foo is required',
+                      'shouldAlwaysBeFalse set to true',
+                  ]));
+            });
+
+            test('with a re-render', () {
+              var jacket = mount(Sample()());
+
+              shouldPass(() => jacket.rerender((Sample()..shouldAlwaysBeFalse = true)((Sample2())())),
+                  logsPropTypeWarnings('shouldAlwaysBeFalse set to true'));
+            });
+
+            // In the case that there are two similar prop failure errors, the test
+            // should anticipate them and either acknowledge both failures (using
+            // logsPropTypeWarnings) or make their current expectation more specific
+            // by including the namespaced prop name or custom error message.
+            test('when two actual logs are the same', (){
+              shouldFail(() => mount((Sample())(Sample2()())),
+                  logsPropTypeWarnings(['foo is required']),
+                  contains('Ensure each expected warning is unique.'));
+            });
+
+            // In the case that there are two similar prop failure errors, the test
+            // should anticipate them and either acknowledge both failures (using
+            // logsPropTypeWarnings) or make their current expectation more specific
+            // by including the namespaced prop name or custom error message.
+            test('when two expected logs are the same', (){
+              shouldFail(() => mount((Sample())(Sample2()())),
+                  logsPropTypeWarning(['foo is required', 'foo is required']),
+                  contains('Ensure each expected warning is unique.'));
+            });
+          });
+
+          group('- logsNoPropTypeWarnings -', (){
+            test('simple usage', (){
+              shouldPass(() => mount((Sample()..foo = true)()), logsNoPropTypeWarnings());
+            });
+
+            test('when there are prop type errors', () {
+              shouldFail(() => mount((Sample())()),
+                  logsNoPropTypeWarnings(),
+                  contains('expected no prop types warnings but got 1.'));
             });
           });
         });
