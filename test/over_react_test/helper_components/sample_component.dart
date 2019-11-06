@@ -25,6 +25,8 @@ class _$SampleProps extends UiProps {
 
   bool shouldRenderSecondChild;
 
+  bool addExtraLogAndWarn;
+
   String shouldNeverBeNullString;
 }
 
@@ -36,7 +38,9 @@ class SampleComponent extends UiComponent2<SampleProps> {
     ..shouldError = false
     ..shouldRenderChild = false
     ..shouldNeverBeNullString = ''
-    ..shouldRenderSecondChild = false);
+    ..shouldRenderSecondChild = false
+    ..addExtraLogAndWarn = false
+  );
 
   @override
   get propTypes => {
@@ -69,7 +73,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
   };
 
   @override
-  void componentDidMount() {
+  componentDidMount() {
     window.console.warn('Just a lil warning');
   }
 
@@ -79,6 +83,11 @@ class SampleComponent extends UiComponent2<SampleProps> {
     if (props.shouldError) {
       throw Error();
     } else {
+      if (props.addExtraLogAndWarn) {
+        window.console.log('Extra Log');
+        window.console.warn('Extra Warn');
+      }
+
       window.console.log('Logging a standard log');
       window.console.warn('And a third');
       return Dom.div()(props.children);

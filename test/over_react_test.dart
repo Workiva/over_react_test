@@ -23,6 +23,7 @@ import 'over_react_test/common_component_util_test.dart' as common_component_uti
 import 'over_react_test/custom_matchers_test.dart' as custom_matchers_test;
 import 'over_react_test/dom_util_test.dart' as test_util_dom_util_test;
 import 'over_react_test/jacket_test.dart' as jacket_test;
+import 'over_react_test/prop_type_util_test.dart' as prop_type_util_test;
 import 'over_react_test/react_util_test.dart' as react_util_test;
 import 'over_react_test/validation_util_test.dart' as validation_util_test;
 
@@ -33,6 +34,7 @@ main() {
 
   common_component_util_test.main();
   custom_matchers_test.main();
+  prop_type_util_test.main();
   test_util_dom_util_test.main();
   jacket_test.main();
   react_util_test.main();

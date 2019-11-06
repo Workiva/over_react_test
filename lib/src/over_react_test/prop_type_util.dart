@@ -16,13 +16,11 @@ import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
-List<String> recordConsoleLogs(Function() cb, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
+List<String> recordConsoleLogs(Function() collback, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
   var consoleLogs = <String>[];
 
-  // Reset warning cache
   PropTypes.resetWarningCache();
 
-  // Swap logs
   JsFunction originalConsole = context['console'][configuration.logType];
   context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
     // NOTE: Using console.log or print within this function will cause an infinite
@@ -31,18 +29,16 @@ List<String> recordConsoleLogs(Function() cb, [_ConsoleConfiguration configurati
     originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
   });
 
-  // Run callback
   try {
-    cb();
-  } catch (e) {
-    // TODO actually handle the error.
-    print(e);
+    collback();
+  } catch (_) {
+    // No error handling is necessary. This catch is meant to catch errors that
+    // may occur if a render fails due to invalid props. It also ensures that the
+    // console is reset correctly, even if the callback is broken.
   } finally {
-    // Swap logs back
     context['console'][configuration.logType] = originalConsole;
   }
 
-  // Return collected logs
   return consoleLogs;
 }
 
