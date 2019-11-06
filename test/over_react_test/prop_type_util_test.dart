@@ -112,7 +112,7 @@ main() {
       });
     });
 
-    group('swallows errors as expected', () {
+    group('handles errors as expected', () {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(
             (Sample()..shouldError = true)()
@@ -120,6 +120,102 @@ main() {
 
         expect(logs.length, 2);
       });
+    });
+  });
+
+  group('recordConsoleLogsAsync', () {
+    test('handles document events', () async {
+      var jacket = mount(Sample()(), attachedToDocument: true);
+      var logs = await recordConsoleLogsAsync(() async {
+        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        await Future.delayed(Duration(milliseconds: 5));
+
+        triggerDocumentClick(button);
+      }, warnConfig);
+
+      expect(logs.length, 1);
+      expect(logs.first.contains('I have been clicked'), isTrue);
+    });
+
+    test('handles errors caused when rendering', () async {
+      var logs = await recordConsoleLogsAsync(() async {
+        await Future.delayed(Duration(milliseconds: 5));
+
+        mount((Sample()
+          ..shouldAlwaysBeFalse = true
+          ..shouldError = true
+        )(), attachedToDocument: true);
+      });
+
+      expect(logs.length, 3);
+    });
+
+    test('handles errors caused when re-rendering', () async {
+      var logs = await recordConsoleLogsAsync(() async {
+        var jacket = mount((Sample()..shouldAlwaysBeFalse = true)(), attachedToDocument: true);
+
+        await Future.delayed(Duration(milliseconds: 5));
+
+        jacket.rerender((Sample()
+          ..shouldError = true
+          ..shouldAlwaysBeFalse = true
+        )());
+      });
+
+      expect(logs.length, 3);
+    });
+
+    test('handles re-renders when the mount is outside of the function', () async {
+      var jacket = mount((Sample())(), attachedToDocument: true);
+
+      var logs = await recordConsoleLogsAsync(() async {
+        await Future.delayed(Duration(milliseconds: 5));
+
+        jacket.rerender((Sample()
+          ..shouldAlwaysBeFalse = true
+        )());
+      });
+
+      expect(logs.length, 2);
+    });
+
+    test('handles re-renders when the mount is inside of the function', () async {
+      var logs = await recordConsoleLogsAsync(() async {
+        var jacket = mount((Sample())(), attachedToDocument: true);
+
+        await Future.delayed(Duration(milliseconds: 5));
+
+        jacket.rerender((Sample()
+          ..shouldAlwaysBeFalse = true
+          ..foo = false
+        )());
+      });
+
+      expect(logs.length, 2);
+    });
+
+    test('captures logs', () async {
+      var logs = await recordConsoleLogsAsync(() async {
+        var jacket = mount((Sample()..addExtraLogAndWarn = true)(), attachedToDocument: true);
+        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        await Future.delayed(Duration(milliseconds: 5));
+
+        triggerDocumentClick(button);
+      }, logConfig);
+
+      expect(logs.length, 3);
+    });
+
+    test('captures warns', () async {
+      var logs = await recordConsoleLogsAsync(() async {
+        var jacket = mount((Sample()..addExtraLogAndWarn = true)(), attachedToDocument: true);
+        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        await Future.delayed(Duration(milliseconds: 5));
+
+        triggerDocumentClick(button);
+      }, warnConfig);
+
+      expect(logs.length, 5);
     });
   });
 }

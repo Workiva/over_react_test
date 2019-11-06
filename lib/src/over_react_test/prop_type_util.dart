@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:async';
 import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
-List<String> recordConsoleLogs(Function() collback, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
+List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
   var consoleLogs = <String>[];
 
   PropTypes.resetWarningCache();
@@ -30,11 +31,40 @@ List<String> recordConsoleLogs(Function() collback, [_ConsoleConfiguration confi
   });
 
   try {
-    collback();
+    callback();
   } catch (_) {
     // No error handling is necessary. This catch is meant to catch errors that
     // may occur if a render fails due to invalid props. It also ensures that the
     // console is reset correctly, even if the callback is broken.
+  } finally {
+    context['console'][configuration.logType] = originalConsole;
+  }
+
+  return consoleLogs;
+}
+
+FutureOr<List<String>> recordConsoleLogsAsync(
+    Future Function() asyncCallback,
+    [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]
+) async {
+  var consoleLogs = <String>[];
+
+  PropTypes.resetWarningCache();
+
+  JsFunction originalConsole = context['console'][configuration.logType];
+  context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+    // NOTE: Using console.log or print within this function will cause an infinite
+    // loop the the logType is set to `log`.
+    consoleLogs.add(message);
+    originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+  });
+
+  try {
+    await asyncCallback();
+  } catch(_) {
+     // No error handling is necessary. This catch is meant to catch errors that
+     // may occur if a render fails due to invalid props. It also ensures that the
+     // console is reset correctly, even if the callback is broken.
   } finally {
     context['console'][configuration.logType] = originalConsole;
   }

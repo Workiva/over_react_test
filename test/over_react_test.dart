@@ -32,11 +32,11 @@ main() {
 
   enableTestMode();
 
-  common_component_util_test.main();
-  custom_matchers_test.main();
+//  common_component_util_test.main();
+//  custom_matchers_test.main();
   prop_type_util_test.main();
-  test_util_dom_util_test.main();
-  jacket_test.main();
-  react_util_test.main();
-  validation_util_test.main();
+//  test_util_dom_util_test.main();
+//  jacket_test.main();
+//  react_util_test.main();
+//  validation_util_test.main();
 }

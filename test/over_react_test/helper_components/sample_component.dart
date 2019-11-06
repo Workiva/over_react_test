@@ -90,8 +90,19 @@ class SampleComponent extends UiComponent2<SampleProps> {
 
       window.console.log('Logging a standard log');
       window.console.warn('And a third');
-      return Dom.div()(props.children);
+      return Dom.div()(
+          (Dom.button()
+            ..onClick = _handleOnClick
+            ..addTestId('ort_sample_component_button')
+          )(),
+          props.children
+      );
     }
+  }
+
+  void _handleOnClick(_) {
+    window.console.log('Clicking');
+    window.console.warn('I have been clicked');
   }
 }
 
