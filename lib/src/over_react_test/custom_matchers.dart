@@ -357,8 +357,6 @@ class _LogMatcher extends Matcher {
   _LogMatcher.logsNoPropTypeWarnings({this.shouldEnforceLogCount = false})
       : _expected = contains('Failed prop type:'), _expectsSingleMatch = false, _expectsMatch = false;
 
-  //  PropTypeLogMatcher.logsReactWarning(this._expected);
-
   /// The expected value.
   final /*List<Matcher> || List<String> || String*/ _expected;
 
@@ -519,5 +517,3 @@ Matcher logsPropTypeWarning(expected, {shouldEnforceLogCount = false}) => _LogMa
 Matcher logsPropTypeWarnings(expected, {shouldEnforceLogCount = false}) => _LogMatcher.logsPropTypeWarnings(expected, shouldEnforceLogCount: shouldEnforceLogCount);
 
 Matcher logsNoPropTypeWarnings({shouldEnforceLogCount = false}) => _LogMatcher.logsNoPropTypeWarnings(shouldEnforceLogCount: shouldEnforceLogCount);
-
-//Matcher logsReactWarning() => PropTypeLogMatcher.logsReactWarning();

@@ -34,7 +34,7 @@ main() {
         var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
 
         // Should clear the error from mounting and not create any more
-        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..foo = true)()));
+        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..shouldNeverBeNull = true)()));
 
         expect(logs.length, 0);
       });
@@ -187,7 +187,7 @@ main() {
 
         jacket.rerender((Sample()
           ..shouldAlwaysBeFalse = true
-          ..foo = false
+          ..shouldNeverBeNull = false
         )());
       });
 

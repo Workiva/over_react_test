@@ -488,7 +488,7 @@ main() {
           });
 
           test('when log count should be enforced', () {
-            shouldFail(logs, logsPropTypeWarning('foo is required'),
+            shouldFail(logs, logsPropTypeWarning('foo is required', shouldEnforceLogCount: true),
                 contains('Expected an equal number of expected and actual logs'));
           });
         });
@@ -538,13 +538,13 @@ main() {
         group('that is synchronous', () {
           group('- logsPropTypeWarning -', (){
             test('simple usage', (){
-              shouldPass(() => mount(Sample()()), logsPropTypeWarning('foo is required'));
+              shouldPass(() => mount(Sample()()), logsPropTypeWarning('shouldNeverBeNull'));
             });
 
             test('when there are multiple prop validation errors', () {
 
               // The matcher does not care if there are more actual logs then expected.
-              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('foo is required'));
+              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('shouldNeverBeNull'));
               shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
             });
 
@@ -557,7 +557,7 @@ main() {
 
             test('when two actual logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
-                  logsPropTypeWarning('foo is required'),
+                  logsPropTypeWarning('shouldNeverBeNull'),
                   contains('Ensure each expected log is specific and unique.'));
             });
           });
@@ -565,7 +565,7 @@ main() {
           group('- logsPropTypeWarnings -', (){
             test('simple usage', (){
               shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
-                  logsPropTypeWarnings(['foo is required',
+                  logsPropTypeWarnings(['shouldNeverBeNull',
                       'shouldAlwaysBeFalse set to true',
                   ]));
             });
@@ -579,20 +579,20 @@ main() {
 
             test('when two actual logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
-                  logsPropTypeWarnings(['foo is required']),
+                  logsPropTypeWarnings(['shouldNeverBeNull']),
                   contains('Ensure each expected log is specific and unique.'));
             });
 
             test('when two expected logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
-                  logsPropTypeWarning(['foo is required', 'foo is required']),
+                  logsPropTypeWarning(['shouldNeverBeNull', 'shouldNeverBeNull']),
                   contains('Ensure each expected log is specific and unique.'));
             });
           });
 
           group('- logsNoPropTypeWarnings -', (){
             test('simple usage', (){
-              shouldPass(() => mount((Sample()..foo = true)()), logsNoPropTypeWarnings());
+              shouldPass(() => mount((Sample()..shouldNeverBeNull = true)()), logsNoPropTypeWarnings());
             });
 
             test('when there are prop type errors', () {

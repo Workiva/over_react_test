@@ -15,19 +15,13 @@ _$Sample;
 
 @Props()
 class _$SampleProps extends UiProps {
-  bool foo;
+  bool shouldNeverBeNull;
 
   bool shouldAlwaysBeFalse;
 
   bool shouldError;
 
-  bool shouldRenderChild;
-
-  bool shouldRenderSecondChild;
-
   bool addExtraLogAndWarn;
-
-  String shouldNeverBeNullString;
 }
 
 @Component2()
@@ -36,27 +30,16 @@ class SampleComponent extends UiComponent2<SampleProps> {
   Map get defaultProps => (newProps()
     ..shouldAlwaysBeFalse = false
     ..shouldError = false
-    ..shouldRenderChild = false
-    ..shouldNeverBeNullString = ''
-    ..shouldRenderSecondChild = false
     ..addExtraLogAndWarn = false
   );
 
   @override
   get propTypes => {
-    getPropKey((props) => props.foo, typedPropsFactory):
+    getPropKey((props) => props.shouldNeverBeNull, typedPropsFactory):
         (props, propName, _, __, ___) {
 
-      if (props.foo == null) {
+      if (props.shouldNeverBeNull == null) {
         return new PropError.required(propName);
-      }
-
-      return null;
-    },
-    getPropKey((props) => props.shouldNeverBeNullString, typedPropsFactory):
-        (props, propName, _, __, ___) {
-      if (props.shouldNeverBeNullString == null) {
-        return new PropError.value(props.shouldNeverBeNullString, propName);
       }
 
       return null;

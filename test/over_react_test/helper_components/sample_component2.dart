@@ -15,53 +15,18 @@ _$Sample2;
 
 @Props()
 class _$Sample2Props extends UiProps {
-  bool foo;
-
-  bool shouldAlwaysBeFalse;
-
-  bool shouldError;
-
-  bool shouldRenderChild;
-
-  bool shouldRenderSecondChild;
-
-  String shouldNeverBeNullString;
+  bool shouldNeverBeNull;
 }
 
 @Component2()
 class SampleComponent2 extends UiComponent2<Sample2Props> {
   @override
-  Map get defaultProps => (newProps()
-    ..shouldAlwaysBeFalse = false
-    ..shouldError = false
-    ..shouldRenderChild = false
-    ..shouldNeverBeNullString = ''
-    ..shouldRenderSecondChild = false);
-
-  @override
   get propTypes => {
-    getPropKey((props) => props.foo, typedPropsFactory):
+    getPropKey((props) => props.shouldNeverBeNull, typedPropsFactory):
         (props, propName, _, __, ___) {
 
-      if (props.foo == null) {
+      if (props.shouldNeverBeNull == null) {
         return new PropError.required(propName);
-      }
-
-      return null;
-    },
-    getPropKey((props) => props.shouldNeverBeNullString, typedPropsFactory):
-        (props, propName, _, __, ___) {
-      if (props.shouldNeverBeNullString == null) {
-        return new PropError.value(props.shouldNeverBeNullString, propName);
-      }
-
-      return null;
-    },
-    getPropKey((props) => props.shouldAlwaysBeFalse, typedPropsFactory):
-        (props, propName, _, __, ___) {
-
-      if (props.shouldAlwaysBeFalse) {
-        return new PropError.value(props.shouldAlwaysBeFalse, propName);
       }
 
       return null;
@@ -76,13 +41,10 @@ class SampleComponent2 extends UiComponent2<Sample2Props> {
   @override
   render() {
     window.console.warn('A second warning');
-    if (props.shouldError) {
-      throw Error();
-    } else {
-      window.console.log('Logging a standard log');
-      window.console.warn('And a third');
-      return Dom.div()(props.children);
-    }
+
+    window.console.log('Logging a standard log');
+    window.console.warn('And a third');
+    return Dom.div()(props.children);
   }
 }
 

@@ -17,6 +17,14 @@ import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
+/// Runs a provided callback and returns the logs that occur during the runtime
+/// of that function.
+///
+/// Can be used to capture logs, warnings, or errors as specified by setting
+/// the [configuration]. To set the [configuration], pass in the corresponding
+/// config class (logConfig, warnConfig, errorConfig).
+///
+/// To handle asynchronous behavior, see [recordConsoleLogsAsync].
 List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
   var consoleLogs = <String>[];
 
@@ -25,7 +33,7 @@ List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration confi
   JsFunction originalConsole = context['console'][configuration.logType];
   context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
     // NOTE: Using console.log or print within this function will cause an infinite
-    // loop the the logType is set to `log`.
+    // loop when the logType is set to `log`.
     consoleLogs.add(message);
     originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
   });
@@ -43,6 +51,10 @@ List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration confi
   return consoleLogs;
 }
 
+/// Captures console logs created during the runtime of a provided asynchronous
+/// callback.
+///
+/// Related: [recordConsoleLogs]
 FutureOr<List<String>> recordConsoleLogsAsync(
     Future Function() asyncCallback,
     [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]
@@ -54,7 +66,7 @@ FutureOr<List<String>> recordConsoleLogsAsync(
   JsFunction originalConsole = context['console'][configuration.logType];
   context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
     // NOTE: Using console.log or print within this function will cause an infinite
-    // loop the the logType is set to `log`.
+    // loop when the logType is set to `log`.
     consoleLogs.add(message);
     originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
   });
@@ -72,16 +84,27 @@ FutureOr<List<String>> recordConsoleLogsAsync(
   return consoleLogs;
 }
 
+/// Configuration class that sets options within [recordConsoleLogs] and
+/// [recordConsoleLogsAsync].
 class _ConsoleConfiguration {
-  final logType;
-
   const _ConsoleConfiguration.warn() : logType = 'warn';
 
   const _ConsoleConfiguration.error() : logType = 'error';
 
   const _ConsoleConfiguration.log() : logType = 'log';
+
+  /// The type of log to capture while running the callbacks within
+  /// [recordConsoleLogs] and [recordConsoleLogsAsync].
+  ///
+  /// Must be `'warn'`, `'error'`, or `'log'`.
+  final logType;
 }
 
+/// The configuration needed to capture logs while running [recordConsoleLogs].
 _ConsoleConfiguration logConfig = const _ConsoleConfiguration.log();
+
+/// The configuration needed to capture warnings while running [recordConsoleLogs].
 _ConsoleConfiguration warnConfig = const _ConsoleConfiguration.warn();
+
+/// The configuration needed to capture errors while running [recordConsoleLogs].
 _ConsoleConfiguration errorConfig = const _ConsoleConfiguration.error();
