@@ -1,5 +1,5 @@
-analyzer:
-  strong-mode: true
+include: package:pedantic/analysis_options.1.8.0.yaml
+
 linter:
   rules:
     # - always_declare_return_types

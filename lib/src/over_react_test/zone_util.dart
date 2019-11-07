@@ -21,7 +21,7 @@ Zone _zone;
 /// Validates that [storeZone] was called before [zonedExpect] was.
 void validateZone() {
   if (_zone == null) {
-    throw new StateError('Need to call storeZone() first.');
+    throw StateError('Need to call storeZone() first.');
   }
 }
 

@@ -40,7 +40,7 @@ main() {
         });
 
         test('with the given container', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode);
 
           expect(document.body.children[0], mountNode);
@@ -76,7 +76,7 @@ main() {
         });
 
         test('with the given container', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           jacket = mount(Sample()(),
               attachedToDocument: true,
               mountNode: mountNode,
@@ -114,7 +114,7 @@ main() {
         });
 
         test('with the given container', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           jacket = mount(Sample()(), mountNode: mountNode);
 
           expect(document.body.children, isEmpty);
@@ -149,7 +149,7 @@ main() {
         });
 
         test('with the given container', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           jacket = mount(Sample()(), mountNode: mountNode, autoTearDown: false);
 
           expect(document.body.children.isEmpty, isTrue);
@@ -171,7 +171,7 @@ main() {
     TestJacket<SampleComponent> jacket;
 
     setUp(() {
-      var mountNode = new DivElement();
+      var mountNode = DivElement();
       jacket = mount<SampleComponent>((Sample()..addTestId('sample'))(),
           mountNode: mountNode,
           attachedToDocument: true

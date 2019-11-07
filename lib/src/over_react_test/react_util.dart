@@ -65,11 +65,12 @@ export 'package:over_react/src/util/react_wrappers.dart';
     renderedInstance = react_dom.render(component, container);
   }
 
-  if (autoTearDown)
+  if (autoTearDown) {
     addTearDown(() {
       unmount(renderedInstance);
       if (autoTearDownCallback != null) autoTearDownCallback();
     });
+  }
 
   return renderedInstance;
 }
@@ -82,10 +83,12 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// See: <https://facebook.github.io/react/docs/test-utils.html#shallow-rendering>.
 ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true, Callback autoTearDownCallback}) {
   var renderer = react_test_utils.createRenderer();
-  if (autoTearDown) addTearDown(() {
-    renderer.unmount();
-    if (autoTearDownCallback != null) autoTearDownCallback();
-  });
+  if (autoTearDown) {
+    addTearDown(() {
+      renderer.unmount();
+      if (autoTearDownCallback != null) autoTearDownCallback();
+    });
+  }
   renderer.render(instance);
   return renderer.getRenderOutput();
 }
@@ -114,7 +117,7 @@ void unmount(dynamic instanceOrContainerNode) {
       return;
     }
   } else {
-    throw new ArgumentError(
+    throw ArgumentError(
         '`instanceOrNode` must be null, a ReactComponent instance, or an Element. Was: $instanceOrContainerNode.'
     );
   }
@@ -126,13 +129,13 @@ void unmount(dynamic instanceOrContainerNode) {
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false.
-Element renderAndGetDom(dynamic component, {bool autoTearDown: true, Callback autoTearDownCallback}) {
+Element renderAndGetDom(dynamic component, {bool autoTearDown = true, Callback autoTearDownCallback}) {
   return findDomNode(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
 }
 
 /// Renders a React component or builder into a detached node and returns the associtated Dart component.
 react.Component renderAndGetComponent(dynamic component,
-        {bool autoTearDown: true, Callback autoTearDownCallback}) =>
+        {bool autoTearDown = true, Callback autoTearDownCallback}) =>
     getDartComponent(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
@@ -145,7 +148,7 @@ List<Element> _attachedReactContainers = [];
     {bool autoTearDown = true,
     Element container,
     Callback autoTearDownCallback}) {
-  container ??= new DivElement()
+  container ??= DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
@@ -260,7 +263,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-/* [1] */ getByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+/* [1] */ getByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   final results = getAllByTestId(root, value, key: key);
   return results.isEmpty ? null : results.first;
 }
@@ -307,7 +310,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {
@@ -345,7 +348,7 @@ List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key: defau
 ///
 ///    // This returns [ `<Instance of 'ForwardsPropsComponent'>` ]
 ///    getAllComponentsByTestId(root, 'foo')
-List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key: defaultTestIdKey}) =>
+List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key = defaultTestIdKey}) =>
     getAllByTestId(root, value, key: key)
         .map((element) => getDartComponent<T>(element)) // ignore: unnecessary_lambdas
         .where((component) => component != null)
@@ -379,7 +382,7 @@ List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String
 ///     getComponentRootDomByTestId(renderedInstance, 'value'); // returns the `outer` `<div>`
 ///
 /// Related: [queryByTestId].
-Element getComponentRootDomByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+Element getComponentRootDomByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   return findDomNode(getByTestId(root, value, key: key));
 }
 
@@ -410,7 +413,7 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key: def
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   return findDomNode(root).querySelector('[$key~="$value"]');
 }
 
@@ -445,14 +448,14 @@ Element queryByTestId(dynamic root, String value, {String key: defaultTestIdKey}
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   return findDomNode(root).querySelectorAll('[$key~="$value"]');
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-react.Component getComponentByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+react.Component getComponentByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getDartComponent(instance);
@@ -464,7 +467,7 @@ react.Component getComponentByTestId(dynamic root, String value, {String key: de
 /// Returns the props of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Map getPropsByTestId(dynamic root, String value, {String key: defaultTestIdKey}) {
+Map getPropsByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getProps(instance);
@@ -473,7 +476,7 @@ Map getPropsByTestId(dynamic root, String value, {String key: defaultTestIdKey})
   return null;
 }
 
-List<ReactElement> _getAllByTestIdShallow(ReactElement root, String value, {String key: defaultTestIdKey}) {
+List<ReactElement> _getAllByTestIdShallow(ReactElement root, String value, {String key = defaultTestIdKey}) {
   Iterable flattenChildren(dynamic children) sync* {
     if (children is Iterable) {
       yield* children.expand(flattenChildren);
@@ -484,7 +487,7 @@ List<ReactElement> _getAllByTestIdShallow(ReactElement root, String value, {Stri
 
   final matchingDescendants = <ReactElement>[];
 
-  var breadthFirstDescendants = new Queue()..add(root);
+  var breadthFirstDescendants = Queue()..add(root);
   while (breadthFirstDescendants.isNotEmpty) {
     var descendant = breadthFirstDescendants.removeFirst();
     if (!isValidElement(descendant)) {

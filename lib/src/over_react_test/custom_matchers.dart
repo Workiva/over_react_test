@@ -23,15 +23,15 @@ import 'package:test/test.dart';
 
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
-  ClassNameMatcher.expected(_expectedClasses, {this.allowExtraneous: true}) :
-    this.expectedClasses = getClassIterable(_expectedClasses).toSet(),
-    this.unexpectedClasses = new Set();
+  ClassNameMatcher.expected(_expectedClasses, {this.allowExtraneous = true}) :
+    expectedClasses = getClassIterable(_expectedClasses).toSet(),
+    unexpectedClasses = {};
 
 
   ClassNameMatcher.unexpected(_unexpectedClasses) :
-    this.unexpectedClasses = getClassIterable(_unexpectedClasses).toSet(),
-    this.allowExtraneous = true,
-    this.expectedClasses = new Set();
+    unexpectedClasses = getClassIterable(_unexpectedClasses).toSet(),
+    allowExtraneous = true,
+    expectedClasses = {};
 
   // Class names that are expected
   final Set expectedClasses;
@@ -47,7 +47,7 @@ class ClassNameMatcher extends Matcher {
     } else if (classNames is String) {
       classes = splitSpaceDelimitedString(classNames);
     } else {
-      throw new ArgumentError.value(classNames, 'Must be a list of classNames or a className string', 'classNames');
+      throw ArgumentError.value(classNames, 'Must be a list of classNames or a className string', 'classNames');
     }
 
     return classes;
@@ -64,7 +64,7 @@ class ClassNameMatcher extends Matcher {
     } else if (className is AnimatedString) {
       castClassName = className.baseVal;
     } else {
-      throw new ArgumentError.value(className, 'Must be a string type');
+      throw ArgumentError.value(className, 'Must be a string type');
     }
 
     Iterable actualClasses = getClassIterable(castClassName);
@@ -147,11 +147,11 @@ class _ElementClassNameMatcher extends CustomMatcher {
   featureValueOf(covariant Element actual) => actual.className;
 }
 class _ElementAttributeMatcher extends CustomMatcher {
-  String _attributeName;
-
   _ElementAttributeMatcher(String attributeName, matcher) :
-      this._attributeName = attributeName,
-      super('Element with "$attributeName" attribute that equals', 'attributes', matcher);
+        _attributeName = attributeName,
+        super('Element with "$attributeName" attribute that equals', 'attributes', matcher);
+
+  String _attributeName;
 
   @override
   featureValueOf(covariant Element element) => element.getAttribute(_attributeName);
@@ -165,11 +165,11 @@ class _HasToStringValue extends CustomMatcher {
 }
 
 class _HasPropMatcher extends CustomMatcher {
-  final dynamic _propKey;
-
   _HasPropMatcher(propKey, propValue)
-      : this._propKey = propKey,
+      : _propKey = propKey,
         super('React instance with props that', 'props/attributes map', containsPair(propKey, propValue));
+
+  final dynamic _propKey;
 
   static bool _useDomAttributes(item) => react_test_utils.isDOMComponent(item);
 
@@ -220,15 +220,15 @@ class _HasPropMatcher extends CustomMatcher {
 }
 
 /// Returns a matcher that matches an element that has [classes].
-Matcher hasClasses(classes) => new _ElementClassNameMatcher(new ClassNameMatcher.expected(classes));
+Matcher hasClasses(classes) => _ElementClassNameMatcher(ClassNameMatcher.expected(classes));
 /// Returns a matcher that matches an element that has [classes], with no additional or duplicated classes.
-Matcher hasExactClasses(classes) => new _ElementClassNameMatcher(new ClassNameMatcher.expected(classes, allowExtraneous: false));
+Matcher hasExactClasses(classes) => _ElementClassNameMatcher(ClassNameMatcher.expected(classes, allowExtraneous: false));
 /// Returns a matcher that matches an element that does not have [classes].
-Matcher excludesClasses(classes) => new _ElementClassNameMatcher(new ClassNameMatcher.unexpected(classes));
+Matcher excludesClasses(classes) => _ElementClassNameMatcher(ClassNameMatcher.unexpected(classes));
 /// Returns a matcher that matches an element that has [attributeName] set to [value].
-Matcher hasAttr(String attributeName, value) => new _ElementAttributeMatcher(attributeName, wrapMatcher(value));
+Matcher hasAttr(String attributeName, value) => _ElementAttributeMatcher(attributeName, wrapMatcher(value));
 /// Returns a matcher that matches an element with the nodeName of [nodeName].
-Matcher hasNodeName(String nodeName) => new IsNode(equalsIgnoringCase(nodeName));
+Matcher hasNodeName(String nodeName) => IsNode(equalsIgnoringCase(nodeName));
 
 /// Returns a matcher that matches Dart, JS composite, and DOM `ReactElement`s and `ReactComponent`s
 /// that contain the prop pair ([propKey], propValue).
@@ -238,10 +238,10 @@ Matcher hasNodeName(String nodeName) => new IsNode(equalsIgnoringCase(nodeName))
 /// This matcher will always fail when unsupported prop keys are tested against a DOM `ReactComponent`.
 ///
 /// TODO: add support for prop keys that aren't the same as their attribute keys
-Matcher hasProp(dynamic propKey, dynamic propValue) => new _HasPropMatcher(propKey, propValue);
+Matcher hasProp(dynamic propKey, dynamic propValue) => _HasPropMatcher(propKey, propValue);
 
 /// Returns a matcher that matches an object whose `toString` value matches [value].
-Matcher hasToStringValue(value) => new _HasToStringValue(value);
+Matcher hasToStringValue(value) => _HasToStringValue(value);
 
 class _IsFocused extends Matcher {
   const _IsFocused();
@@ -288,7 +288,7 @@ class _IsFocused extends Matcher {
 }
 
 /// A matcher that matches the currently focused element (`document.activeElement`).
-const Matcher isFocused = const _IsFocused();
+const Matcher isFocused = _IsFocused();
 
 /// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
 ///
