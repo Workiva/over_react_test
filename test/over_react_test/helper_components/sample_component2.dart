@@ -1,6 +1,5 @@
 import 'dart:html';
 
-import 'package:react/react_client/react_interop.dart';
 import 'package:over_react/over_react.dart';
 
 // ignore: uri_has_not_been_generated

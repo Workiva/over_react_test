@@ -468,16 +468,10 @@ main() {
           test('when there are multiple prop validation errors', () {
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: shouldAlwaysBeFalse set to true'];
 
-            shouldPass(logs, logsPropTypeWarning('foo is required'));
-            shouldPass(logs, logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
-          });
-
-          test('when multiple failures occur', (){
-            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: bar is required'];
-
             // By default the matcher does not care if there are more actual
             // logs then expected.
             shouldPass(logs, logsPropTypeWarning('foo is required'));
+            shouldPass(logs, logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
           });
 
           test('when the expected log is not unique', (){
@@ -498,7 +492,7 @@ main() {
             shouldPass(logs, logsPropTypeWarnings(['foo is required', 'combination error']));
           });
 
-          test('when passed in a matchers instead of string', (){
+          test('when passed in matchers instead of string', (){
             shouldPass(logs, logsPropTypeWarnings([contains('foo is required'), contains('combination error')]));
           });
 
