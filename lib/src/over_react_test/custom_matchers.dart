@@ -340,83 +340,110 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
   ));
 }
 
-/// PropTypes matcher
-/// TODO name?
-class _PropTypeLogMatcher extends Matcher {
+/// A log matcher that ensures that expected log values are present.
+///
+/// In its core, the matcher compares two lists. The added utility is that by
+/// passing in a callback, the matcher will run the function and record the logs,
+/// using that list as the actual value to compare against the expected.
+///
+/// Related: [recordConsoleLogs]
+class _LogMatcher extends Matcher {
+  _LogMatcher.logsPropTypeWarning(/*String || Contains*/ this._expected, {this.shouldEnforceLogCount = false})
+      : _expectsSingleMatch = true, _expectsMatch = true;
 
-  // can be warning or matcher
-  final _expected;
+  _LogMatcher.logsPropTypeWarnings(/*String || Contains*/ this._expected, {this.shouldEnforceLogCount = false})
+      : _expectsSingleMatch = false, _expectsMatch = true;
 
-  final _hasOneWarning;
+  _LogMatcher.logsNoPropTypeWarnings({this.shouldEnforceLogCount = false})
+      : _expected = contains('Failed prop type:'), _expectsSingleMatch = false, _expectsMatch = false;
 
-  final _expectsWarning;
+  //  PropTypeLogMatcher.logsReactWarning(this._expected);
 
-  _PropTypeLogMatcher.logsPropTypeWarning(/*String || Contains*/ this._expected)
-      : _hasOneWarning = true, _expectsWarning = true;
+  /// The expected value.
+  final /*List<Matcher> || List<String> || String*/ _expected;
 
-  _PropTypeLogMatcher.logsPropTypeWarnings(/*String || Contains*/ this._expected)
-      : _hasOneWarning = false, _expectsWarning = true;
+  /// Whether or not the matcher should expect any log matches.
+  ///
+  /// This can be useful to validate that a certain log does not occur.
+  final _expectsMatch;
 
-  _PropTypeLogMatcher.logsNoPropTypeWarnings()
-      : _expected = contains('Failed prop type:'), _hasOneWarning = false, _expectsWarning = false;
+  /// Whether or not the matcher should expect only a single log match.
+  final _expectsSingleMatch;
 
-//  PropTypeLogMatcher.logsReactWarning(this._expected);
+  /// Whether or not the matcher should enforce that the number of actual logs
+  /// is equal to the number of expected logs.
+  ///
+  /// Default: false
+  final shouldEnforceLogCount;
 
   @override
   bool matches(/*Function || List*/ dynamic actual, Map matchState) {
+    // Get the expected values
     final List</*Matcher || String*/ dynamic> expectedList = _expected is List ? _expected : [_expected];
-    final expectedMatchCount = _expectsWarning ? expectedList.length : 0;
-    final individualExpectedWarningCounts = <int>[];
-    final individualActualWarningCounts = <String, int>{};
+    final expectedMatchCount = _expectsMatch ? expectedList.length : 0;
 
-    var actualTotalMatchCount = 0;
-    var actualWarnings = <String>[];
-    var shouldPrintActualLogs = false;
+    // Declare variables used to test against the expected values
     var hasDuplicateExpectedWarnings = false;
     var hasDuplicateActualWarnings = false;
+    var actualTotalMatchCount = 0;
 
-    if (actual is List) {
-      actualWarnings = actual;
-    } else if (actual is Function){
-      actualWarnings = recordConsoleLogs(actual);
-      shouldPrintActualLogs = true;
-    } else {
-      throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a callback.');
+    // Local function state variables
+    final actualWarningCounts= <String, int>{};
+    final expectedWarningCounts = <int>[];
+
+    // Validate that actual is a list of logs and set it to one if not.
+    try {
+      actual = actual is List<String> ? actual : recordConsoleLogs(actual);
+    } catch (e, st) {
+      throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a callback. \n$e \n$st');
     }
 
-    expectedList.forEach((expectedWarning) {
-      var numberOfMatches = 0;
+    // If number of expected and actual logs should match but do not, short circuit.
+    if (shouldEnforceLogCount && actual.length != expectedList.length) {
+      matchState.addAll({
+        'hasTooManyActualLogs': true,
+      });
 
-      actualWarnings.forEach((actualWarning) {
-        var matcher = expectedWarning is Matcher ? expectedWarning : contains(expectedWarning);
+      return false;
+    }
+
+    // Function that looks for matches and updates the match state.
+    void matchExpectedWarnings(/*Matcher || String*/ dynamic warning) {
+      var expectedWarningMatches = 0;
+
+      actual.forEach((actualWarning) {
+        var matcher = warning is Matcher ? warning : contains(warning);
 
         if (matcher.matches(actualWarning, {})) {
-            if(individualActualWarningCounts[actualWarning] != null) {
-              individualActualWarningCounts[actualWarning]++;
-            } else {
-              individualActualWarningCounts.addAll({actualWarning: 1});
-            }
+          if (actualWarningCounts[actualWarning] != null) {
+            actualWarningCounts[actualWarning]++;
+          } else {
+            actualWarningCounts.addAll({actualWarning: 1});
+          }
 
-            numberOfMatches++;
+          expectedWarningMatches++;
         }
       });
 
-      individualExpectedWarningCounts.add(numberOfMatches);
-    });
+      expectedWarningCounts.add(expectedWarningMatches);
+    }
 
-    actualTotalMatchCount = individualExpectedWarningCounts.fold(0, (prev, curr) => prev + curr);
-    hasDuplicateExpectedWarnings = (individualExpectedWarningCounts.where((v) => v > 1)).isNotEmpty;
-    hasDuplicateActualWarnings = individualActualWarningCounts.values.where((v) => v > 1).isNotEmpty;
+    // Iterate over expected values looking for matches.
+    expectedList.forEach(matchExpectedWarnings);
 
+    actualTotalMatchCount = expectedWarningCounts.fold(0, (prev, curr) => prev + curr);
+    hasDuplicateExpectedWarnings = (expectedWarningCounts.where((v) => v > 1)).isNotEmpty;
+    hasDuplicateActualWarnings = actualWarningCounts.values.where((v) => v > 1).isNotEmpty;
 
     matchState.addAll({
-      'shouldPrintActualLogs': shouldPrintActualLogs,
-      'actualLogs': actualWarnings,
+      'shouldPrintActualLogs': actual is Function,
+      'actualLogs': actual,
       'matchCount': actualTotalMatchCount,
       'hasDuplicateExpectedWarnings': hasDuplicateExpectedWarnings,
       'hasDuplicateActualWarnings': hasDuplicateActualWarnings,
     });
 
+    // Validate there are the correct number of matches and there are no duplicate matches.
     return actualTotalMatchCount == expectedMatchCount &&
         !hasDuplicateExpectedWarnings &&
         !hasDuplicateActualWarnings;
@@ -424,14 +451,14 @@ class _PropTypeLogMatcher extends Matcher {
 
   @override
   Description describe(Description description) {
-    if (_expectsWarning) {
-      if (_hasOneWarning) {
-        description.add('one prop validation warning');
+    if (_expectsMatch) {
+      if (_expectsSingleMatch) {
+        description.add('one log match');
       } else {
-        description.add('${_expected.length} prop validation warnings.');
+        description.add('${_expected.length} log matches.');
       }
     } else {
-      description.add('no prop validation warnings');
+      description.add('no log matches');
     }
 
     return description;
@@ -439,32 +466,46 @@ class _PropTypeLogMatcher extends Matcher {
 
   @override
   Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
-    var shouldPrintActualLogs = matchState['shouldPrintActualLogs'];
-    var actualLogs = matchState['actualLogs'];
-    var matchCount = matchState['matchCount'];
-    var hasDuplicateExpectedWarnings = matchState['hasDuplicateExpectedWarnings'];
-    var hasDuplcateActualWarnings = matchState['hasDuplicateActualWarnings'];
+    bool shouldPrintActualLogs = matchState['shouldPrintActualLogs'];
+    List<String> actualLogs = matchState['actualLogs'];
+    int matchCount = matchState['matchCount'];
+    bool hasDuplicateExpectedWarnings = matchState['hasDuplicateExpectedWarnings'];
+    bool hasDuplicateActualWarnings = matchState['hasDuplicateActualWarnings'];
+    bool hasTooManyActualLogs = matchState['hasTooManyActualLogs'] ?? false;
 
-    var description = [];
+    var description = <String>[];
+
+    if (hasTooManyActualLogs) {
+      mismatchDescription.add('Expected an equal number of expected and actual '
+          'logs, but received too many actual logs');
+
+      return mismatchDescription;
+    }
 
     if (shouldPrintActualLogs) description.add('was ${actualLogs.toString()}');
 
-    if (_expectsWarning) {
-      if (_hasOneWarning) {
-        description.add('expected one prop validation warning but got $matchCount. ');
+    if (_expectsMatch) {
+      if (_expectsSingleMatch) {
+        description.add('Expected one log match but got $matchCount. ');
       } else {
-        description.add('expected ${_expected.length} prop validation warnings but got $matchCount. ');
+        description.add('Expected ${_expected.length} log matches but got $matchCount. ');
+      }
+
+      if (hasDuplicateExpectedWarnings && hasDuplicateActualWarnings) {
+        description.add('There were duplicate matches between the expected '
+            'logs and the actual logs. Ensure each expected log '
+            'is specific and unique.');
+      } else if (hasDuplicateExpectedWarnings) {
+        description.add('There were multiple actual logs matched to a single '
+            'expected warning. Ensure each expected log is specific and'
+            ' unique.');
+      } else if (hasDuplicateActualWarnings){
+        description.add('There were multiple expected logs that matched to a '
+            'single actual warning. Ensure each expected log is specific'
+            ' and unique.');
       }
     } else {
-        description.add('expected no prop types warnings but got $matchCount. ');
-    }
-
-    if (hasDuplicateExpectedWarnings) {
-      description.add('there were multiple warnings matched to a single expected warning. Ensure each expected warning is unique.');
-    }
-
-    if (hasDuplcateActualWarnings) {
-      description.add('there were multiple expected warnings that matched to a single actual warning. Ensure each expected warning is unique.');
+        description.add('Expected no log matches but got $matchCount. ');
     }
 
     mismatchDescription.add(description.join(""));
@@ -473,10 +514,10 @@ class _PropTypeLogMatcher extends Matcher {
   }
 }
 
-Matcher logsPropTypeWarning(expected) => _PropTypeLogMatcher.logsPropTypeWarning(expected);
+Matcher logsPropTypeWarning(expected, {shouldEnforceLogCount = false}) => _LogMatcher.logsPropTypeWarning(expected, shouldEnforceLogCount: shouldEnforceLogCount);
 
-Matcher logsPropTypeWarnings(expected) => _PropTypeLogMatcher.logsPropTypeWarnings(expected);
+Matcher logsPropTypeWarnings(expected, {shouldEnforceLogCount = false}) => _LogMatcher.logsPropTypeWarnings(expected, shouldEnforceLogCount: shouldEnforceLogCount);
 
-Matcher logsNoPropTypeWarnings() => _PropTypeLogMatcher.logsNoPropTypeWarnings();
+Matcher logsNoPropTypeWarnings({shouldEnforceLogCount = false}) => _LogMatcher.logsNoPropTypeWarnings(shouldEnforceLogCount: shouldEnforceLogCount);
 
 //Matcher logsReactWarning() => PropTypeLogMatcher.logsReactWarning();

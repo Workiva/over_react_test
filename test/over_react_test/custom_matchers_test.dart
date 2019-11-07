@@ -468,7 +468,6 @@ main() {
           test('when there are multiple prop validation errors', () {
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: shouldAlwaysBeFalse set to true'];
 
-            // The matcher does not care if there are more actual logs then expected.
             shouldPass(logs, logsPropTypeWarning('foo is required'));
             shouldPass(logs, logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
           });
@@ -476,18 +475,21 @@ main() {
           test('when multiple failures occur', (){
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: bar is required'];
 
+            // By default the matcher does not care if there are more actual
+            // logs then expected.
             shouldPass(logs, logsPropTypeWarning('foo is required'));
           });
 
           test('when the expected log is not unique', (){
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required'];
 
-            // In the case that there are two similar prop failure errors, the test
-            // should anticipate them and either acknowledge both failures (using
-            // logsPropTypeWarnings) or make their current expectation more specific
-            // by including the namespaced prop name or custom error message.
             shouldFail(logs, logsPropTypeWarning('foo is required'),
-                contains('Ensure each expected warning is unique.'));
+                contains('Ensure each expected log is specific and unique.'));
+          });
+
+          test('when log count should be enforced', () {
+            shouldFail(logs, logsPropTypeWarning('foo is required'),
+                contains('Expected an equal number of expected and actual logs'));
           });
         });
 
@@ -503,13 +505,9 @@ main() {
           test('when two expects are the same', (){
             shouldFail(logs,
                 logsPropTypeWarnings(['foo is required', 'foo is required']),
-                contains('Ensure each expected warning is unique.'));
+                contains('Ensure each expected log is specific and unique.'));
           });
 
-          // In the case that there are two similar prop failure errors, the test
-          // should anticipate them and either acknowledge both failures (using
-          // logsPropTypeWarnings) or make their current expectation more specific
-          // by including the namespaced prop name or custom error message.
           test('when two logs are the same', (){
             logs = ['random log', 'Failed prop type: foo is required',
                 'Failed prop type: foo is required',
@@ -518,7 +516,7 @@ main() {
 
             shouldFail(logs,
                 logsPropTypeWarnings(['foo is required', 'foo is required', 'combination error']),
-                contains('Ensure each expected warning is unique.')
+                contains('Ensure each expected log is specific and unique.')
             );
           });
         });
@@ -531,7 +529,7 @@ main() {
           });
 
           test('when there are prop type errors', () {
-            shouldFail(logs, logsNoPropTypeWarnings(), contains('expected no prop types warnings but got 2.'));
+            shouldFail(logs, logsNoPropTypeWarnings(), contains('Expected no log matches but got 2.'));
           });
         });
       });
@@ -557,14 +555,10 @@ main() {
                   logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
             });
 
-            // In the case that there are two similar prop failure errors, the test
-            // should anticipate them and either acknowledge both failures (using
-            // logsPropTypeWarnings) or make their current expectation more specific
-            // by including the namespaced prop name or custom error message.
             test('when two actual logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
                   logsPropTypeWarning('foo is required'),
-                  contains('Ensure each expected warning is unique.'));
+                  contains('Ensure each expected log is specific and unique.'));
             });
           });
 
@@ -583,24 +577,16 @@ main() {
                   logsPropTypeWarnings('shouldAlwaysBeFalse set to true'));
             });
 
-            // In the case that there are two similar prop failure errors, the test
-            // should anticipate them and either acknowledge both failures (using
-            // logsPropTypeWarnings) or make their current expectation more specific
-            // by including the namespaced prop name or custom error message.
             test('when two actual logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
                   logsPropTypeWarnings(['foo is required']),
-                  contains('Ensure each expected warning is unique.'));
+                  contains('Ensure each expected log is specific and unique.'));
             });
 
-            // In the case that there are two similar prop failure errors, the test
-            // should anticipate them and either acknowledge both failures (using
-            // logsPropTypeWarnings) or make their current expectation more specific
-            // by including the namespaced prop name or custom error message.
             test('when two expected logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
                   logsPropTypeWarning(['foo is required', 'foo is required']),
-                  contains('Ensure each expected warning is unique.'));
+                  contains('Ensure each expected log is specific and unique.'));
             });
           });
 
@@ -612,7 +598,7 @@ main() {
             test('when there are prop type errors', () {
               shouldFail(() => mount((Sample())()),
                   logsNoPropTypeWarnings(),
-                  contains('expected no prop types warnings but got 1.'));
+                  contains('Expected no log matches but got 1.'));
             });
           });
         });
