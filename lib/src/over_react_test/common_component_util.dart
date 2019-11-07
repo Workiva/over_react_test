@@ -11,14 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import 'dart:collection';
+// ignore_for_file: avoid_forEach_with_function_literal
 import 'dart:html';
 import 'dart:js';
 
 import 'package:over_react/over_react.dart'
-    show BuilderOnlyUiFactory, ConsumedProps, CssClassPropsMixin, DomPropsMixin, DomProps,
-         PropDescriptor, ReactPropsMixin, UbiquitousDomPropsMixin, unindent, requiredProp, defaultTestIdKey;
+    show BuilderOnlyUiFactory, ConsumedProps, DomProps, PropDescriptor,
+        requiredProp;
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client.dart';
@@ -63,24 +62,24 @@ import './react_util.dart';
 /// > __[unconsumedPropKeys]__ should be used when a component has props as part of it's definition that ARE forwarded
 /// to its children _(ie, a smart component wrapping a primitive and forwarding some props to it)_.
 /// >
-/// > By default, [testPropForwarding] tests that all consumed props are not forwarded, so you can specify
+/// > By default, `testPropForwarding` tests that all consumed props are not forwarded, so you can specify
 /// forwarding props in [unconsumedPropKeys] _(which gets flattened into a 1D array of strings)_.
 /// >
-/// > When the forwarding of certain props is ambiguous (see error message in [testPropForwarding]), you can resolve
+/// > When the forwarding of certain props is ambiguous (see error message in `testPropForwarding`), you can resolve
 /// this by specifying [nonDefaultForwardingTestProps], a map of prop values that aren't the same as the forwarding
 /// target's defaults.
 /// >
 /// > If [nonDefaultForwardingTestProps] can't be used for some reason, you can skip prop forwarding tests altogether
 /// for certain props by specifying their keys in [skippedPropKeys] _(which gets flattened into a 1D array of strings)_.
 void commonComponentTests(BuilderOnlyUiFactory factory, {
-  bool shouldTestPropForwarding: true,
-  List unconsumedPropKeys: const [],
-  List skippedPropKeys: const [],
-  Map nonDefaultForwardingTestProps: const {},
-  bool shouldTestClassNameMerging: true,
-  bool shouldTestClassNameOverrides: true,
-  bool ignoreDomProps: true,
-  bool shouldTestRequiredProps: true,
+  bool shouldTestPropForwarding = true,
+  List unconsumedPropKeys = const [],
+  List skippedPropKeys = const [],
+  Map nonDefaultForwardingTestProps = const {},
+  bool shouldTestClassNameMerging = true,
+  bool shouldTestClassNameOverrides = true,
+  bool ignoreDomProps = true,
+  bool shouldTestRequiredProps = true,
   bool isComponent2 = false,
   dynamic childrenFactory()
 }) {
@@ -395,22 +394,26 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
     var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
     jacket.unmount();
 
-    consumedProps.forEach((ConsumedProps consumedProps) {
-      consumedProps.props.forEach((PropDescriptor prop) {
-        if (prop.isRequired) {
-          requiredProps.add(prop.key);
-        } else if (prop.isNullable) {
-          nullableProps.add(prop.key);
-        }
+    void categorizeProps(PropDescriptor prop) {
+      if (prop.isRequired) {
+        requiredProps.add(prop.key);
+      } else if (prop.isNullable) {
+        nullableProps.add(prop.key);
+      }
 
-        keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
-      });
-    });
+      keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
+    }
+
+    void iterateOverProps(ConsumedProps consumedProps) {
+      consumedProps.props.forEach(categorizeProps);
+    }
+
+    consumedProps.forEach(iterateOverProps);
   });
 
   if (!isComponent2) {
     test('throws when the required prop is not set or is null', () {
-        requiredProps.forEach((String propKey) {
+        void testRequireProps(String propKey) {
           final reactComponentFactory = factory()
               .componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
 
@@ -435,7 +438,9 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
           expect(badRenderer,
               throwsPropError_Required(propKey, keyToErrorMessage[propKey]),
               reason: '$propKey is set to null');
-        });
+        }
+
+        requiredProps.forEach(testRequireProps);
     });
   } else {
     test('logs the correct errors when the required prop is not set or is '
@@ -444,7 +449,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
       List<String> consoleErrors = [];
       JsFunction originalConsoleError = context['console']['error'];
-      context['console']['error'] = new JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
+      context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
         originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
             thisArg: self);
@@ -453,7 +458,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       final reactComponentFactory = factory().componentFactory as
       ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
-      requiredProps.forEach((String propKey) {
+      void testRequiredProps(String propKey) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
 
           mount((factory()
@@ -480,14 +485,16 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 
         consoleErrors = [];
         PropTypes.resetWarningCache();
-      });
+      }
+
+      requiredProps.forEach(testRequiredProps);
 
       addTearDown(() => context['console']['error'] = originalConsoleError);
     });
   }
 
   test('nullable props', () {
-    nullableProps.forEach((String propKey) {
+    void testNullableProps(String propKey) {
       var badRenderer = () => render((factory()..remove(propKey)(childrenFactory())));
 
       expect(badRenderer, throwsPropError_Required(propKey, keyToErrorMessage[propKey]), reason: 'should throw when the required, nullable prop $propKey is not set');
@@ -498,7 +505,9 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
       )(childrenFactory()));
 
       expect(badRenderer, returnsNormally, reason: 'does not throw when the required, nullable prop $propKey is set to null');
-    });
+    }
+
+    nullableProps.forEach(testNullableProps);
   });
 }
 
@@ -557,9 +566,9 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
 /// Return the components to which `props` have been forwarded.
 ///
 /// > Identified using the [forwardedPropBeacon] prop key.
-List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRendered: false}) {
+List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRendered = false}) {
   if (!forwardedPropBeacon.startsWith('data-')) {
-    throw new Exception('forwardedPropBeacon must begin with "data-" so that is a valid HTML attribute.');
+    throw Exception('forwardedPropBeacon must begin with "data-" so that is a valid HTML attribute.');
   }
 
   List forwardingTargets = [];
@@ -575,7 +584,7 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRen
 
       if (children is List) {
         flattenChildren(List _children) {
-          _children.forEach((_child) {
+          void flattenChild(_child) {
             if (_child != null && isValidElement(_child)) {
               getProps(_child).forEach((propKey, propValue) {
                 // Some props may be of type Function, and will produce interop errors if passed into isValidElement
@@ -587,7 +596,9 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRen
             }  else if (_child is List) {
               flattenChildren(_child);
             }
-          });
+          }
+
+          _children.forEach(flattenChild);
         }
 
         flattenChildren(children);
@@ -604,7 +615,7 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount: 1, shallowRen
   }
 
   if (forwardingTargets.length != expectedTargetCount) {
-    throw new StateError('Unexpected number of forwarding targets: ${forwardingTargets.length}.');
+    throw StateError('Unexpected number of forwarding targets: ${forwardingTargets.length}.');
   }
   return forwardingTargets;
 }

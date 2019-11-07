@@ -31,7 +31,7 @@ List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration confi
   PropTypes.resetWarningCache();
 
   JsFunction originalConsole = context['console'][configuration.logType];
-  context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+  context['console'][configuration.logType] = JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
     // NOTE: Using console.log or print within this function will cause an infinite
     // loop when the logType is set to `log`.
     consoleLogs.add(message);
@@ -64,7 +64,7 @@ FutureOr<List<String>> recordConsoleLogsAsync(
   PropTypes.resetWarningCache();
 
   JsFunction originalConsole = context['console'][configuration.logType];
-  context['console'][configuration.logType] = new JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+  context['console'][configuration.logType] = JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
     // NOTE: Using console.log or print within this function will cause an infinite
     // loop when the logType is set to `log`.
     consoleLogs.add(message);

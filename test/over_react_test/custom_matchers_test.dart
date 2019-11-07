@@ -28,7 +28,7 @@ main() {
     Element testElement;
 
     setUp(() {
-      testElement = new Element.div();
+      testElement = Element.div();
     });
 
     group('hasClasses', () {
@@ -76,7 +76,7 @@ main() {
 
       test('throws an error when an invalid, non-class value is passed to the matcher', () {
         expect(() {
-          hasClasses(new Object());
+          hasClasses(Object());
         }, throwsArgumentError);
       });
     });
@@ -96,7 +96,7 @@ main() {
         test('the element has the exact classes and is an SvgElement', () {
           // Test workaround for https://github.com/dart-lang/sdk/issues/36200.
           // This may be removed when the workaround is removed.
-          testElement = new SvgElement.svg('<svg class="class1 class2"/>');
+          testElement = SvgElement.svg('<svg class="class1 class2"/>');
           shouldPass(testElement, hasExactClasses(['class1', 'class2']));
         });
       });
@@ -141,7 +141,7 @@ main() {
 
       test('throws an error when an invalid, non-class value is passed to the matcher', () {
         expect(() {
-          hasExactClasses(new Object());
+          hasExactClasses(Object());
         }, throwsArgumentError);
       });
     });
@@ -185,7 +185,7 @@ main() {
 
       test('throws an error when an invalid, non-class value is passed to the matcher', () {
         expect(() {
-          excludesClasses(new Object());
+          excludesClasses(Object());
         }, throwsArgumentError);
       });
     });
@@ -243,12 +243,12 @@ main() {
         });
 
         test('Element', () {
-          shouldPass(new DivElement()..id = 'test', hasProp('id', 'test'));
+          shouldPass(DivElement()..id = 'test', hasProp('id', 'test'));
         });
       });
 
       group('fails when the props are not present in a', () {
-        final failMessagePattern = new RegExp(r"Which: has props/attributes map with value .* which doesn't contain key 'id'");
+        final failMessagePattern = RegExp(r"Which: has props/attributes map with value .* which doesn't contain key 'id'");
 
         group('ReactElement', () {
           test('(DOM)', () {
@@ -280,7 +280,7 @@ main() {
       });
 
       group('fails when the props are different in a', () {
-        final failMessagePattern = new RegExp(r"Which: has props/attributes map with value .* is different. Expected: test +Actual: different");
+        final failMessagePattern = RegExp(r"Which: has props/attributes map with value .* is different. Expected: test +Actual: different");
 
         group('ReactElement', () {
           test('(DOM)', () {
@@ -381,7 +381,7 @@ main() {
       group('attached node:', () {
         List<Element> allAttachedNodes = [];
         Element makeAttachedNode() {
-          var node = new DivElement()..tabIndex = 1;
+          var node = DivElement()..tabIndex = 1;
           document.body.append(node);
 
           allAttachedNodes.add(node);
@@ -427,7 +427,7 @@ main() {
 
       group('provides a useful failure message when', () {
         test('the node is not attached to the DOM, and thus cannot be focused', () {
-          var detachedNode = new DivElement();
+          var detachedNode = DivElement();
           shouldFail(detachedNode, isFocused, contains(
               'Which: is not attached to the document, and thus cannot be focused.'
               ' If testing with React, you can use `renderAttachedToDocument`.'
@@ -600,23 +600,23 @@ main() {
     });
 
     test('throwsPropError', () {
-      expect(() => throw new PropError('propName', 'message'), throwsPropError('propName', 'message'));
+      expect(() => throw PropError('propName', 'message'), throwsPropError('propName', 'message'));
     });
 
     test('throwsPropError_Required', () {
-      expect(() => throw new PropError.required('propName', 'message'),
+      expect(() => throw PropError.required('propName', 'message'),
           throwsPropError_Required('propName', 'message')
       );
     });
 
     test('throwsPropError_Value', () {
-      expect(() => throw new PropError.value('value', 'propName', 'message'),
+      expect(() => throw PropError.value('value', 'propName', 'message'),
           throwsPropError_Value('value', 'propName', 'message')
       );
     });
 
     test('throwsPropError_Combination', () {
-      expect(() => throw new PropError.combination('prop1Name', 'prop2Name', 'message'),
+      expect(() => throw PropError.combination('prop1Name', 'prop2Name', 'message'),
           throwsPropError_Combination('prop1Name', 'prop2Name', 'message')
       );
     });
@@ -638,7 +638,7 @@ void shouldFail(value, Matcher matcher, expected) {
     if (expected is String) {
       expect(_errorString, equalsIgnoringWhitespace(expected));
     } else {
-      expect(_errorString.replaceAll(new RegExp(r'[\s\n]+'), ' '), expected);
+      expect(_errorString.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
     }
   }
 

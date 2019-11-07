@@ -21,11 +21,11 @@ class _$Sample2Props extends UiProps {
 class SampleComponent2 extends UiComponent2<Sample2Props> {
   @override
   get propTypes => {
-    getPropKey((props) => props.shouldNeverBeNull, typedPropsFactory):
-        (props, propName, _, __, ___) {
+    getPropKey((p) => p.shouldNeverBeNull):
+        (props, info) {
 
       if (props.shouldNeverBeNull == null) {
-        return new PropError.required(propName);
+        return PropError.required(info.propName);
       }
 
       return null;

@@ -34,20 +34,20 @@ class SampleComponent extends UiComponent2<SampleProps> {
 
   @override
   get propTypes => {
-    getPropKey((props) => props.shouldNeverBeNull, typedPropsFactory):
-        (props, propName, _, __, ___) {
+    getPropKey((p) => p.shouldNeverBeNull):
+        (props, info) {
 
       if (props.shouldNeverBeNull == null) {
-        return new PropError.required(propName);
+        return PropError.required(info.propName);
       }
 
       return null;
     },
-    getPropKey((props) => props.shouldAlwaysBeFalse, typedPropsFactory):
-        (props, propName, _, __, ___) {
+    getPropKey((p) => p.shouldAlwaysBeFalse):
+        (props, info) {
 
       if (props.shouldAlwaysBeFalse) {
-        return new PropError.value(props.shouldAlwaysBeFalse, propName);
+        return PropError.value(props.shouldAlwaysBeFalse, info.propName);
       }
 
       return null;
