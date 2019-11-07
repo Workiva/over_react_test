@@ -25,8 +25,14 @@ UiFactory<TestCommonRequiredProps> TestCommonRequired =
 
 @Props()
 class _$TestCommonRequiredProps extends UiProps {
+  @nullableRequiredProp
+  bool foobar;
+
   @requiredProp
   bool bar;
+
+  @nullableRequiredProp
+  bool defaultFoo;
 }
 
 @Component()
@@ -35,6 +41,11 @@ class TestCommonRequiredComponent extends UiComponent<TestCommonRequiredProps> {
   get consumedProps => const [
     TestCommonRequiredProps.meta,
   ];
+
+  @override
+  Map getDefaultProps() {
+    return (newProps()..defaultFoo = true);
+  }
 
   @override
   render() {

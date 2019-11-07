@@ -1154,6 +1154,7 @@ main() {
       group('unmounts a React instance specified', () {
         test('by its rendered instance', () {
           var mountNode = DivElement();
+          react_dom.render(Wrapper()(), mountNode);
           expect(react_dom.unmountComponentAtNode(mountNode), isTrue);
         });
 
