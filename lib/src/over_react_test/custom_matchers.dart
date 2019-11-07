@@ -26,14 +26,14 @@ import './prop_type_util.dart';
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
   ClassNameMatcher.expected(_expectedClasses, {this.allowExtraneous: true}) :
-    this.expectedClasses = getClassIterable(_expectedClasses).toSet(),
-    this.unexpectedClasses = new Set();
+    expectedClasses = getClassIterable(_expectedClasses).toSet(),
+    unexpectedClasses = {};
 
 
   ClassNameMatcher.unexpected(_unexpectedClasses) :
-    this.unexpectedClasses = getClassIterable(_unexpectedClasses).toSet(),
-    this.allowExtraneous = true,
-    this.expectedClasses = new Set();
+    unexpectedClasses = getClassIterable(_unexpectedClasses).toSet(),
+    allowExtraneous = true,
+    expectedClasses = {};
 
   // Class names that are expected
   final Set expectedClasses;

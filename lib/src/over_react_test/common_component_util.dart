@@ -45,7 +45,7 @@ import './react_util.dart';
 ///
 /// __Options:__
 ///
-/// > __[shouldTestPropForwarding]__ - whether [testPropForwarding] will be called.
+/// > __[shouldTestPropForwarding]__ - whether `testPropForwarding` will be called.
 /// >
 /// > Optionally, set [ignoreDomProps] to false if you want to test the forwarding of keys found within [DomProps].
 ///
