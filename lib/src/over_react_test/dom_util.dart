@@ -80,8 +80,15 @@ Future triggerFocus(Element target, {Duration timeout: _defaultTriggerTimeout}) 
     throw new ArgumentError.value(target, 'target', 'Target should be attached to the document.');
   }
 
-  var completer = new Completer()
-    ..complete(target.onFocus.first);
+  var completer = new Completer();
+
+  // Use capturing events on the window so that stopPropagation/stopImmediatePropagation
+  // of focus events doesn't prevent this from being fired.
+  void listener(Event event) {
+    completer.complete(event);
+    window.removeEventListener('focus', listener, true);
+  }
+  window.addEventListener('focus', listener, true);
 
   target.focus();
 
