@@ -21,7 +21,7 @@ class _$Sample2Props extends UiProps {
 class SampleComponent2 extends UiComponent2<Sample2Props> {
   @override
   get propTypes => {
-    getPropKey((p) => p.shouldNeverBeNull):
+    keyForProp((p) => p.shouldNeverBeNull):
         (props, info) {
 
       if (props.shouldNeverBeNull == null) {

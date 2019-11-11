@@ -34,7 +34,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
 
   @override
   get propTypes => {
-    getPropKey((p) => p.shouldNeverBeNull):
+    keyForProp((p) => p.shouldNeverBeNull):
         (props, info) {
 
       if (props.shouldNeverBeNull == null) {
@@ -43,7 +43,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
 
       return null;
     },
-    getPropKey((p) => p.shouldAlwaysBeFalse):
+    keyForProp((p) => p.shouldAlwaysBeFalse):
         (props, info) {
 
       if (props.shouldAlwaysBeFalse) {
