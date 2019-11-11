@@ -1,4 +1,4 @@
-// Copyright 2017 Workiva Inc.
+// Copyright 2019 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,15 @@
 import 'package:over_react/over_react.dart';
 
 // ignore: uri_has_not_been_generated
-part 'test_common_component_required_props.over_react.g.dart';
+part 'test_common_component_required_props_commponent2.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
-UiFactory<TestCommonRequiredProps> TestCommonRequired =
+UiFactory<TestCommonRequiredProps2> TestCommonRequired2 =
     // ignore: undefined_identifier
-    _$TestCommonRequired;
+    _$TestCommonRequired2;
 
 @Props()
-class _$TestCommonRequiredProps extends UiProps {
+class _$TestCommonRequiredProps2 extends UiProps {
   @nullableRequiredProp
   bool foobar;
 
@@ -35,29 +34,28 @@ class _$TestCommonRequiredProps extends UiProps {
   bool defaultFoo;
 }
 
-@Component()
-class TestCommonRequiredComponent extends UiComponent<TestCommonRequiredProps> {
+@Component2()
+class TestCommonRequiredComponent2 extends
+    UiComponent2<TestCommonRequiredProps2> {
   @override
   get consumedProps => const [
-    TestCommonRequiredProps.meta,
+    TestCommonRequiredProps2.meta,
   ];
 
   @override
-  Map getDefaultProps() {
-    return (newProps()..defaultFoo = true);
-  }
+  Map get defaultProps => (newProps()..defaultFoo = true);
 
   @override
   render() {
     return (Dom.div()
-      ..addProps(copyUnconsumedDomProps())
+      ..modifyProps(addUnconsumedDomProps)
     )(props.children);
   }
 }
 
 // AF-3369 This will be removed once the transition to Dart 2 is complete.
 // ignore: mixin_of_non_class, undefined_class
-class TestCommonRequiredProps extends _$TestCommonRequiredProps with _$TestCommonRequiredPropsAccessorsMixin {
+class TestCommonRequiredProps2 extends _$TestCommonRequiredProps2 with _$TestCommonRequiredProps2AccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForTestCommonRequiredProps;
+  static const PropsMeta meta = _$metaForTestCommonRequiredProps2;
 }

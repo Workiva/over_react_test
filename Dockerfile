@@ -37,7 +37,7 @@ WORKDIR /build/
 ADD . /build/
 
 RUN pub get
-RUN pub run dart_dev analyze 
+RUN pub run dart_dev analyze
 RUN pub run dependency_validator
 RUN pub run dart_dev test
 FROM scratch
