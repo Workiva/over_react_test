@@ -61,6 +61,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
   if (container == null) {
     renderedInstance = react_test_utils.renderIntoDocument(component);
   } else {
+    // orcm_ignore
     renderedInstance = react_dom.render(component, container);
   }
 
@@ -164,6 +165,7 @@ List<Element> _attachedReactContainers = [];
     _attachedReactContainers.add(container);
   }
 
+  // orcm_ignore
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
