@@ -349,14 +349,7 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
 ///
 /// Related: [recordConsoleLogs]
 class _LogMatcher extends Matcher {
-  _LogMatcher.logsPropTypeWarning(/*String || Contains*/ this._expected, {this.shouldEnforceLogCount = false})
-      : _expectsSingleMatch = true, _expectsMatch = true;
-
-  _LogMatcher.logsPropTypeWarnings(/*String || Contains*/ this._expected, {this.shouldEnforceLogCount = false})
-      : _expectsSingleMatch = false, _expectsMatch = true;
-
-  _LogMatcher.logsNoPropTypeWarnings({this.shouldEnforceLogCount = false})
-      : _expected = contains('Failed prop type:'), _expectsSingleMatch = false, _expectsMatch = false;
+  _LogMatcher(this._expected, this._expectsMatch, this._expectsSingleMatch, {this.shouldEnforceLogCount = false});
 
   /// The expected value.
   final /*List<Contains> || List<String> || String*/ _expected;
@@ -372,6 +365,10 @@ class _LogMatcher extends Matcher {
   /// Whether or not the matcher should enforce that the number of actual logs
   /// is equal to the number of expected logs.
   ///
+  /// Note that when passed a callback for the `actual` value, the matcher will
+  /// look for all errors. Enforcing that the actual and expected lists have the
+  /// same length will enforce that no errors other than the expected will occur.
+  ///
   /// Default: false
   final shouldEnforceLogCount;
 
@@ -382,6 +379,7 @@ class _LogMatcher extends Matcher {
     final expectedMatchCount = _expectsMatch ? expectedList.length : 0;
 
     // Declare variables used to test against the expected values
+    final shouldPrintLogsIfMatchFails = actual is Function;
     var hasDuplicateExpectedWarnings = false;
     var hasDuplicateActualWarnings = false;
     var actualTotalMatchCount = 0;
@@ -436,7 +434,7 @@ class _LogMatcher extends Matcher {
     hasDuplicateActualWarnings = actualWarningCounts.values.where((v) => v > 1).isNotEmpty;
 
     matchState.addAll({
-      'shouldPrintActualLogs': actual is Function,
+      'shouldPrintActualLogs': shouldPrintLogsIfMatchFails,
       'actualLogs': actual,
       'matchCount': actualTotalMatchCount,
       'hasDuplicateExpectedWarnings': hasDuplicateExpectedWarnings,
@@ -528,14 +526,14 @@ class _LogMatcher extends Matcher {
 /// the expected ones. Note that this will not catch warnings or logs.
 ///
 /// Related: [logsPropTypeWarnings], [logsNoPropTypeWarnings]
-_LogMatcher logsPropTypeWarning(dynamic expected, {shouldEnforceLogCount = false}) => _LogMatcher.logsPropTypeWarning(expected, shouldEnforceLogCount: shouldEnforceLogCount);
+_LogMatcher logsPropTypeWarning(dynamic expected, {shouldEnforceLogCount = false}) => _LogMatcher(expected, true, true, shouldEnforceLogCount: shouldEnforceLogCount);
 
 /// Matcher used to check for multiple `propType` warnings.
 ///
 /// Related: [logsPropTypeWarning], [logsNoPropTypeWarnings]
-_LogMatcher logsPropTypeWarnings(dynamic expected, {shouldEnforceLogCount = false}) => _LogMatcher.logsPropTypeWarnings(expected, shouldEnforceLogCount: shouldEnforceLogCount);
+_LogMatcher logsPropTypeWarnings(List<dynamic> expected, {shouldEnforceLogCount = false}) => _LogMatcher(expected, true, false, shouldEnforceLogCount: shouldEnforceLogCount);
 
 /// Matcher used enforce that there are no `propType` warnings.
 ///
 /// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
-_LogMatcher logsNoPropTypeWarnings({shouldEnforceLogCount = false}) => _LogMatcher.logsNoPropTypeWarnings(shouldEnforceLogCount: shouldEnforceLogCount);
+_LogMatcher logsNoPropTypeWarnings({shouldEnforceLogCount = false}) => _LogMatcher(contains('Failed prop type:'), false, false, shouldEnforceLogCount: shouldEnforceLogCount);

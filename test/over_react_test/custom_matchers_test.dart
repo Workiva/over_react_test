@@ -568,7 +568,7 @@ main() {
               var jacket = mount(Sample()());
 
               shouldPass(() => jacket.rerender((Sample()..shouldAlwaysBeFalse = true)((Sample2())())),
-                  logsPropTypeWarnings('shouldAlwaysBeFalse set to true'));
+                  logsPropTypeWarnings(['shouldAlwaysBeFalse set to true']));
             });
 
             test('when two actual logs are the same', (){
