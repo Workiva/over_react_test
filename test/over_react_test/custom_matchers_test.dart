@@ -444,19 +444,17 @@ main() {
 
     group('PropTypeLogMatcher', () {
       group('when passed a List of logs', () {
-        const defaultLogsValue = [
-          'random log',
-          'Failed prop type: foo is required',
-          'nonsense',
-          'Failed prop type: combination error',
-        ];
-        var logs = defaultLogsValue;
-
-        tearDown(() {
-          logs = defaultLogsValue;
-        });
+        var logs;
 
         group('- logsPropTypeWarning -', (){
+          setUp(() {
+            logs = [
+              'random log',
+              'Failed prop type: foo is required',
+              'nonsense',
+            ];
+          });
+
           test('simple usage', (){
             shouldPass(logs, logsPropTypeWarning('foo is required'));
           });
@@ -468,26 +466,20 @@ main() {
           test('when there are multiple prop validation errors', () {
             logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: shouldAlwaysBeFalse set to true'];
 
-            // By default the matcher does not care if there are more actual
-            // logs then expected.
-            shouldPass(logs, logsPropTypeWarning('foo is required'));
-            shouldPass(logs, logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
-          });
-
-          test('when the expected log is not unique', (){
-            logs = ['random log', 'Failed prop type: foo is required', 'Failed prop type: foo is required'];
-
-            shouldFail(logs, logsPropTypeWarning('foo is required'),
-                contains('Ensure each expected log is specific and unique.'));
-          });
-
-          test('when log count should be enforced', () {
-            shouldFail(logs, logsPropTypeWarning('foo is required', shouldEnforceLogCount: true),
-                contains('Expected an equal number of expected and actual logs'));
+            shouldFail(logs, logsPropTypeWarning('foo is required'), contains('Expected one log match'));
           });
         });
 
         group('- logsPropTypeWarnings -', (){
+          setUp(() {
+            logs = [
+              'random log',
+              'Failed prop type: foo is required',
+              'nonsense',
+              'Failed prop type: combination error',
+            ];
+          });
+
           test('simple usage', (){
             shouldPass(logs, logsPropTypeWarnings(['foo is required', 'combination error']));
           });
@@ -516,6 +508,15 @@ main() {
         });
 
         group('- logsNoPropTypeWarnings -', (){
+          setUp(() {
+            logs = [
+              'random log',
+              'Failed prop type: foo is required',
+              'nonsense',
+              'Failed prop type: combination error',
+            ];
+          });
+
           test('simple usage', (){
             logs = ['random log', 'random error', 'not a prop type log'];
 
@@ -536,23 +537,25 @@ main() {
             });
 
             test('when there are multiple prop validation errors', () {
+              shouldFail(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
+                  logsPropTypeWarning('shouldNeverBeNull'), contains('received too many actual logs'));
 
-              // The matcher does not care if there are more actual logs then expected.
-              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('shouldNeverBeNull'));
-              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()), logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
             });
 
             test('with a re-render', () {
               var jacket = mount(Sample()());
 
-              shouldPass(() => jacket.rerender((Sample()..shouldAlwaysBeFalse = true)()),
+              shouldPass(() => jacket.rerender((Sample()
+                  ..shouldAlwaysBeFalse = true
+                  ..shouldNeverBeNull = false
+              )()),
                   logsPropTypeWarning('shouldAlwaysBeFalse set to true'));
             });
 
             test('when two actual logs are the same', (){
               shouldFail(() => mount((Sample())(Sample2()())),
                   logsPropTypeWarning('shouldNeverBeNull'),
-                  contains('Ensure each expected log is specific and unique.'));
+                  contains('received too many actual logs'));
             });
           });
 
@@ -561,14 +564,19 @@ main() {
               shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
                   logsPropTypeWarnings(['shouldNeverBeNull',
                       'shouldAlwaysBeFalse set to true',
-                  ]));
+                  ])
+              );
             });
 
             test('with a re-render', () {
               var jacket = mount(Sample()());
 
-              shouldPass(() => jacket.rerender((Sample()..shouldAlwaysBeFalse = true)((Sample2())())),
-                  logsPropTypeWarnings(['shouldAlwaysBeFalse set to true']));
+              shouldPass(() => jacket.rerender((Sample()
+                  ..shouldAlwaysBeFalse = true
+                  ..shouldNeverBeNull = false
+              )(Sample2()())),
+                  logsPropTypeWarnings(['shouldAlwaysBeFalse set to true',
+                      'Prop Sample2Props.shouldNeverBeNull is required']));
             });
 
             test('when two actual logs are the same', (){

@@ -380,6 +380,7 @@ class _LogMatcher extends Matcher {
 
     // Declare variables used to test against the expected values
     final shouldPrintLogsIfMatchFails = actual is Function;
+    final hasTooManyLogs = shouldEnforceLogCount && actual.length != expectedMatchCount;
     var hasDuplicateExpectedWarnings = false;
     var hasDuplicateActualWarnings = false;
     var actualTotalMatchCount = 0;
@@ -394,15 +395,6 @@ class _LogMatcher extends Matcher {
     } catch (e, st) {
       throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a'
           ' callback. \n$e \n$st');
-    }
-
-    // If number of expected and actual logs should match but do not, short circuit
-    if (shouldEnforceLogCount && actual.length != expectedList.length) {
-      matchState.addAll({
-        'hasTooManyActualLogs': true,
-      });
-
-      return false;
     }
 
     // Function that looks for matches and updates the match state
@@ -439,12 +431,14 @@ class _LogMatcher extends Matcher {
       'matchCount': actualTotalMatchCount,
       'hasDuplicateExpectedWarnings': hasDuplicateExpectedWarnings,
       'hasDuplicateActualWarnings': hasDuplicateActualWarnings,
+      'hasTooManyActualLogs': hasTooManyLogs,
     });
 
     // Validate there are the correct number of matches and there are no duplicate matches
     return actualTotalMatchCount == expectedMatchCount &&
         !hasDuplicateExpectedWarnings &&
-        !hasDuplicateActualWarnings;
+        !hasDuplicateActualWarnings &&
+        !hasTooManyLogs;
   }
 
   @override
@@ -475,9 +469,7 @@ class _LogMatcher extends Matcher {
 
     if (hasTooManyActualLogs) {
       mismatchDescription.add('Expected an equal number of expected and actual '
-          'logs, but received too many actual logs');
-
-      return mismatchDescription;
+          'logs, but received too many actual logs. ');
     }
 
     // Printing the actual logs can help because if the matcher fails when passed
@@ -515,6 +507,29 @@ class _LogMatcher extends Matcher {
   }
 }
 
+/// A matcher used to assert expected a `List` contains expected `propType`
+/// warnings.
+///
+/// The actual value can be a callback function, which will result in the matcher
+/// asserting that the expected `propType` warnings appear during th runtime
+/// of the callback.
+///
+/// Related: [_LogMatcher]
+class _PropTypeLogMatcher extends _LogMatcher {
+  _PropTypeLogMatcher(_expected, _expectsMatch, _expectsSingleMatch)
+      : super(_expected, _expectsMatch, _expectsSingleMatch, shouldEnforceLogCount: true);
+
+  final _filter = contains('Failed prop type');
+
+  @override
+  bool matches(actual, Map matchState) {
+    actual = actual is List<String> ? actual : recordConsoleLogs(actual);
+    actual.removeWhere((log) => !_filter.matches(log, {}));
+
+    return super.matches(actual, matchState);
+  }
+}
+
 /// Matcher used to check for a single `propTypes` warning.
 ///
 /// [expected] can be:
@@ -522,18 +537,15 @@ class _LogMatcher extends Matcher {
 ///   * `List<Contains>`
 ///   * `String`
 ///
-/// [shouldEnforceLogCount] can be used to ensure no are not errors outside of
-/// the expected ones. Note that this will not catch warnings or logs.
-///
 /// Related: [logsPropTypeWarnings], [logsNoPropTypeWarnings]
-_LogMatcher logsPropTypeWarning(dynamic expected, {shouldEnforceLogCount = false}) => _LogMatcher(expected, true, true, shouldEnforceLogCount: shouldEnforceLogCount);
+_PropTypeLogMatcher logsPropTypeWarning(dynamic expected) => _PropTypeLogMatcher(expected, true, true);
 
 /// Matcher used to check for multiple `propType` warnings.
 ///
 /// Related: [logsPropTypeWarning], [logsNoPropTypeWarnings]
-_LogMatcher logsPropTypeWarnings(List<dynamic> expected, {shouldEnforceLogCount = false}) => _LogMatcher(expected, true, false, shouldEnforceLogCount: shouldEnforceLogCount);
+_PropTypeLogMatcher logsPropTypeWarnings(List<dynamic> expected) => _PropTypeLogMatcher(expected, true, false);
 
 /// Matcher used enforce that there are no `propType` warnings.
 ///
 /// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
-_LogMatcher logsNoPropTypeWarnings({shouldEnforceLogCount = false}) => _LogMatcher(contains('Failed prop type:'), false, false, shouldEnforceLogCount: shouldEnforceLogCount);
+_PropTypeLogMatcher logsNoPropTypeWarnings() => _PropTypeLogMatcher(contains('Failed prop type:'), false, false);
