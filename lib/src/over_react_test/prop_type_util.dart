@@ -25,7 +25,7 @@ import 'package:react/react_client/react_interop.dart';
 /// config class (logConfig, warnConfig, errorConfig).
 ///
 /// To handle asynchronous behavior, see [recordConsoleLogsAsync].
-List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]) {
+List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration configuration = const ConsoleConfiguration.error()]) {
   var consoleLogs = <String>[];
 
   PropTypes.resetWarningCache();
@@ -57,7 +57,7 @@ List<String> recordConsoleLogs(Function() callback, [_ConsoleConfiguration confi
 /// Related: [recordConsoleLogs]
 FutureOr<List<String>> recordConsoleLogsAsync(
     Future Function() asyncCallback,
-    [_ConsoleConfiguration configuration = const _ConsoleConfiguration.error()]
+    [ConsoleConfiguration configuration = const ConsoleConfiguration.error()]
 ) async {
   var consoleLogs = <String>[];
 
@@ -86,12 +86,12 @@ FutureOr<List<String>> recordConsoleLogsAsync(
 
 /// Configuration class that sets options within [recordConsoleLogs] and
 /// [recordConsoleLogsAsync].
-class _ConsoleConfiguration {
-  const _ConsoleConfiguration.warn() : logType = 'warn';
+class ConsoleConfiguration {
+  const ConsoleConfiguration.warn() : logType = 'warn';
 
-  const _ConsoleConfiguration.error() : logType = 'error';
+  const ConsoleConfiguration.error() : logType = 'error';
 
-  const _ConsoleConfiguration.log() : logType = 'log';
+  const ConsoleConfiguration.log() : logType = 'log';
 
   /// The type of log to capture while running the callbacks within
   /// [recordConsoleLogs] and [recordConsoleLogsAsync].
@@ -101,10 +101,10 @@ class _ConsoleConfiguration {
 }
 
 /// The configuration needed to capture logs while running [recordConsoleLogs].
-_ConsoleConfiguration logConfig = const _ConsoleConfiguration.log();
+ConsoleConfiguration logConfig = const ConsoleConfiguration.log();
 
 /// The configuration needed to capture warnings while running [recordConsoleLogs].
-_ConsoleConfiguration warnConfig = const _ConsoleConfiguration.warn();
+ConsoleConfiguration warnConfig = const ConsoleConfiguration.warn();
 
 /// The configuration needed to capture errors while running [recordConsoleLogs].
-_ConsoleConfiguration errorConfig = const _ConsoleConfiguration.error();
+ConsoleConfiguration errorConfig = const ConsoleConfiguration.error();
