@@ -371,10 +371,6 @@ class LogMatcher extends Matcher {
   /// Whether or not the matcher should enforce that the number of actual logs
   /// is equal to the number of expected logs.
   ///
-  /// Note that when passed a callback for the `actual` value, the matcher will
-  /// look for all errors. Enforcing that the actual and expected lists have the
-  /// same length will enforce that no errors other than the expected will occur.
-  ///
   /// Default: `false`
   final bool shouldEnforceLogCount;
 
@@ -403,6 +399,11 @@ class LogMatcher extends Matcher {
     final actualWarningCounts= <String, int>{};
     final expectedWarningCounts = <int>[];
     final shouldPrintLogsIfMatchFails = actual is Function;
+
+    if (expectedList.isEmpty || _expected == null) {
+      throw ArgumentError.value(expectedList, 'expected', 'The expected value '
+          'cannot be null or an empty list.');
+    }
 
     // Validate that actual is a list of logs and set it to one if not
     try {
@@ -475,12 +476,12 @@ class LogMatcher extends Matcher {
 
   @override
   Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
-    bool shouldPrintActualLogs = matchState['shouldPrintActualLogs'];
-    List<String> actualLogs = matchState['actualLogs'];
-    int matchCount = matchState['matchCount'];
-    bool hasDuplicateExpectedLogs = matchState['hasDuplicateExpectedLogs'];
-    bool hasDuplicateActualLogs = matchState['hasDuplicateActualLogs'];
-    bool hasTooManyActualLogs = matchState['hasTooManyActualLogs'];
+    bool shouldPrintActualLogs = matchState['shouldPrintActualLogs'] ?? false;
+    List<String> actualLogs = matchState['actualLogs'] ?? [];
+    int matchCount = matchState['matchCount'] ?? 0;
+    bool hasDuplicateExpectedLogs = matchState['hasDuplicateExpectedLogs'] ?? false;
+    bool hasDuplicateActualLogs = matchState['hasDuplicateActualLogs'] ?? false;
+    bool hasTooManyActualLogs = matchState['hasTooManyActualLogs'] ?? false;
 
     var description = <String>[];
 
@@ -547,11 +548,14 @@ LogMatcher hasLogs(List<dynamic> expected, {ConsoleConfiguration consoleConfig, 
 LogMatcher doesNotLog(String uniqueLogMessage, {ConsoleConfiguration consoleConfig}) =>
     LogMatcher(contains(uniqueLogMessage), false, false, config: consoleConfig ?? logConfig);
 
+/// The string used to identify a `propType` error.
+const _propTypeErrorMessage = 'Failed prop type';
+
 /// A matcher used to assert expected a `List` contains expected `propType`
 /// warnings.
 ///
 /// The actual value can be a callback function, which will result in the matcher
-/// asserting that the expected `propType` warnings appear during th runtime
+/// asserting that the expected `propType` warnings appear during the runtime
 /// of the callback.
 ///
 /// Related: [LogMatcher]
@@ -559,10 +563,11 @@ class _PropTypeLogMatcher extends LogMatcher {
   _PropTypeLogMatcher(_expected, _expectsMatch, _expectsSingleMatch)
       : super(_expected, _expectsMatch, _expectsSingleMatch, shouldEnforceLogCount: true);
 
-  final _filter = contains('Failed prop type');
+  final _filter = contains(_propTypeErrorMessage);
 
   @override
   bool matches(actual, Map matchState) {
+    matchState.addAll({'shouldPrintActualLogs': actual is Function});
     actual = actual is List<String> ? actual : recordConsoleLogs(actual);
     actual.removeWhere((log) => !_filter.matches(log, {}));
 
@@ -591,4 +596,4 @@ _PropTypeLogMatcher logsPropTypeWarnings(List<dynamic> expected) =>
 ///
 /// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
 _PropTypeLogMatcher logsNoPropTypeWarnings() =>
-    _PropTypeLogMatcher(contains('Failed prop type:'), false, false);
+    _PropTypeLogMatcher(contains(_propTypeErrorMessage), false, false);
