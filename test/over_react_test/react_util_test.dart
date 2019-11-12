@@ -61,7 +61,7 @@ main() {
       test('renderAttachedToDocument renders the component into the document with a given container', () {
         expect(document.body.children, isEmpty);
 
-        var container = new DivElement();
+        var container = DivElement();
         renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
 
         expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
@@ -219,7 +219,7 @@ main() {
         group('the single descendant that has the appropriate value for the `data-test-id` prop key when it is a', () {
           const String targetFlagProp = 'data-name';
 
-          const Map testProps = const {
+          const Map testProps = {
             'data-test-id': 'value',
             'data-name': 'target',
           };
@@ -427,7 +427,7 @@ main() {
         group('a list containing the single descendant that have the appropriate value for the `data-test-id` prop key when it is a', () {
           const String targetFlagProp = 'data-name';
 
-          const Map testProps = const {
+          const Map testProps = {
             'data-test-id': 'value',
             'data-name': 'target',
           };
@@ -649,13 +649,13 @@ main() {
         expect(allByTestId, [
           allOf(hasProp('data-name', 'Wrapper'), isCompositeCOmponentMatcher),
           // The Wrapper should render a div with the same test ID
-          allOf(hasProp('data-name', 'Wrapper'), const isInstanceOf<Element>()),
-          allOf(hasProp('data-name', 'div'), const isInstanceOf<Element>()),
+          allOf(hasProp('data-name', 'Wrapper'), isA<Element>()),
+          allOf(hasProp('data-name', 'div'), isA<Element>()),
           allOf(hasProp('data-name', 'js'), isCompositeCOmponentMatcher),
         ], reason: 'test setup sanity check');
 
         expect(allComponentsByTestId, [
-          const isInstanceOf<WrapperComponent>()
+          isA<WrapperComponent>()
         ]);
       }
 
@@ -1153,13 +1153,13 @@ main() {
     group('unmount:', () {
       group('unmounts a React instance specified', () {
         test('by its rendered instance', () {
-          var mountNode = new DivElement();
-          var instance = react_dom.render(Wrapper()(), mountNode);
+          var mountNode = DivElement();
+          react_dom.render(Wrapper()(), mountNode);
           expect(react_dom.unmountComponentAtNode(mountNode), isTrue);
         });
 
         test('by its mount node', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           var ref;
           react_dom.render((Dom.div()
             ..ref = ((instance) => ref = instance)
@@ -1179,7 +1179,7 @@ main() {
         });
 
         test('a non-mounted React instance', () {
-          var mountNode = new DivElement();
+          var mountNode = DivElement();
           var ref;
           var instance = react_dom.render((Dom.div()
             ..ref = ((instance) => ref = instance)
@@ -1196,7 +1196,7 @@ main() {
 
       test('throws when an invalid value is passed in', () {
         expect(() {
-          unmount(new Object());
+          unmount(Object());
         }, throwsArgumentError);
       });
     });

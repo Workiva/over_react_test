@@ -45,10 +45,10 @@ import 'package:over_react_test/src/over_react_test/react_util.dart' as react_ut
 /// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
 TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElement, {
     Element mountNode,
-    bool attachedToDocument: false,
-    bool autoTearDown: true
+    bool attachedToDocument = false,
+    bool autoTearDown = true
 }) {
-  return new TestJacket<T>._(reactElement,
+  return TestJacket<T>._(reactElement,
       mountNode: mountNode,
       attachedToDocument: attachedToDocument,
       autoTearDown: autoTearDown
@@ -57,18 +57,19 @@ TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElem
 
 /// Provides more a more consistent and easier to use API to test and manipulate a rendered [ReactComponent].
 class TestJacket<T extends react.Component> {
+
+  TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument = false, this.autoTearDown = true})
+      : mountNode = mountNode ?? (DivElement()
+    ..style.height = '800px'
+    ..style.width = '800px') {
+    _render(reactElement);
+  }
+
   /* [1] */ Object _renderedInstance;
   final Element mountNode;
   final bool attachedToDocument;
   final bool autoTearDown;
   bool _isMounted = false;
-
-  TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument: false, this.autoTearDown: true})
-      : this.mountNode = mountNode ?? (new DivElement()
-          ..style.height = '800px'
-          ..style.width = '800px') {
-    _render(reactElement);
-  }
 
   void _render(over_react.ReactElement reactElement) {
     _isMounted = true;
@@ -91,7 +92,7 @@ class TestJacket<T extends react.Component> {
   /// Returns the mounted React component instance.
   ReactComponent getInstance() {
     if (!react_test_utils.isCompositeComponent(_renderedInstance)) {
-      throw new UnsupportedError('Not a composite component');
+      throw UnsupportedError('Not a composite component');
     }
 
     return _renderedInstance as ReactComponent;
