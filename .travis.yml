@@ -11,7 +11,7 @@ cache:
 
 script:
   - pub run dart_dev analyze
-  - pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers
+  - pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers,pedantic
   - pub run dart_dev test
   # Re-enable when we have a coverage solution for Dart 2
   # - pub run dart_dev coverage --no-open
