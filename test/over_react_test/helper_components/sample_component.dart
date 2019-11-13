@@ -21,6 +21,8 @@ class _$SampleProps extends UiProps {
   bool shouldError;
 
   bool addExtraLogAndWarn;
+
+  bool shouldLog;
 }
 
 @Component2()
@@ -30,6 +32,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
     ..shouldAlwaysBeFalse = false
     ..shouldError = false
     ..addExtraLogAndWarn = false
+    ..shouldLog = true
   );
 
   @override
@@ -70,7 +73,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
         window.console.warn('Extra Warn');
       }
 
-      window.console.log('Logging a standard log');
+      if (props.shouldLog) window.console.log('Logging a standard log');
       window.console.warn('And a third');
       return Dom.div()(
           (Dom.button()

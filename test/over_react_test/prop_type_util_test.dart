@@ -20,11 +20,49 @@ import './helper_components/sample_component2.dart';
 
 main() {
   group('recordConsoleLogs', () {
+    group('captures all logs correctly', () {
+      test('when mounting', () {
+        var logs = recordConsoleLogs(() => mount(Sample()()));
+        expect(logs.length, 5);
+        expect(logs, containsAll([
+          contains('SampleProps.shouldNeverBeNull is required.'),
+          contains('Logging a standard log'),
+          contains('A second warning'),
+          contains('And a third'),
+          contains('Just a lil warning'),
+        ]));
+      });
+
+      test('when re-rendering', () {
+        var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
+
+        var logs = recordConsoleLogs(() => jacket.rerender(Sample()()));
+
+        expect(logs.length, 4);
+        expect(logs, containsAll([
+          contains('SampleProps.shouldNeverBeNull is required.'),
+          contains('Logging a standard log'),
+          contains('A second warning'),
+          contains('And a third'),
+        ]));
+      });
+
+      test('with nested components', () {
+        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())));
+        expect(logs.length, 10);
+      });
+
+      test('with nested components that are the same', () {
+        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())));
+        expect(logs.length, 9);
+      });
+    });
+
     group('captures errors correctly', () {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(
             (Sample()..shouldAlwaysBeFalse = true)()
-        ));
+        ), errorConfig);
 
         expect(logs.length, 2);
         expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')), contains('set to true'));
@@ -35,19 +73,19 @@ main() {
         var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
 
         // Should clear the error from mounting and not create any more
-        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..shouldNeverBeNull = true)()));
+        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..shouldNeverBeNull = true)()), errorConfig);
 
         expect(logs.length, 0);
       });
 
       test('with nested components', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())));
+        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())), errorConfig);
 
         expect(logs.length, 2);
       });
 
       test('with nested components that are the same', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())));
+        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())), errorConfig);
 
         expect(logs.length, 1, reason: 'React will only show a particular props error once');
       });
@@ -117,7 +155,7 @@ main() {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(
             (Sample()..shouldError = true)()
-        ));
+        ), errorConfig);
 
         expect(logs.length, 2);
       });
@@ -146,7 +184,7 @@ main() {
           ..shouldAlwaysBeFalse = true
           ..shouldError = true
         )(), attachedToDocument: true);
-      });
+      }, errorConfig);
 
       expect(logs.length, 3);
     });
@@ -161,7 +199,7 @@ main() {
           ..shouldError = true
           ..shouldAlwaysBeFalse = true
         )());
-      });
+      }, errorConfig);
 
       expect(logs.length, 3);
     });
@@ -175,7 +213,7 @@ main() {
         jacket.rerender((Sample()
           ..shouldAlwaysBeFalse = true
         )());
-      });
+      }, errorConfig);
 
       expect(logs.length, 2);
     });
@@ -190,7 +228,7 @@ main() {
           ..shouldAlwaysBeFalse = true
           ..shouldNeverBeNull = false
         )());
-      });
+      }, errorConfig);
 
       expect(logs.length, 2);
     });
