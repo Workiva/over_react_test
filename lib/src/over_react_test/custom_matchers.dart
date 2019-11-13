@@ -170,7 +170,7 @@ class _HasPropMatcher extends CustomMatcher {
   _HasPropMatcher(propKey, propValue)
       : _propKey = propKey,
         super('React instance with props that', 'props/attributes map', containsPair(propKey, propValue));
-  
+
   final dynamic _propKey;
 
   static bool _useDomAttributes(item) => react_test_utils.isDOMComponent(item);
@@ -440,7 +440,9 @@ const _propTypeErrorMessage = 'Failed prop type';
 /// Related: [_LoggingFunctionMatcher]
 class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
   _PropTypeLogMatcher(expected)
-      : super(expected, description: 'emits the propType warning', name: 'propType warning');
+      : super(expected,
+      description: 'emits the propType warning',
+      name: 'propType warning');
 
   final _filter = contains(_propTypeErrorMessage);
 
@@ -473,5 +475,4 @@ _PropTypeLogMatcher emitsPropTypeWarnings(dynamic expected) =>
 /// Matcher used enforce that there are no `propType` warnings.
 ///
 /// Related: [emitsPropTypeWarnings]
-_PropTypeLogMatcher emitsNoPropTypeWarnings =
-    _PropTypeLogMatcher(isEmpty);
+_PropTypeLogMatcher emitsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);

@@ -25,9 +25,12 @@ import 'package:react/react_client/react_interop.dart';
 /// config class (logConfig, warnConfig, errorConfig, any).
 ///
 /// To handle asynchronous behavior, see [recordConsoleLogsAsync].
-List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration configuration = const ConsoleConfiguration.all()]) {
+List<String> recordConsoleLogs(Function() callback,
+    [ConsoleConfiguration configuration = const ConsoleConfiguration.all()]) {
   final consoleLogs = <String>[];
-  final logTypeToCapture = configuration.logType == 'all' ? ConsoleConfiguration.types : [configuration.logType];
+  final logTypeToCapture = configuration.logType == 'all'
+      ? ConsoleConfiguration.types
+      : [configuration.logType];
 
   PropTypes.resetWarningCache();
 
@@ -35,12 +38,12 @@ List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration config
     JsFunction originalConsole = context['console'][config];
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-          // NOTE: Using console.log or print within this function will cause an infinite
-          // loop when the logType is set to `log`.
-          consoleLogs.add(message);
-          originalConsole.apply(
-              [message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-        });
+      // NOTE: Using console.log or print within this function will cause an infinite
+      // loop when the logType is set to `log`.
+      consoleLogs.add(message);
+      originalConsole
+          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+    });
 
     try {
       callback();
@@ -60,12 +63,13 @@ List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration config
 /// callback.
 ///
 /// Related: [recordConsoleLogs]
-FutureOr<List<String>> recordConsoleLogsAsync(
-    Future Function() asyncCallback,
-    [ConsoleConfiguration configuration = const ConsoleConfiguration.error()]
-) async {
+FutureOr<List<String>> recordConsoleLogsAsync(Future Function() asyncCallback,
+    [ConsoleConfiguration configuration =
+        const ConsoleConfiguration.error()]) async {
   var consoleLogs = <String>[];
-  final logTypeToCapture = configuration.logType == 'all' ? ConsoleConfiguration.types : [configuration.logType];
+  final logTypeToCapture = configuration.logType == 'all'
+      ? ConsoleConfiguration.types
+      : [configuration.logType];
 
   PropTypes.resetWarningCache();
 
@@ -73,12 +77,12 @@ FutureOr<List<String>> recordConsoleLogsAsync(
     JsFunction originalConsole = context['console'][config];
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-          // NOTE: Using console.log or print within this function will cause an infinite
-          // loop when the logType is set to `log`.
-          consoleLogs.add(message);
-          originalConsole.apply(
-              [message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-        });
+      // NOTE: Using console.log or print within this function will cause an infinite
+      // loop when the logType is set to `log`.
+      consoleLogs.add(message);
+      originalConsole
+          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+    });
 
     try {
       await asyncCallback();

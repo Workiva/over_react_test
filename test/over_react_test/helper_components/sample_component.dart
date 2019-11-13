@@ -5,12 +5,11 @@ import 'package:over_react/over_react.dart';
 // ignore: uri_has_not_been_generated
 part 'sample_component.over_react.g.dart';
 
-
 @Factory()
 // ignore: undefined_identifier
 UiFactory<SampleProps> Sample =
 // ignore: undefined_identifier
-_$Sample;
+    _$Sample;
 
 @Props()
 class _$SampleProps extends UiProps {
@@ -32,30 +31,25 @@ class SampleComponent extends UiComponent2<SampleProps> {
     ..shouldAlwaysBeFalse = false
     ..shouldError = false
     ..addExtraLogAndWarn = false
-    ..shouldLog = true
-  );
+    ..shouldLog = true);
 
   @override
   get propTypes => {
-    keyForProp((p) => p.shouldNeverBeNull):
-        (props, info) {
+        keyForProp((p) => p.shouldNeverBeNull): (props, info) {
+          if (props.shouldNeverBeNull == null) {
+            return PropError.required(info.propName);
+          }
 
-      if (props.shouldNeverBeNull == null) {
-        return PropError.required(info.propName);
-      }
+          return null;
+        },
+        keyForProp((p) => p.shouldAlwaysBeFalse): (props, info) {
+          if (props.shouldAlwaysBeFalse) {
+            return PropError.value(props.shouldAlwaysBeFalse, info.propName);
+          }
 
-      return null;
-    },
-    keyForProp((p) => p.shouldAlwaysBeFalse):
-        (props, info) {
-
-      if (props.shouldAlwaysBeFalse) {
-        return PropError.value(props.shouldAlwaysBeFalse, info.propName);
-      }
-
-      return null;
-    },
-  };
+          return null;
+        },
+      };
 
   @override
   componentDidMount() {
@@ -78,10 +72,8 @@ class SampleComponent extends UiComponent2<SampleProps> {
       return Dom.div()(
           (Dom.button()
             ..onClick = _handleOnClick
-            ..addTestId('ort_sample_component_button')
-          )(),
-          props.children
-      );
+            ..addTestId('ort_sample_component_button'))(),
+          props.children);
     }
   }
 

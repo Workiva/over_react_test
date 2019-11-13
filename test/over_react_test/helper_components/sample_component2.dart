@@ -5,12 +5,11 @@ import 'package:over_react/over_react.dart';
 // ignore: uri_has_not_been_generated
 part 'sample_component2.over_react.g.dart';
 
-
 @Factory()
 // ignore: undefined_identifier
 UiFactory<Sample2Props> Sample2 =
 // ignore: undefined_identifier
-_$Sample2;
+    _$Sample2;
 
 @Props()
 class _$Sample2Props extends UiProps {
@@ -21,16 +20,14 @@ class _$Sample2Props extends UiProps {
 class SampleComponent2 extends UiComponent2<Sample2Props> {
   @override
   get propTypes => {
-    keyForProp((p) => p.shouldNeverBeNull):
-        (props, info) {
+        keyForProp((p) => p.shouldNeverBeNull): (props, info) {
+          if (props.shouldNeverBeNull == null) {
+            return PropError.required(info.propName);
+          }
 
-      if (props.shouldNeverBeNull == null) {
-        return PropError.required(info.propName);
-      }
-
-      return null;
-    },
-  };
+          return null;
+        },
+      };
 
   @override
   void componentDidMount() {
