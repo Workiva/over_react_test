@@ -24,13 +24,15 @@ main() {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(Sample()()));
         expect(logs.length, 5);
-        expect(logs, containsAll([
-          contains('SampleProps.shouldNeverBeNull is required.'),
-          contains('Logging a standard log'),
-          contains('A second warning'),
-          contains('And a third'),
-          contains('Just a lil warning'),
-        ]));
+        expect(
+            logs,
+            containsAll([
+              contains('SampleProps.shouldNeverBeNull is required.'),
+              contains('Logging a standard log'),
+              contains('A second warning'),
+              contains('And a third'),
+              contains('Just a lil warning'),
+            ]));
       });
 
       test('when re-rendering', () {
@@ -39,12 +41,14 @@ main() {
         var logs = recordConsoleLogs(() => jacket.rerender(Sample()()));
 
         expect(logs.length, 4);
-        expect(logs, containsAll([
-          contains('SampleProps.shouldNeverBeNull is required.'),
-          contains('Logging a standard log'),
-          contains('A second warning'),
-          contains('And a third'),
-        ]));
+        expect(
+            logs,
+            containsAll([
+              contains('SampleProps.shouldNeverBeNull is required.'),
+              contains('Logging a standard log'),
+              contains('A second warning'),
+              contains('And a third'),
+            ]));
       });
 
       test('with nested components', () {
@@ -60,12 +64,12 @@ main() {
 
     group('captures errors correctly', () {
       test('when mounting', () {
-        var logs = recordConsoleLogs(() => mount(
-            (Sample()..shouldAlwaysBeFalse = true)()
-        ), errorConfig);
+        var logs = recordConsoleLogs(
+            () => mount((Sample()..shouldAlwaysBeFalse = true)()), errorConfig);
 
         expect(logs.length, 2);
-        expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')), contains('set to true'));
+        expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')),
+            contains('set to true'));
       });
 
       test('when re-rendering', () {
@@ -73,21 +77,26 @@ main() {
         var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
 
         // Should clear the error from mounting and not create any more
-        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..shouldNeverBeNull = true)()), errorConfig);
+        var logs = recordConsoleLogs(
+            () => jacket.rerender((Sample()..shouldNeverBeNull = true)()),
+            errorConfig);
 
         expect(logs.length, 0);
       });
 
       test('with nested components', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())), errorConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample2()())), errorConfig);
 
         expect(logs.length, 2);
       });
 
       test('with nested components that are the same', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())), errorConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample()())), errorConfig);
 
-        expect(logs.length, 1, reason: 'React will only show a particular props error once');
+        expect(logs.length, 1,
+            reason: 'React will only show a particular props error once');
       });
     });
 
@@ -103,19 +112,23 @@ main() {
         var jacket = mount(Sample()());
 
         // Should clear the previous log and result in there being two
-        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..addExtraLogAndWarn = true)()), logConfig);
+        var logs = recordConsoleLogs(
+            () => jacket.rerender((Sample()..addExtraLogAndWarn = true)()),
+            logConfig);
 
         expect(logs.length, 2);
       });
 
       test('with nested components', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())), logConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample2()())), logConfig);
 
         expect(logs.length, 2);
       });
 
       test('with nested components that are the same', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())), logConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample()())), logConfig);
 
         expect(logs.length, 2);
       });
@@ -133,19 +146,23 @@ main() {
         var jacket = mount(Sample()());
 
         // Should clear the previous warnings and result in there being 3
-        var logs = recordConsoleLogs(() => jacket.rerender((Sample()..addExtraLogAndWarn = true)()), warnConfig);
+        var logs = recordConsoleLogs(
+            () => jacket.rerender((Sample()..addExtraLogAndWarn = true)()),
+            warnConfig);
 
         expect(logs.length, 3);
       });
 
       test('with nested components', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())), warnConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample2()())), warnConfig);
 
         expect(logs.length, 6);
       });
 
       test('with nested components that are the same', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())), warnConfig);
+        var logs =
+            recordConsoleLogs(() => mount(Sample()(Sample()())), warnConfig);
 
         expect(logs.length, 6);
       });
@@ -153,9 +170,8 @@ main() {
 
     group('handles errors as expected', () {
       test('when mounting', () {
-        var logs = recordConsoleLogs(() => mount(
-            (Sample()..shouldError = true)()
-        ), errorConfig);
+        var logs = recordConsoleLogs(
+            () => mount((Sample()..shouldError = true)()), errorConfig);
 
         expect(logs.length, 2);
       });
@@ -166,7 +182,8 @@ main() {
     test('handles document events', () async {
       var jacket = mount(Sample()(), attachedToDocument: true);
       var logs = await recordConsoleLogsAsync(() async {
-        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        var button =
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
@@ -180,10 +197,11 @@ main() {
       var logs = await recordConsoleLogsAsync(() async {
         await Future.delayed(Duration(milliseconds: 5));
 
-        mount((Sample()
-          ..shouldAlwaysBeFalse = true
-          ..shouldError = true
-        )(), attachedToDocument: true);
+        mount(
+            (Sample()
+              ..shouldAlwaysBeFalse = true
+              ..shouldError = true)(),
+            attachedToDocument: true);
       }, errorConfig);
 
       expect(logs.length, 3);
@@ -191,34 +209,34 @@ main() {
 
     test('handles errors caused when re-rendering', () async {
       var logs = await recordConsoleLogsAsync(() async {
-        var jacket = mount((Sample()..shouldAlwaysBeFalse = true)(), attachedToDocument: true);
+        var jacket = mount((Sample()..shouldAlwaysBeFalse = true)(),
+            attachedToDocument: true);
 
         await Future.delayed(Duration(milliseconds: 5));
 
         jacket.rerender((Sample()
           ..shouldError = true
-          ..shouldAlwaysBeFalse = true
-        )());
+          ..shouldAlwaysBeFalse = true)());
       }, errorConfig);
 
       expect(logs.length, 3);
     });
 
-    test('handles re-renders when the mount is outside of the function', () async {
+    test('handles re-renders when the mount is outside of the function',
+        () async {
       var jacket = mount((Sample())(), attachedToDocument: true);
 
       var logs = await recordConsoleLogsAsync(() async {
         await Future.delayed(Duration(milliseconds: 5));
 
-        jacket.rerender((Sample()
-          ..shouldAlwaysBeFalse = true
-        )());
+        jacket.rerender((Sample()..shouldAlwaysBeFalse = true)());
       }, errorConfig);
 
       expect(logs.length, 2);
     });
 
-    test('handles re-renders when the mount is inside of the function', () async {
+    test('handles re-renders when the mount is inside of the function',
+        () async {
       var logs = await recordConsoleLogsAsync(() async {
         var jacket = mount((Sample())(), attachedToDocument: true);
 
@@ -226,8 +244,7 @@ main() {
 
         jacket.rerender((Sample()
           ..shouldAlwaysBeFalse = true
-          ..shouldNeverBeNull = false
-        )());
+          ..shouldNeverBeNull = false)());
       }, errorConfig);
 
       expect(logs.length, 2);
@@ -235,8 +252,10 @@ main() {
 
     test('captures logs', () async {
       var logs = await recordConsoleLogsAsync(() async {
-        var jacket = mount((Sample()..addExtraLogAndWarn = true)(), attachedToDocument: true);
-        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        var jacket = mount((Sample()..addExtraLogAndWarn = true)(),
+            attachedToDocument: true);
+        var button =
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
@@ -247,8 +266,10 @@ main() {
 
     test('captures warns', () async {
       var logs = await recordConsoleLogsAsync(() async {
-        var jacket = mount((Sample()..addExtraLogAndWarn = true)(), attachedToDocument: true);
-        var button = queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+        var jacket = mount((Sample()..addExtraLogAndWarn = true)(),
+            attachedToDocument: true);
+        var button =
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
