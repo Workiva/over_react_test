@@ -16,8 +16,7 @@ import 'dart:html';
 import 'dart:js';
 
 import 'package:over_react/over_react.dart'
-    show BuilderOnlyUiFactory, ConsumedProps, DomProps, PropDescriptor,
-        requiredProp;
+    show BuilderOnlyUiFactory, DomProps, requiredProp;
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client.dart';
@@ -394,21 +393,17 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
     var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
     jacket.unmount();
 
-    void categorizeProps(PropDescriptor prop) {
-      if (prop.isNullable) {
-        nullableProps.add(prop.key);
-      } else if (prop.isRequired) {
-        requiredProps.add(prop.key);
+    for (var consumedProp in consumedProps) {
+      for (var prop in consumedProp.props) {
+        if (prop.isNullable) {
+          nullableProps.add(prop.key);
+        } else if (prop.isRequired) {
+          requiredProps.add(prop.key);
+        }
+
+        keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
       }
-
-      keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
     }
-
-    void iterateOverProps(ConsumedProps consumedProps) {
-      consumedProps.props.forEach(categorizeProps);
-    }
-
-    consumedProps.forEach(iterateOverProps);
   });
 
   if (!isComponent2) {
@@ -639,7 +634,7 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRe
 
       if (children is List) {
         flattenChildren(List _children) {
-          void flattenChild(_child) {
+          for (var _child in children) {
             if (_child != null && isValidElement(_child)) {
               getProps(_child).forEach((propKey, propValue) {
                 // Some props may be of type Function, and will produce interop errors if passed into isValidElement
@@ -652,8 +647,6 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRe
               flattenChildren(_child);
             }
           }
-
-          _children.forEach(flattenChild);
         }
 
         flattenChildren(children);

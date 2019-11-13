@@ -22,30 +22,35 @@ import 'package:react/react_client/react_interop.dart';
 ///
 /// Can be used to capture logs, warnings, or errors as specified by setting
 /// the [configuration]. To set the [configuration], pass in the corresponding
-/// config class (logConfig, warnConfig, errorConfig).
+/// config class (logConfig, warnConfig, errorConfig, any).
 ///
 /// To handle asynchronous behavior, see [recordConsoleLogsAsync].
-List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration configuration = const ConsoleConfiguration.error()]) {
-  var consoleLogs = <String>[];
+List<String> recordConsoleLogs(Function() callback, [ConsoleConfiguration configuration = const ConsoleConfiguration.all()]) {
+  final consoleLogs = <String>[];
+  final logTypeToCapture = configuration.logType == 'all' ? ConsoleConfiguration.types : [configuration.logType];
 
   PropTypes.resetWarningCache();
 
-  JsFunction originalConsole = context['console'][configuration.logType];
-  context['console'][configuration.logType] = JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-    // NOTE: Using console.log or print within this function will cause an infinite
-    // loop when the logType is set to `log`.
-    consoleLogs.add(message);
-    originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-  });
+  for (var config in logTypeToCapture) {
+    JsFunction originalConsole = context['console'][config];
+    context['console'][config] =
+        JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+          // NOTE: Using console.log or print within this function will cause an infinite
+          // loop when the logType is set to `log`.
+          consoleLogs.add(message);
+          originalConsole.apply(
+              [message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+        });
 
-  try {
-    callback();
-  } catch (_) {
-    // No error handling is necessary. This catch is meant to catch errors that
-    // may occur if a render fails due to invalid props. It also ensures that the
-    // console is reset correctly, even if the callback is broken.
-  } finally {
-    context['console'][configuration.logType] = originalConsole;
+    try {
+      callback();
+    } catch (_) {
+      // No error handling is necessary. This catch is meant to catch errors that
+      // may occur if a render fails due to invalid props. It also ensures that the
+      // console is reset correctly, even if the callback is broken.
+    } finally {
+      context['console'][config] = originalConsole;
+    }
   }
 
   return consoleLogs;
@@ -60,25 +65,30 @@ FutureOr<List<String>> recordConsoleLogsAsync(
     [ConsoleConfiguration configuration = const ConsoleConfiguration.error()]
 ) async {
   var consoleLogs = <String>[];
+  final logTypeToCapture = configuration.logType == 'all' ? ConsoleConfiguration.types : [configuration.logType];
 
   PropTypes.resetWarningCache();
 
-  JsFunction originalConsole = context['console'][configuration.logType];
-  context['console'][configuration.logType] = JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-    // NOTE: Using console.log or print within this function will cause an infinite
-    // loop when the logType is set to `log`.
-    consoleLogs.add(message);
-    originalConsole.apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-  });
+  for (var config in logTypeToCapture) {
+    JsFunction originalConsole = context['console'][config];
+    context['console'][config] =
+        JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+          // NOTE: Using console.log or print within this function will cause an infinite
+          // loop when the logType is set to `log`.
+          consoleLogs.add(message);
+          originalConsole.apply(
+              [message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+        });
 
-  try {
-    await asyncCallback();
-  } catch(_) {
-     // No error handling is necessary. This catch is meant to catch errors that
-     // may occur if a render fails due to invalid props. It also ensures that the
-     // console is reset correctly, even if the callback is broken.
-  } finally {
-    context['console'][configuration.logType] = originalConsole;
+    try {
+      await asyncCallback();
+    } catch (_) {
+      // No error handling is necessary. This catch is meant to catch errors that
+      // may occur if a render fails due to invalid props. It also ensures that the
+      // console is reset correctly, even if the callback is broken.
+    } finally {
+      context['console'][config] = originalConsole;
+    }
   }
 
   return consoleLogs;
@@ -93,11 +103,16 @@ class ConsoleConfiguration {
 
   const ConsoleConfiguration.log() : logType = 'log';
 
+  const ConsoleConfiguration.all() : logType = 'all';
+
   /// The type of log to capture while running the callbacks within
   /// [recordConsoleLogs] and [recordConsoleLogsAsync].
   ///
-  /// Must be `'warn'`, `'error'`, or `'log'`.
+  /// Must be `'warn'`, `'error'`, `'log'` or `'all'`.
   final logType;
+
+  /// The possible console types that have different log contexts.
+  static const types = ['error', 'log', 'warn'];
 }
 
 /// The configuration needed to capture logs while running [recordConsoleLogs].
@@ -108,3 +123,7 @@ ConsoleConfiguration warnConfig = const ConsoleConfiguration.warn();
 
 /// The configuration needed to capture errors while running [recordConsoleLogs].
 ConsoleConfiguration errorConfig = const ConsoleConfiguration.error();
+
+/// The configuration that will capture all logs, whether they be logs, warnings,
+/// or errors.
+ConsoleConfiguration allConfig = const ConsoleConfiguration.all();

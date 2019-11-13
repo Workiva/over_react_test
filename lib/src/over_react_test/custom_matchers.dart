@@ -340,213 +340,92 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
   ));
 }
 
-/// A log matcher that ensures that expected log values are present.
+/// A log matcher that captures logs and uses a provided matcher or string to compare
+/// against.
 ///
-/// In its core, the matcher compares two lists. The added utility is that by
-/// passing in a callback, the matcher will run the function and record the logs,
-/// return them in a list, and use that list as the actual value to compare
-/// against the expected.
-///
-/// Related: [recordConsoleLogs]
-class LogMatcher extends Matcher {
-  LogMatcher(
-      this._expected,
-      this._expectsMatch,
-      this._expectsSingleMatch, {
-        this.shouldEnforceLogCount = false,
-        this.config
-      });
+/// The primary use case of the matcher is to take in a callback as the actual,
+/// and pass it to [recordConsoleLogs] to run the function and record the resulting
+/// logs that are emitted during the function runtime.
+class _LoggingFunctionMatcher extends CustomMatcher {
+  /// [matcher] is tested against the list of recorded logs
+  // could make wrapMatcher be `contains` by default as well if desired
+  _LoggingFunctionMatcher(dynamic matcher, {this.config, description, name})
+      : super(description ?? 'emits the logs', name ?? 'logs', _customWrapMatcher(matcher));
 
-  /// The expected value.
-  final /*List<Contains> || List<String> || String*/ _expected;
-
-  /// Whether or not the matcher should expect any log matches.
-  ///
-  /// This can be useful to validate that a certain log does not occur.
-  final _expectsMatch;
-
-  /// Whether or not the matcher should expect only a single log match.
-  final _expectsSingleMatch;
-
-  /// Whether or not the matcher should enforce that the number of actual logs
-  /// is equal to the number of expected logs.
-  ///
-  /// Default: `false`
-  final bool shouldEnforceLogCount;
-
-  /// The configuration setting used to capture logs during a function's runtime.
-  ///
-  /// If the actual value passed to the matcher is a function, the function will
-  /// be run. Based on the configuration setting, the logs, warnings, or errors
-  /// will be captured and stored.
-  ///
-  /// Default: `errorConfig`
   final ConsoleConfiguration config;
 
-  @override
-  bool matches(/*Function || List*/ dynamic actual, Map matchState) {
-    // Get the expected values
-    final List</*Contains || String*/ dynamic> expectedList = _expected is List ? _expected : [_expected];
-    final expectedMatchCount = _expectsMatch ? expectedList.length : 0;
-
-    // Declare variables used to test against the expected values
-    var actualTotalMatchCount = 0;
-    var hasDuplicateActualLogs = false;
-    var hasDuplicateExpectedLogs = false;
-    var hasTooManyLogs = false;
-
-    // Local function state variables
-    final actualWarningCounts= <String, int>{};
-    final expectedWarningCounts = <int>[];
-    final shouldPrintLogsIfMatchFails = actual is Function;
-
-    if (expectedList.isEmpty || _expected == null) {
-      throw ArgumentError.value(expectedList, 'expected', 'The expected value '
-          'cannot be null or an empty list.');
+  static Matcher _customWrapMatcher(dynamic x) {
+    if (x == null || (x is List && x.isEmpty)) {
+      throw ArgumentError('The expected value cannot be null or an empty list. \n\n'
+          'If you are expecting no logs, use the emitsNoLogs matcher');
     }
 
-    // Validate that actual is a list of logs and set it to one if not
+    if (x is Matcher) {
+      return x;
+    } else if (x is String) {
+      return anyElement(contains(x));
+    } else {
+      return equals(x);
+    }
+  }
+
+  @override
+  featureValueOf(actual) {
+    var logs = <String>[];
+
+    if (actual is List) return actual;
+
+    if (actual is! Function()) {
+      throw ArgumentError('The actual value must be a callback or a List.');
+    }
+
     try {
-      actual = actual is List<String> ? actual : recordConsoleLogs(actual, config ?? errorConfig);
-    } catch (e, st) {
-      throw ArgumentError('PropTypeLogMatcher expects either a List<String> or a'
-          ' callback. \n$e \n$st');
-    }
+      print(config?.logType);
+      logs = recordConsoleLogs(actual, config ?? logConfig);
+    } catch (_) {}
 
-    hasTooManyLogs = shouldEnforceLogCount && actual.length != expectedMatchCount;
-
-    // Function that looks for matches and updates the match state
-    void matchExpectedLogs(/*Contains || String*/ dynamic warning) {
-      var expectedWarningMatches = 0;
-
-      actual.forEach((actualWarning) {
-        var matcher = warning is Matcher ? warning : contains(warning);
-
-        if (matcher.matches(actualWarning, {})) {
-          if (actualWarningCounts[actualWarning] != null) {
-            actualWarningCounts[actualWarning]++;
-          } else {
-            actualWarningCounts.addAll({actualWarning: 1});
-          }
-
-          expectedWarningMatches++;
-        }
-      });
-
-      expectedWarningCounts.add(expectedWarningMatches);
-    }
-
-    // Iterate over expected values looking for matches
-    expectedList.forEach(matchExpectedLogs);
-
-    actualTotalMatchCount = expectedWarningCounts.fold(0, (prev, curr) => prev + curr);
-    hasDuplicateExpectedLogs = (expectedWarningCounts.where((v) => v > 1)).isNotEmpty;
-    hasDuplicateActualLogs = actualWarningCounts.values.where((v) => v > 1).isNotEmpty;
-
-    matchState.addAll({
-      'shouldPrintActualLogs': shouldPrintLogsIfMatchFails,
-      'actualLogs': actual,
-      'matchCount': actualTotalMatchCount,
-      'hasDuplicateExpectedLogs': hasDuplicateExpectedLogs,
-      'hasDuplicateActualLogs': hasDuplicateActualLogs,
-      'hasTooManyActualLogs': hasTooManyLogs,
-    });
-
-    // Validate there are the correct number of matches and there are no duplicate matches
-    return actualTotalMatchCount == expectedMatchCount &&
-        !hasDuplicateExpectedLogs &&
-        !hasDuplicateActualLogs &&
-        !hasTooManyLogs;
-  }
-
-  @override
-  Description describe(Description description) {
-    if (_expectsMatch) {
-      if (_expectsSingleMatch) {
-        description.add('one log match');
-      } else {
-        description.add('${_expected.length} log matches.');
-      }
-    } else {
-      description.add('no log matches');
-    }
-
-    return description;
-  }
-
-  @override
-  Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
-    bool shouldPrintActualLogs = matchState['shouldPrintActualLogs'] ?? false;
-    List<String> actualLogs = matchState['actualLogs'] ?? [];
-    int matchCount = matchState['matchCount'] ?? 0;
-    bool hasDuplicateExpectedLogs = matchState['hasDuplicateExpectedLogs'] ?? false;
-    bool hasDuplicateActualLogs = matchState['hasDuplicateActualLogs'] ?? false;
-    bool hasTooManyActualLogs = matchState['hasTooManyActualLogs'] ?? false;
-
-    var description = <String>[];
-
-    if (hasTooManyActualLogs) {
-      mismatchDescription.add('Expected an equal number of expected and actual '
-          'logs, but received too many actual logs. ');
-    }
-
-    // Printing the actual logs can help because if the matcher fails when passed
-    // a callback, the test prints the function rather than the return value of
-    // recordConsoleLogs
-    if (shouldPrintActualLogs) description.add('was ${actualLogs.toString()}');
-
-    if (_expectsMatch) {
-      if (_expectsSingleMatch) {
-        description.add('Expected one log match but got $matchCount. ');
-      } else {
-        description.add('Expected ${_expected.length} log matches but got $matchCount. ');
-      }
-
-      if (hasDuplicateExpectedLogs && hasDuplicateActualLogs) {
-        description.add('There were duplicate matches between the expected '
-            'logs and the actual logs. Ensure each expected log '
-            'is specific and unique.');
-      } else if (hasDuplicateExpectedLogs) {
-        description.add('There were multiple actual logs matched to a single '
-            'expected warning. Ensure each expected log is specific and'
-            ' unique.');
-      } else if (hasDuplicateActualLogs){
-        description.add('There were multiple expected logs that matched to a '
-            'single actual warning. Ensure each expected log is specific'
-            ' and unique.');
-      }
-    } else {
-        description.add('Expected no log matches but got $matchCount. ');
-    }
-
-    mismatchDescription.add(description.join(""));
-
-    return mismatchDescription;
+    return logs;
   }
 }
 
-/// Matcher used to check for a single log.
+/// A Matcher used to compare a list of logs against a provided matcher.
 ///
-/// [expected] can be:
-///   * `List<String>`
-///   * `List<Contains>`
-///   * `String`
+/// __Examples:__
 ///
-/// Related: [hasLogs], [doesNotLog]
-LogMatcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool shouldEnforceLogCount = false}) =>
-    LogMatcher(expected, true, true, shouldEnforceLogCount: shouldEnforceLogCount, config: consoleConfig ?? logConfig);
+///     When passed a string, the matcher look for any log that contains that
+///     substring.
+///     ```dart
+///       expect(callbackFunction, emitsLogs('I expect this log'));
+///     ```
+///
+///     When passed a list, the matcher will do an equality check on the actual
+///     log List.
+///
+///     Alternatively, the `String` can be wrapped in a `contains` to check the
+///     if the comparable index contains that substring.
+///     ```dart
+///       expect(callbackFunction, emitsLogs(['I expect this log', 'And this Log']));
+///       expect(callbackFunction, emitsLogs([
+///         contains('I expect this log'),
+///         contains('And this Log'),
+///       ]));
+///     ```
+///
+///     All usual `Iterable` matchers can also be used.
+///     ```dart
+///       expect(callbackFunction, emitsLogs(containsAll(['I expect this log'])));
+///       expect(callbackFunction, emitsLogs(containsAllInOrder(['I expect this log'])));
+///       expect(callbackFunction, emitsLogs(hasLength(1)));
+///     ```
+///
+/// Related: [emitsNoLogs]
+Matcher emitsLogs(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
+    _LoggingFunctionMatcher(expected, config: consoleConfig);
 
-/// Matcher used to check for multiple logs.
+/// A matcher to verify that a callback function does not emit any logs.
 ///
-/// Related: [hasLog], [doesNotLog]
-LogMatcher hasLogs(List<dynamic> expected, {ConsoleConfiguration consoleConfig, bool shouldEnforceLogCount = false}) =>
-    LogMatcher(expected, true, false, shouldEnforceLogCount: shouldEnforceLogCount, config: consoleConfig ?? logConfig);
-
-/// Matcher used enforce that there are no logs that match a specific `String`.
-///
-/// Related: [hasLog], [hasLogs]
-LogMatcher doesNotLog(String uniqueLogMessage, {ConsoleConfiguration consoleConfig}) =>
-    LogMatcher(contains(uniqueLogMessage), false, false, config: consoleConfig ?? logConfig);
+/// Related: [emitsLogs]
+final Matcher emitsNoLogs = _LoggingFunctionMatcher(isEmpty);
 
 /// The string used to identify a `propType` error.
 const _propTypeErrorMessage = 'Failed prop type';
@@ -558,42 +437,41 @@ const _propTypeErrorMessage = 'Failed prop type';
 /// asserting that the expected `propType` warnings appear during the runtime
 /// of the callback.
 ///
-/// Related: [LogMatcher]
-class _PropTypeLogMatcher extends LogMatcher {
-  _PropTypeLogMatcher(_expected, _expectsMatch, _expectsSingleMatch)
-      : super(_expected, _expectsMatch, _expectsSingleMatch, shouldEnforceLogCount: true);
+/// Related: [_LoggingFunctionMatcher]
+class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
+  _PropTypeLogMatcher(expected)
+      : super(expected, description: 'emits the propType warning', name: 'propType warning');
 
   final _filter = contains(_propTypeErrorMessage);
 
   @override
-  bool matches(actual, Map matchState) {
-    matchState.addAll({'shouldPrintActualLogs': actual is Function});
-    actual = actual is List<String> ? actual : recordConsoleLogs(actual);
-    actual.removeWhere((log) => !_filter.matches(log, {}));
+  featureValueOf(actual) {
+    if (actual is! Function() && actual is! List) {
+      throw ArgumentError('The actual value must be a callback or a List.');
+    }
 
-    return super.matches(actual, matchState);
+    try {
+      actual = actual is List ? actual : recordConsoleLogs(actual, errorConfig);
+      actual.removeWhere((log) => !_filter.matches(log, {}));
+    } catch (_) {}
+
+    return actual;
   }
 }
 
-/// Matcher used to check for a single `propTypes` warning.
+/// Matcher used to check for specific `propType` warnings being emitted during
+/// the runtime of a callback function.
 ///
-/// [expected] can be:
-///   * `List<String>`
-///   * `List<Contains>`
-///   * `String`
+/// Has the same underlying logic as [emitsLogs], with the difference being that
+/// console configuration is set to `errorConfig` and non-propType related warnings
+/// are filtered out of the list.
 ///
-/// Related: [logsPropTypeWarnings], [logsNoPropTypeWarnings]
-_PropTypeLogMatcher logsPropTypeWarning(dynamic expected) =>
-    _PropTypeLogMatcher(expected, true, true);
-
-/// Matcher used to check for multiple `propType` warnings.
-///
-/// Related: [logsPropTypeWarning], [logsNoPropTypeWarnings]
-_PropTypeLogMatcher logsPropTypeWarnings(List<dynamic> expected) =>
-    _PropTypeLogMatcher(expected, true, false);
+/// Related: [emitsNoPropTypeWarnings], [emitsLogs]
+_PropTypeLogMatcher emitsPropTypeWarnings(dynamic expected) =>
+    _PropTypeLogMatcher(expected);
 
 /// Matcher used enforce that there are no `propType` warnings.
 ///
-/// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
-_PropTypeLogMatcher logsNoPropTypeWarnings() =>
-    _PropTypeLogMatcher(contains(_propTypeErrorMessage), false, false);
+/// Related: [emitsPropTypeWarnings]
+_PropTypeLogMatcher emitsNoPropTypeWarnings =
+    _PropTypeLogMatcher(isEmpty);
