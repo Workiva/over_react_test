@@ -80,6 +80,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestClassNameOverrides = true,
   bool ignoreDomProps = true,
   bool shouldTestRequiredProps = true,
+  @Deprecated('This flag is not needed as the test will auto detect the version')
   bool isComponent2 = false,
   dynamic childrenFactory()
 }) {
