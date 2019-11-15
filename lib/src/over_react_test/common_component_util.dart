@@ -388,6 +388,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   var keyToErrorMessage = {};
   var nullableProps = <String>[];
   var requiredProps = <String>[];
+  final isAutoDetectedAsComponent2 = ReactDartComponentVersion.fromType((factory()()).type) == '2';
 
   setUp(() {
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
@@ -411,7 +412,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
     consumedProps.forEach(iterateOverProps);
   });
 
-  if (!isComponent2) {
+  if (!isComponent2 && !isAutoDetectedAsComponent2) {
     test('throws when the required prop is not set or is null', () {
         for (var propKey in requiredProps) {
           final reactComponentFactory = factory()
@@ -498,7 +499,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
   }
 
   test('nullable props', () {
-    if (!isComponent2) {
+    if (!isComponent2 && !isAutoDetectedAsComponent2) {
       for (var propKey in nullableProps) {
         final reactComponentFactory = factory().componentFactory as
           ReactDartComponentFactoryProxy; // ignore: avoid_as

@@ -49,7 +49,6 @@ main() {
           shouldTestClassNameMerging: false,
           shouldTestClassNameOverrides: false,
           shouldTestPropForwarding: false,
-          isComponent2: true,
       );
       });
     });
