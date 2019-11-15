@@ -380,7 +380,6 @@ class _LoggingFunctionMatcher extends CustomMatcher {
     }
 
     try {
-      print(config?.logType);
       logs = recordConsoleLogs(actual, config ?? logConfig);
     } catch (_) {}
 
