@@ -23,10 +23,9 @@ main() {
     group('captures all logs correctly', () {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(Sample()()));
-        expect(logs.length, 5);
         expect(
             logs,
-            containsAll([
+            unorderedEquals([
               contains('SampleProps.shouldNeverBeNull is required.'),
               contains('Logging a standard log'),
               contains('A second warning'),
@@ -40,10 +39,9 @@ main() {
 
         var logs = recordConsoleLogs(() => jacket.rerender(Sample()()));
 
-        expect(logs.length, 4);
         expect(
             logs,
-            containsAll([
+            unorderedEquals([
               contains('SampleProps.shouldNeverBeNull is required.'),
               contains('Logging a standard log'),
               contains('A second warning'),
@@ -53,12 +51,12 @@ main() {
 
       test('with nested components', () {
         var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())));
-        expect(logs.length, 10);
+        expect(logs, hasLength(10));
       });
 
       test('with nested components that are the same', () {
         var logs = recordConsoleLogs(() => mount(Sample()(Sample()())));
-        expect(logs.length, 9);
+        expect(logs, hasLength(9));
       });
     });
 
@@ -67,7 +65,7 @@ main() {
         var logs = recordConsoleLogs(
             () => mount((Sample()..shouldAlwaysBeFalse = true)()), errorConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
         expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')),
             contains('set to true'));
       });
@@ -81,21 +79,21 @@ main() {
             () => jacket.rerender((Sample()..shouldNeverBeNull = true)()),
             errorConfig);
 
-        expect(logs.length, 0);
+        expect(logs, hasLength(0));
       });
 
       test('with nested components', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample2()())), errorConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
       });
 
       test('with nested components that are the same', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample()())), errorConfig);
 
-        expect(logs.length, 1,
+        expect(logs, hasLength(1),
             reason: 'React will only show a particular props error once');
       });
     });
@@ -104,7 +102,7 @@ main() {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(Sample()()), logConfig);
 
-        expect(logs.length, 1);
+        expect(logs, hasLength(1));
       });
 
       test('when re-rendering', () {
@@ -116,21 +114,21 @@ main() {
             () => jacket.rerender((Sample()..addExtraLogAndWarn = true)()),
             logConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
       });
 
       test('with nested components', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample2()())), logConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
       });
 
       test('with nested components that are the same', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample()())), logConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
       });
     });
 
@@ -138,7 +136,7 @@ main() {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(Sample()()), warnConfig);
 
-        expect(logs.length, 3);
+        expect(logs, hasLength(3));
       });
 
       test('when re-rendering', () {
@@ -150,21 +148,21 @@ main() {
             () => jacket.rerender((Sample()..addExtraLogAndWarn = true)()),
             warnConfig);
 
-        expect(logs.length, 3);
+        expect(logs, hasLength(3));
       });
 
       test('with nested components', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample2()())), warnConfig);
 
-        expect(logs.length, 6);
+        expect(logs, hasLength(6));
       });
 
       test('with nested components that are the same', () {
         var logs =
             recordConsoleLogs(() => mount(Sample()(Sample()())), warnConfig);
 
-        expect(logs.length, 6);
+        expect(logs, hasLength(6));
       });
     });
 
@@ -173,7 +171,7 @@ main() {
         var logs = recordConsoleLogs(
             () => mount((Sample()..shouldError = true)()), errorConfig);
 
-        expect(logs.length, 2);
+        expect(logs, hasLength(2));
       });
     });
   });
@@ -189,7 +187,7 @@ main() {
         triggerDocumentClick(button);
       }, warnConfig);
 
-      expect(logs.length, 1);
+      expect(logs, hasLength(1));
       expect(logs.first.contains('I have been clicked'), isTrue);
     });
 
@@ -204,7 +202,7 @@ main() {
             attachedToDocument: true);
       }, errorConfig);
 
-      expect(logs.length, 3);
+      expect(logs, hasLength(3));
     });
 
     test('handles errors caused when re-rendering', () async {
@@ -219,7 +217,7 @@ main() {
           ..shouldAlwaysBeFalse = true)());
       }, errorConfig);
 
-      expect(logs.length, 3);
+      expect(logs, hasLength(3));
     });
 
     test('handles re-renders when the mount is outside of the function',
@@ -232,7 +230,7 @@ main() {
         jacket.rerender((Sample()..shouldAlwaysBeFalse = true)());
       }, errorConfig);
 
-      expect(logs.length, 2);
+      expect(logs, hasLength(2));
     });
 
     test('handles re-renders when the mount is inside of the function',
@@ -247,7 +245,7 @@ main() {
           ..shouldNeverBeNull = false)());
       }, errorConfig);
 
-      expect(logs.length, 2);
+      expect(logs, hasLength(2));
     });
 
     test('captures logs', () async {
@@ -261,7 +259,7 @@ main() {
         triggerDocumentClick(button);
       }, logConfig);
 
-      expect(logs.length, 3);
+      expect(logs, hasLength(3));
     });
 
     test('captures warns', () async {
@@ -275,7 +273,7 @@ main() {
         triggerDocumentClick(button);
       }, warnConfig);
 
-      expect(logs.length, 5);
+      expect(logs, hasLength(5));
     });
   });
 }

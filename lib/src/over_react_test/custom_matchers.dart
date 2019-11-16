@@ -350,24 +350,9 @@ class _LoggingFunctionMatcher extends CustomMatcher {
   /// [matcher] is tested against the list of recorded logs
   // could make wrapMatcher be `contains` by default as well if desired
   _LoggingFunctionMatcher(dynamic matcher, {this.config, description, name})
-      : super(description ?? 'emits the logs', name ?? 'logs', _customWrapMatcher(matcher));
+      : super(description ?? 'emits the logs', name ?? 'logs', wrapMatcher(matcher));
 
   final ConsoleConfiguration config;
-
-  static Matcher _customWrapMatcher(dynamic x) {
-    if (x == null || (x is List && x.isEmpty)) {
-      throw ArgumentError('The expected value cannot be null or an empty list. \n\n'
-          'If you are expecting no logs, use the emitsNoLogs matcher');
-    }
-
-    if (x is Matcher) {
-      return x;
-    } else if (x is String) {
-      return anyElement(contains(x));
-    } else {
-      return equals(x);
-    }
-  }
 
   @override
   featureValueOf(actual) {
@@ -379,43 +364,44 @@ class _LoggingFunctionMatcher extends CustomMatcher {
       throw ArgumentError('The actual value must be a callback or a List.');
     }
 
-    try {
-      logs = recordConsoleLogs(actual, config ?? logConfig);
-    } catch (_) {}
+    logs = recordConsoleLogs(actual, config ?? logConfig);
 
     return logs;
   }
 }
 
+Matcher emitsLog(String expected, {ConsoleConfiguration consoleConfig}) =>
+    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig);
+
 /// A Matcher used to compare a list of logs against a provided matcher.
 ///
 /// __Examples:__
 ///
-///     When passed a string, the matcher look for any log that contains that
-///     substring.
-///     ```dart
-///       expect(callbackFunction, emitsLogs('I expect this log'));
-///     ```
+/// When passed a string, the matcher look for any log that contains that
+/// substring.
+/// ```dart
+///   expect(callbackFunction, emitsLogs('I expect this log'));
+/// ```
 ///
-///     When passed a list, the matcher will do an equality check on the actual
-///     log List.
+/// When passed a list, the matcher will do an equality check on the actual
+/// log List.
 ///
-///     Alternatively, the `String` can be wrapped in a `contains` to check the
-///     if the comparable index contains that substring.
-///     ```dart
-///       expect(callbackFunction, emitsLogs(['I expect this log', 'And this Log']));
-///       expect(callbackFunction, emitsLogs([
-///         contains('I expect this log'),
-///         contains('And this Log'),
-///       ]));
-///     ```
+/// Alternatively, the `String` can be wrapped in a `contains` to check the
+/// if the comparable index contains that substring.
+/// ```dart
+///   expect(callbackFunction, emitsLogs(['I expect this log', 'And this Log']));
+///   expect(callbackFunction, emitsLogs([
+///     contains('I expect this log'),
+///     contains('And this Log'),
+///   ]));
+/// ```
 ///
-///     All usual `Iterable` matchers can also be used.
-///     ```dart
-///       expect(callbackFunction, emitsLogs(containsAll(['I expect this log'])));
-///       expect(callbackFunction, emitsLogs(containsAllInOrder(['I expect this log'])));
-///       expect(callbackFunction, emitsLogs(hasLength(1)));
-///     ```
+/// All usual `Iterable` matchers can also be used.
+/// ```dart
+///   expect(callbackFunction, emitsLogs(containsAll(['I expect this log'])));
+///   expect(callbackFunction, emitsLogs(containsAllInOrder(['I expect this log'])));
+///   expect(callbackFunction, emitsLogs(hasLength(1)));
+/// ```
 ///
 /// Related: [emitsNoLogs]
 Matcher emitsLogs(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
@@ -451,14 +437,13 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
       throw ArgumentError('The actual value must be a callback or a List.');
     }
 
-    try {
-      actual = actual is List ? actual : recordConsoleLogs(actual, errorConfig);
-      actual.removeWhere((log) => !_filter.matches(log, {}));
-    } catch (_) {}
-
-    return actual;
+    var logs = actual is List ? actual : recordConsoleLogs(actual, errorConfig);
+    return logs.where((log) => _filter.matches(log, {})).toList();
   }
 }
+
+_PropTypeLogMatcher emitsPropTypeWarning(String expected) =>
+    _PropTypeLogMatcher(anyElement(contains(expected)));
 
 /// Matcher used to check for specific `propType` warnings being emitted during
 /// the runtime of a callback function.
@@ -474,4 +459,4 @@ _PropTypeLogMatcher emitsPropTypeWarnings(dynamic expected) =>
 /// Matcher used enforce that there are no `propType` warnings.
 ///
 /// Related: [emitsPropTypeWarnings]
-_PropTypeLogMatcher emitsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
+final _PropTypeLogMatcher emitsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);

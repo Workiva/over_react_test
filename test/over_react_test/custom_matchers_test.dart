@@ -444,36 +444,38 @@ main() {
 
     group('LoggingFunctionMatcher', () {
       group('when passed a List of logs', () {
-        var logs;
+        List<String> logs;
 
-        group('- emitsLogs -', () {
-          setUp(() {
-            logs = [
-              'random log1',
-              'random log2',
-              'random log',
-              'pizza',
-              'nonsense',
-              'Failed prop type: combination error',
-            ];
-          });
+        setUp(() {
+          logs = [
+            'random log1',
+            'random log2',
+            'random log',
+            'pizza',
+            'nonsense',
+            'Failed prop type: combination error',
+          ];
+        });
 
+        group('- emitsLog -', () {
           test('simple usage', () {
-            shouldPass(logs, emitsLogs('pizza'));
+            shouldPass(logs, emitsLog('pizza'));
           });
 
           test('when looking for a substring of a log', () {
-            shouldPass(logs, emitsLogs('log2'));
-          });
-
-          test('when passed in a matcher instead of a String', () {
-            shouldPass(logs, emitsLogs(anyElement(contains('nonsense'))));
+            shouldPass(logs, emitsLog('log2'));
           });
 
           test('when there are multiple of the same log', () {
             logs = ['random log', 'random log', 'nonense'];
 
-            shouldPass(logs, emitsLogs('random log'));
+            shouldPass(logs, emitsLog('random log'));
+          });
+        });
+
+        group('- emitsLogs -', () {
+          test('when passed in a matcher instead of a String', () {
+            shouldPass(logs, emitsLogs(anyElement(contains('nonsense'))));
           });
 
           test('simple usage when checking for specifically two logs', () {
@@ -490,10 +492,6 @@ main() {
             logs = ['nonsense', 'nonsense'];
 
             shouldPass(logs, emitsLogs(['nonsense', 'nonsense']));
-          });
-
-          test('when checking for the length of the logs list', () {
-            shouldPass(logs, hasLength(6));
           });
         });
 
@@ -520,33 +518,35 @@ main() {
 
       group('when passed a callback', () {
         group('that is synchronous', () {
-          group('- emitsLogs -', () {
+          group('- emitsLog -', () {
             test('simple usage', () {
-              shouldPass(() => mount(Sample()()), emitsLogs('Logging a standard log'));
+              shouldPass(() => mount(Sample()()), emitsLog('Logging a standard log'));
             });
 
             test('simple usage with warn config', () {
-              shouldPass(() => mount(Sample()()), emitsLogs('Just a lil warning', consoleConfig: warnConfig));
+              shouldPass(() => mount(Sample()()), emitsLog('Just a lil warning', consoleConfig: warnConfig));
             });
 
             test('simple usage with error config', () {
-              shouldPass(() => mount(Sample()()), emitsLogs('shouldNeverBeNull', consoleConfig: errorConfig));
+              shouldPass(() => mount(Sample()()), emitsLog('shouldNeverBeNull', consoleConfig: errorConfig));
             });
 
             test('when there are multiple logs', () {
               shouldPass(
-                  () => mount((Sample()..addExtraLogAndWarn = true)()),
-                  emitsLogs('Extra Log'),
+                    () => mount((Sample()..addExtraLogAndWarn = true)()),
+                emitsLog('Extra Log'),
               );
             });
 
             test('when two actual logs are the same', () {
               shouldPass(
-                  () => mount(Sample()(Sample2()())),
-                  emitsLogs('Logging a standard log'),
+                    () => mount(Sample()(Sample2()())),
+                emitsLog('Logging a standard log'),
               );
             });
+          });
 
+          group('- emitsLogs -', () {
             test('simple usage when looking for multiple logs', () {
               shouldPass(
                   () => mount((Sample()..addExtraLogAndWarn = true)()),
@@ -600,24 +600,20 @@ main() {
 
     group('PropTypeLogMatcher', () {
       group('when passed a List of logs', () {
-        var logs;
+        List<String> logs;
 
-        group('- emitsPropTypeWarnings -', () {
-          setUp(() {
-            logs = [
-              'random log',
-              'Failed prop type: foo is required',
-              'nonsense',
-              'Failed prop type: combination error',
-            ];
-          });
+        setUp(() {
+          logs = [
+            'random log',
+            'Failed prop type: foo is required',
+            'nonsense',
+            'Failed prop type: combination error',
+          ];
+        });
 
+        group('- emitsPropTypeWarning -', () {
           test('simple usage', () {
-            shouldPass(logs, emitsPropTypeWarnings('foo is required'));
-          });
-
-          test('when passed in a matcher instead of a String', () {
-            shouldPass(logs, emitsPropTypeWarnings(containsAll([contains('foo is required')])));
+            shouldPass(logs, emitsPropTypeWarning('foo is required'));
           });
 
           test('when there are multiple prop validation errors', () {
@@ -627,7 +623,13 @@ main() {
               'Failed prop type: shouldAlwaysBeFalse set to true',
             ];
 
-            shouldPass(logs, emitsPropTypeWarnings('foo is required'));
+            shouldPass(logs, emitsPropTypeWarning('foo is required'));
+          });
+        });
+
+        group('- emitsPropTypeWarnings -', () {
+          test('when passed in a matcher instead of a String', () {
+            shouldPass(logs, emitsPropTypeWarnings(containsAll([contains('foo is required')])));
           });
 
           test('simple usage with multiple logs', () {
@@ -639,14 +641,14 @@ main() {
 
           test('when passed in matchers instead of string', () {
             shouldPass(logs, emitsPropTypeWarnings(
-                [contains('foo is required'), contains('combination error')]));
+                orderedEquals([contains('foo is required'), contains('combination error')])));
           });
 
           test('when two expects are the same', () {
-            shouldPass(logs, emitsPropTypeWarnings([
+            shouldPass(logs, emitsPropTypeWarnings(orderedEquals([
               contains('Failed prop type'),
               contains('Failed prop type'),
-            ]));
+            ])));
           });
 
           test('when two logs are the same', () {
@@ -658,11 +660,11 @@ main() {
             ];
 
             shouldPass(logs,
-                emitsPropTypeWarnings([
+                emitsPropTypeWarnings(orderedEquals([
                   contains('foo is required'),
                   contains('foo is required'),
                   contains('combination error')
-                ]),
+                ])),
             );
           });
         });
@@ -691,15 +693,9 @@ main() {
 
       group('when passed a callback', () {
         group('that is synchronous', () {
-          group('- emitsPropTypeWarnings -', () {
+          group('- emitsPropTypeWarning -', () {
             test('simple usage', () {
-              shouldPass(() => mount(Sample()()), emitsPropTypeWarnings('shouldNeverBeNull'));
-            });
-
-            test('when there are multiple prop validation errors', () {
-              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
-                  emitsPropTypeWarnings('shouldNeverBeNull'));
-
+              shouldPass(() => mount(Sample()()), emitsPropTypeWarning('shouldNeverBeNull'));
             });
 
             test('with a re-render', () {
@@ -709,14 +705,22 @@ main() {
                 ..shouldAlwaysBeFalse = true
                 ..shouldNeverBeNull = false
               )()),
-                  emitsPropTypeWarnings('shouldAlwaysBeFalse set to true'));
+                  emitsPropTypeWarning('shouldAlwaysBeFalse set to true'));
+            });
+
+            test('when there are multiple prop validation errors', () {
+              shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
+                  emitsPropTypeWarning('shouldNeverBeNull'));
+
             });
 
             test('when two actual logs are the same', () {
               shouldPass(() => mount(Sample()(Sample2()())),
-                  emitsPropTypeWarnings('shouldNeverBeNull'));
+                  emitsPropTypeWarning('shouldNeverBeNull'));
             });
+          });
 
+          group('- emitsPropTypeWarnings -', () {
             test('simple usage with multiple logs', () {
               shouldPass(() => mount((Sample()..shouldAlwaysBeFalse = true)()),
                   emitsPropTypeWarnings([
