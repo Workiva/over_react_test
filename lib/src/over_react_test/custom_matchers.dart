@@ -370,6 +370,12 @@ class _LoggingFunctionMatcher extends CustomMatcher {
   }
 }
 
+/// A Matcher used to compare a list of logs against a provided matcher.
+///
+/// Takes in a specific `String` and passes as long as the actual list of logs
+/// contains the expected `String` at any index.
+///
+/// Related: [emitsLogs], [emitsNoLogs]
 Matcher emitsLog(String expected, {ConsoleConfiguration consoleConfig}) =>
     _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig);
 
@@ -403,7 +409,7 @@ Matcher emitsLog(String expected, {ConsoleConfiguration consoleConfig}) =>
 ///   expect(callbackFunction, emitsLogs(hasLength(1)));
 /// ```
 ///
-/// Related: [emitsNoLogs]
+/// Related: [emitsLog], [emitsNoLogs]
 Matcher emitsLogs(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
     _LoggingFunctionMatcher(expected, config: consoleConfig);
 
@@ -442,6 +448,14 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
   }
 }
 
+/// Matcher used to check for a specific `propType` warning being emitted during
+/// the runtime of a callback function.
+///
+/// Has the same underlying logic as [emitsLog], with the difference being that
+/// console configuration is set to `errorConfig` and non-propType related warnings
+/// are filtered out of the list.
+///
+/// Related: [emitsPropTypeWarnings], [emitsNoPropTypeWarnings], [emitsLog]
 _PropTypeLogMatcher emitsPropTypeWarning(String expected) =>
     _PropTypeLogMatcher(anyElement(contains(expected)));
 
@@ -452,11 +466,11 @@ _PropTypeLogMatcher emitsPropTypeWarning(String expected) =>
 /// console configuration is set to `errorConfig` and non-propType related warnings
 /// are filtered out of the list.
 ///
-/// Related: [emitsNoPropTypeWarnings], [emitsLogs]
+/// Related: [emitsPropTypeWarning], [emitsNoPropTypeWarnings], [emitsLogs]
 _PropTypeLogMatcher emitsPropTypeWarnings(dynamic expected) =>
     _PropTypeLogMatcher(expected);
 
 /// Matcher used enforce that there are no `propType` warnings.
 ///
-/// Related: [emitsPropTypeWarnings]
+/// Related: [emitsPropTypeWarning], [emitsPropTypeWarnings]
 final _PropTypeLogMatcher emitsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
