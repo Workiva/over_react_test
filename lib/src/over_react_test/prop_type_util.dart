@@ -22,7 +22,7 @@ import 'package:react/react_client/react_interop.dart';
 ///
 /// Can be used to capture logs, warnings, or errors as specified by setting
 /// the [configuration]. To set the [configuration], pass in the corresponding
-/// config class (logConfig, warnConfig, errorConfig, any).
+/// config class ([logConfig], [warnConfig], [errorConfig], [allConfig]).
 ///
 /// If any errors are thrown during the callback, e.g. during a render that expects
 /// props that are not valid, the errors will be caught to allow the test to complete.

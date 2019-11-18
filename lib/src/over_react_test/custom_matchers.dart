@@ -340,15 +340,13 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
   ));
 }
 
-/// A log matcher that captures logs and uses a provided matcher or string to compare
-/// against.
+/// A log matcher that captures logs and uses an expected matcher or `String` to compare
+/// against the actual `List` of logs.
 ///
 /// The primary use case of the matcher is to take in a callback as the actual,
 /// and pass it to [recordConsoleLogs] to run the function and record the resulting
 /// logs that are emitted during the function runtime.
 class _LoggingFunctionMatcher extends CustomMatcher {
-  /// [matcher] is tested against the list of recorded logs
-  // could make wrapMatcher be `contains` by default as well if desired
   _LoggingFunctionMatcher(dynamic matcher, {this.config, description, name})
       : super(description ?? 'emits the logs', name ?? 'logs', wrapMatcher(matcher));
 
@@ -370,7 +368,7 @@ class _LoggingFunctionMatcher extends CustomMatcher {
   }
 }
 
-/// A Matcher used to compare a list of logs against a provided matcher.
+/// A Matcher used to compare a list of logs against a provided `String`.
 ///
 /// Takes in a specific `String` and passes as long as the actual list of logs
 /// contains the expected `String` at any index.
@@ -383,22 +381,23 @@ Matcher emitsLog(String expected, {ConsoleConfiguration consoleConfig}) =>
 ///
 /// __Examples:__
 ///
-/// When passed a string, the matcher look for any log that contains that
-/// substring.
+/// To look for a specific `String` in any log index, the best solution is to use
+/// [emitsLog], but the behavior can be mimicked by passing in the correct `Iterable`
+/// matchers.
 /// ```dart
-///   expect(callbackFunction, emitsLogs('I expect this log'));
+///   expect(callbackFunction, emitsLogs(anyElement(contains('I expect this log'))));
 /// ```
 ///
-/// When passed a list, the matcher will do an equality check on the actual
-/// log List.
+/// When passed a `List`, the matcher will do an equality check on the actual
+/// log `List`.
 ///
 /// Alternatively, the `String` can be wrapped in a `contains` to check the
 /// if the comparable index contains that substring.
 /// ```dart
 ///   expect(callbackFunction, emitsLogs(['I expect this log', 'And this Log']));
 ///   expect(callbackFunction, emitsLogs([
-///     contains('I expect this log'),
-///     contains('And this Log'),
+///     contains('I expect'),
+///     contains('And this'),
 ///   ]));
 /// ```
 ///
@@ -421,7 +420,7 @@ final Matcher emitsNoLogs = _LoggingFunctionMatcher(isEmpty);
 /// The string used to identify a `propType` error.
 const _propTypeErrorMessage = 'Failed prop type';
 
-/// A matcher used to assert expected a `List` contains expected `propType`
+/// A matcher used to assert an actual `List` contains expected `propType`
 /// warnings.
 ///
 /// The actual value can be a callback function, which will result in the matcher
