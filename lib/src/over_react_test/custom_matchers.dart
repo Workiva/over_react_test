@@ -21,7 +21,7 @@ import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
-import './prop_type_util.dart';
+import './console_log_utils.dart';
 
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
