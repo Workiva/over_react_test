@@ -362,7 +362,7 @@ class _LoggingFunctionMatcher extends CustomMatcher {
       throw ArgumentError('The actual value must be a callback or a List.');
     }
 
-    logs = recordConsoleLogs(actual, config ?? logConfig);
+    logs = recordConsoleLogs(actual, configuration: config ?? logConfig);
 
     return logs;
   }
@@ -442,7 +442,7 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
       throw ArgumentError('The actual value must be a callback or a List.');
     }
 
-    var logs = actual is List ? actual : recordConsoleLogs(actual, errorConfig);
+    var logs = actual is List ? actual : recordConsoleLogs(actual, configuration: errorConfig);
     return logs.where((log) => _filter.matches(log, {})).toList();
   }
 }

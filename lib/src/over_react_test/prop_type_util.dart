@@ -24,30 +24,39 @@ import 'package:react/react_client/react_interop.dart';
 /// the [configuration]. To set the [configuration], pass in the corresponding
 /// config class ([logConfig], [warnConfig], [errorConfig], [allConfig]).
 ///
+/// By default, the function assumes that any `propType` warnings that occur during
+/// the function runtime should be captured. Consequently, the `PropType` cache
+/// is reset prior to calling the provided callback. If you wish to ignore the
+/// `propType` warnings that have occurred outside the scope of the callback,
+/// set [shouldResetPropTypesWarningCache] to `false`.
+///
 /// If any errors are thrown during the callback, e.g. during a render that expects
 /// props that are not valid, the errors will be caught to allow the test to complete.
 ///
 /// To handle asynchronous behavior, see [recordConsoleLogsAsync].
-List<String> recordConsoleLogs(Function() callback,
-    [ConsoleConfiguration configuration = allConfig]) {
+List<String> recordConsoleLogs(
+  Function() callback, {
+  ConsoleConfiguration configuration = allConfig,
+  bool shouldResetPropTypesWarningCache = true,
+}) {
   final consoleLogs = <String>[];
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
   Map<String, JsFunction> consoleRefs = {};
 
-  PropTypes.resetWarningCache();
+  if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 
   for (var config in logTypeToCapture) {
     consoleRefs[config] = context['console'][config];
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-          // NOTE: Using console.log or print within this function will cause an infinite
-          // loop when the logType is set to `log`.
-          consoleLogs.add(message);
-          consoleRefs[config]
-              .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-        });
+      // NOTE: Using console.log or print within this function will cause an infinite
+      // loop when the logType is set to `log`.
+      consoleLogs.add(message);
+      consoleRefs[config]
+          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+    });
   }
 
   try {
@@ -62,34 +71,39 @@ List<String> recordConsoleLogs(Function() callback,
     }
   }
 
-
   return consoleLogs;
 }
 
 /// Captures console logs created during the runtime of a provided asynchronous
 /// callback.
 ///
+/// The core logic and parameters are the same as those for [recordConsoleLogs],
+/// with the exception being the provided callback should be asynchronous.
+///
 /// Related: [recordConsoleLogs]
-FutureOr<List<String>> recordConsoleLogsAsync(Future Function() asyncCallback,
-    [ConsoleConfiguration configuration = errorConfig]) async {
+FutureOr<List<String>> recordConsoleLogsAsync(
+  Future Function() asyncCallback, {
+  ConsoleConfiguration configuration = allConfig,
+  bool shouldResetPropTypesWarningCache = true,
+}) async {
   var consoleLogs = <String>[];
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
   Map<String, JsFunction> consoleRefs = {};
 
-  PropTypes.resetWarningCache();
+  if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 
   for (var config in logTypeToCapture) {
     consoleRefs[config] = context['console'][config];
     context['console'][config] =
-      JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-          // NOTE: Using console.log or print within this function will cause an infinite
-          // loop when the logType is set to `log`.
-          consoleLogs.add(message);
-          consoleRefs[config]
-              .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-      });
+        JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
+      // NOTE: Using console.log or print within this function will cause an infinite
+      // loop when the logType is set to `log`.
+      consoleLogs.add(message);
+      consoleRefs[config]
+          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+    });
   }
 
   try {
@@ -105,6 +119,13 @@ FutureOr<List<String>> recordConsoleLogsAsync(Future Function() asyncCallback,
   }
 
   return consoleLogs;
+}
+
+/// Utility method that resets the `PropTypes` warning cache safely.
+void _resetPropTypeWarningCache() {
+  try {
+    PropTypes.resetWarningCache();
+  } catch(_){}
 }
 
 /// Configuration class that sets options within [recordConsoleLogs] and
