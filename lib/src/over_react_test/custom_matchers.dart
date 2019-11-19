@@ -373,11 +373,21 @@ class _LoggingFunctionMatcher extends CustomMatcher {
 /// Takes in a specific `String` and passes as long as the actual list of logs
 /// contains the expected `String` at any index.
 ///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored. If [consoleConfig] is set to
+/// `errorConfig`, the actual list of logs will include the error message from the
+/// caught error.
+///
 /// Related: [emitsLogs], [emitsNoLogs]
 Matcher emitsLog(String expected, {ConsoleConfiguration consoleConfig}) =>
     _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig);
 
 /// A Matcher used to compare a list of logs against a provided matcher.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored. If [consoleConfig] is set to
+/// `errorConfig`, the actual list of logs will include the error message from the
+/// caught error.
 ///
 /// __Examples:__
 ///
@@ -413,6 +423,9 @@ Matcher emitsLogs(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
     _LoggingFunctionMatcher(expected, config: consoleConfig);
 
 /// A matcher to verify that a callback function does not emit any logs.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored.
 ///
 /// Related: [emitsLogs]
 final Matcher emitsNoLogs = _LoggingFunctionMatcher(isEmpty);
@@ -454,6 +467,11 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
 /// console configuration is set to `errorConfig` and non-propType related warnings
 /// are filtered out of the list.
 ///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
+///
 /// Related: [emitsPropTypeWarnings], [emitsNoPropTypeWarnings], [emitsLog]
 _PropTypeLogMatcher emitsPropTypeWarning(String expected) =>
     _PropTypeLogMatcher(anyElement(contains(expected)));
@@ -465,11 +483,21 @@ _PropTypeLogMatcher emitsPropTypeWarning(String expected) =>
 /// console configuration is set to `errorConfig` and non-propType related warnings
 /// are filtered out of the list.
 ///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
+///
 /// Related: [emitsPropTypeWarning], [emitsNoPropTypeWarnings], [emitsLogs]
 _PropTypeLogMatcher emitsPropTypeWarnings(dynamic expected) =>
     _PropTypeLogMatcher(expected);
 
 /// Matcher used enforce that there are no `propType` warnings.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
 ///
 /// Related: [emitsPropTypeWarning], [emitsPropTypeWarnings]
 final _PropTypeLogMatcher emitsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
