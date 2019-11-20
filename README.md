@@ -20,23 +20,12 @@
     import 'package:over_react_test/over_react_test.dart';
     ```
 
-2. Add the `test/pub_serve` transformer to your `pubspec.yaml` _after_ the `over_react` transformer.
-
-    ```yaml
-    transformers:
-    - over_react
-    - test/pub_serve:
-        $include: test/**_test{.*,}.dart
-    - $dart2js
-    ```
-
-3. Use the [--pub-serve option](https://github.com/dart-lang/test#testing-with-barback) when running your tests:
+2. Run your tests:
 
     ```bash
-    $ pub run test --pub-serve=8081 test/your_test_file.dart
+    $ pub run test test/your_test_file.dart
     ```
 
-    > __Note:__ `8081` is the default port used, but your project may use something different. Be sure to take note of the output when running `pub serve` to ensure you are using the correct port.
 
 ## Naming Conventions
 
