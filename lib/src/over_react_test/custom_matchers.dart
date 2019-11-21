@@ -468,8 +468,8 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
 /// Matcher used to check for a specific `propType` warning being emitted during
 /// the runtime of a callback function.
 ///
-/// Has the same underlying logic as [hasLog], with the difference being that
-/// console configuration is set to `errorConfig` and non-propType related warnings
+/// Has the same underlying logic as [hasLog], with the difference being that the
+/// console configuration is set to `errorConfig` and non-`propType` related warnings
 /// are filtered out of the list.
 ///
 /// In the case the actual value is a callback that is run, any errors caused by
@@ -493,7 +493,7 @@ _PropTypeLogMatcher logsPropTypeWarning(String expected) =>
 /// is set to `errorConfig`, the actual list of logs will include the error
 /// message from the caught error.
 ///
-/// Related: [logsPropTypeWarnings], [logsNoPropTypeWarnings], [logsToConsole]
+/// Related: [logsPropTypeWarning], [logsNoPropTypeWarnings], [logsToConsole]
 _PropTypeLogMatcher logsPropTypeWarnings(dynamic expected) =>
     _PropTypeLogMatcher(expected);
 

@@ -457,7 +457,7 @@ main() {
           ];
         });
 
-        group('- emitsLog -', () {
+        group('- hasLog -', () {
           test('simple usage', () {
             shouldPass(logs, hasLog('pizza'));
           });
@@ -473,7 +473,7 @@ main() {
           });
         });
 
-        group('- emitsLogs -', () {
+        group('- logsToConsole -', () {
           test('when passed in a matcher instead of a String', () {
             shouldPass(logs, logsToConsole(anyElement(contains('nonsense'))));
           });
@@ -495,7 +495,7 @@ main() {
           });
         });
 
-        group('- emitsNoLogs -', () {
+        group('- hasNoLogs -', () {
           setUp(() {
             logs = [
               'random log',
@@ -518,7 +518,7 @@ main() {
 
       group('when passed a callback', () {
         group('that is synchronous', () {
-          group('- emitsLog -', () {
+          group('- hasLog -', () {
             test('simple usage', () {
               shouldPass(() => mount(Sample()()), hasLog('Logging a standard log'));
             });

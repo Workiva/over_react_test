@@ -48,7 +48,6 @@ class SampleComponent extends UiComponent2<SampleProps> {
             return PropError('shouldNeverBeNull should not be false');
           }
 
-
           return null;
         },
         keyForProp((p) => p.shouldAlwaysBeFalse): (props, info) {
