@@ -280,7 +280,7 @@ main() {
           ..shouldNeverBeNull = false)());
       }, configuration: errorConfig);
 
-      expect(logs, hasLength(2));
+      expect(logs, hasLength(3));
     });
 
     test('captures logs', () async {

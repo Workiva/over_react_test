@@ -37,14 +37,23 @@ class SampleComponent extends UiComponent2<SampleProps> {
   get propTypes => {
         keyForProp((p) => p.shouldNeverBeNull): (props, info) {
           if (props.shouldNeverBeNull == null) {
-            return PropError.required(info.propName);
+            return PropError.required(info.propName, 'shouldNeverBeNull is necessary');
           }
+
+          if (props.shouldLog == false && props.shouldAlwaysBeFalse == false) {
+            return PropError.combination('shoudLog', 'shouldAlwaysBeFalse', 'logging is required');
+          }
+
+          if (props.shouldNeverBeNull == false) {
+            return PropError('shouldNeverBeNull should not be false');
+          }
+
 
           return null;
         },
         keyForProp((p) => p.shouldAlwaysBeFalse): (props, info) {
           if (props.shouldAlwaysBeFalse) {
-            return PropError.value(props.shouldAlwaysBeFalse, info.propName);
+            return PropError.value(props.shouldAlwaysBeFalse, info.propName, 'shouldAlwaysBeFalse should never equal true.');
           }
 
           return null;
