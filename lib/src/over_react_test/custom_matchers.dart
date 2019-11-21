@@ -521,7 +521,7 @@ _PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running a provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
-_PropTypeLogMatcher logsRequiredPropError(String propName, [String message = '']) {
+_PropTypeLogMatcher logsPropRequiredError(String propName, [String message = '']) {
   return logsPropTypeWarning('RequiredPropError: Prop $propName is required. $message'.trim());
 }
 
@@ -530,7 +530,7 @@ _PropTypeLogMatcher logsRequiredPropError(String propName, [String message = '']
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running a provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
-_PropTypeLogMatcher logsValuePropError(dynamic invalidValue, String propName, [String message = '']) {
+_PropTypeLogMatcher logsPropValueError(dynamic invalidValue, String propName, [String message = '']) {
   return logsPropTypeWarning('InvalidPropValueError: Prop $propName set to $invalidValue. '
       '$message'.trim());
 }
@@ -540,7 +540,7 @@ _PropTypeLogMatcher logsValuePropError(dynamic invalidValue, String propName, [S
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running a provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
-_PropTypeLogMatcher logsCombinationPropError(String propName, String prop2Name, [String message = '']) {
+_PropTypeLogMatcher logsPropCombinationError(String propName, String prop2Name, [String message = '']) {
   return logsPropTypeWarning('InvalidPropCombinationError: Prop $propName and prop $prop2Name are set to '
       'incompatible values. $message'.trim());
 }

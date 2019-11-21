@@ -796,19 +796,31 @@ main() {
     });
 
     test('logsPropError', () {
-      expect(() => mount((Sample()..shouldNeverBeNull = false)()), logsPropError('shouldNeverBeNull', 'should not be false'));
+      expect(() => mount((Sample()..shouldNeverBeNull = false)()),
+          logsPropError('shouldNeverBeNull', 'should not be false'));
     });
 
     test('logsRequiredPropError', () {
-      expect(() => mount(Sample()()), logsRequiredPropError('SampleProps.shouldNeverBeNull', 'shouldNeverBeNull is necessary'));
+      expect(() => mount(Sample()()),
+          logsPropRequiredError('SampleProps.shouldNeverBeNull',
+              'shouldNeverBeNull is necessary'));
     });
 
     test('logsValuePropError', () {
-      expect(() => mount((Sample()..shouldNeverBeNull = true..shouldAlwaysBeFalse = true)()), logsValuePropError(true, 'SampleProps.shouldAlwaysBeFalse', 'shouldAlwaysBeFalse should never equal true.'));
+      expect(() => mount((Sample()
+            ..shouldNeverBeNull = true
+            ..shouldAlwaysBeFalse = true)()),
+          logsPropValueError(true, 'SampleProps.shouldAlwaysBeFalse',
+              'shouldAlwaysBeFalse should never equal true.'));
     });
 
     test('logsCombinationPropError', () {
-      expect(() => mount((Sample()..shouldNeverBeNull = false..shouldAlwaysBeFalse = false..shouldLog = false)()), logsCombinationPropError('shoudLog', 'shouldAlwaysBeFalse', 'logging is required'));
+      expect(() => mount((Sample()
+            ..shouldNeverBeNull = false
+            ..shouldAlwaysBeFalse = false
+            ..shouldLog = false)()),
+          logsPropCombinationError(
+              'shoudLog', 'shouldAlwaysBeFalse', 'logging is required'));
     });
   });
 }
