@@ -297,7 +297,7 @@ const Matcher isFocused = _IsFocused();
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
 ///
-/// __Deprecated.__ Use [logsPropError] in conjunction with `Component.propTypes` instead.
+/// __Deprecated.__ Use [logsPropError] in conjunction with `UiComponent2.propTypes` instead.
 @Deprecated('3.0.0')
 Matcher throwsPropError(String propName, [String message = '']) {
   return throwsA(anyOf(
@@ -311,7 +311,7 @@ Matcher throwsPropError(String propName, [String message = '']) {
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
 ///
-/// __Deprecated.__ Use [logsPropRequiredError] in conjunction with `Component.propTypes` instead.
+/// __Deprecated.__ Use [logsPropRequiredError] in conjunction with `UiComponent2.propTypes` instead.
 @Deprecated('3.0.0')
 Matcher throwsPropError_Required(String propName, [String message = '']) {
   return throwsA(anyOf(
@@ -325,7 +325,7 @@ Matcher throwsPropError_Required(String propName, [String message = '']) {
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
 ///
-/// __Deprecated.__ Use [logsPropValueError] in conjunction with `Component.propTypes` instead.
+/// __Deprecated.__ Use [logsPropValueError] in conjunction with `UiComponent2.propTypes` instead.
 @Deprecated('3.0.0')
 Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String message = '']) {
   return throwsA(anyOf(
@@ -341,7 +341,7 @@ Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String mes
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
 ///
-/// __Deprecated.__ Use [logsPropCombinationError] in conjunction with `Component.propTypes` instead.
+/// __Deprecated.__ Use [logsPropCombinationError] in conjunction with `UiComponent2.propTypes` instead.
 @Deprecated('3.0.0')
 Matcher throwsPropError_Combination(String propName, String prop2Name, [String message = '']) {
   return throwsA(anyOf(
