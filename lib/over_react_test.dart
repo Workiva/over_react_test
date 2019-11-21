@@ -13,6 +13,7 @@
 // limitations under the License.
 
 export 'src/over_react_test/common_component_util.dart';
+export 'src/over_react_test/console_log_utils.dart';
 export 'src/over_react_test/custom_matchers.dart';
 export 'src/over_react_test/dom_util.dart';
 export 'src/over_react_test/jacket.dart';

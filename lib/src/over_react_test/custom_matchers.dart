@@ -21,6 +21,8 @@ import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
+import './console_log_utils.dart';
+
 /// Match a list of class names on a component
 class ClassNameMatcher extends Matcher {
   ClassNameMatcher.expected(_expectedClasses, {this.allowExtraneous = true}) :
@@ -294,6 +296,9 @@ const Matcher isFocused = _IsFocused();
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
+///
+/// __Deprecated.__ Use [logsPropError] in conjunction with `UiComponent2.propTypes` instead.
+@Deprecated('3.0.0')
 Matcher throwsPropError(String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -305,6 +310,9 @@ Matcher throwsPropError(String propName, [String message = '']) {
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
+///
+/// __Deprecated.__ Use [logsPropRequiredError] in conjunction with `UiComponent2.propTypes` instead.
+@Deprecated('3.0.0')
 Matcher throwsPropError_Required(String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -316,6 +324,9 @@ Matcher throwsPropError_Required(String propName, [String message = '']) {
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
+///
+/// __Deprecated.__ Use [logsPropValueError] in conjunction with `UiComponent2.propTypes` instead.
+@Deprecated('3.0.0')
 Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -329,6 +340,9 @@ Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String mes
 ///
 /// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
+///
+/// __Deprecated.__ Use [logsPropCombinationError] in conjunction with `UiComponent2.propTypes` instead.
+@Deprecated('3.0.0')
 Matcher throwsPropError_Combination(String propName, String prop2Name, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -336,4 +350,209 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
           'incompatible values. $message'.trim()
       ))
   ));
+}
+
+/// A log matcher that captures logs and uses an expected matcher or `String` to compare
+/// against the actual `List` of logs.
+///
+/// The primary use case of the matcher is to take in a callback as the actual,
+/// and pass it to [recordConsoleLogs] to run the function and record the resulting
+/// logs that are emitted during the function runtime.
+class _LoggingFunctionMatcher extends CustomMatcher {
+  _LoggingFunctionMatcher(dynamic matcher, {this.config, description, name})
+      : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher));
+
+  final ConsoleConfiguration config;
+
+  static dynamic _wrapMatcherForSingleLog(dynamic expected) {
+    if (expected is Matcher || expected is List) return expected;
+    return contains(expected);
+  }
+
+  @override
+  featureValueOf(actual) {
+    var logs = <String>[];
+
+    if (actual is List) return actual;
+
+    if (actual is! Function()) {
+      throw ArgumentError('The actual value must be a callback or a List.');
+    }
+
+    logs = recordConsoleLogs(actual, configuration: config ?? logConfig);
+
+    return logs;
+  }
+}
+
+/// A Matcher used to compare a list of logs against a provided `String`.
+///
+/// Takes in a specific `String` and passes as long as the actual list of logs
+/// contains the expected `String` at any index.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored. If [consoleConfig] is set to
+/// `errorConfig`, the actual list of logs will include the error message from the
+/// caught error.
+///
+/// Related: [logsToConsole], [hasNoLogs]
+Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
+    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig);
+
+/// A Matcher used to compare a list of logs against a provided matcher.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored. If [consoleConfig] is set to
+/// `errorConfig`, the actual list of logs will include the error message from the
+/// caught error.
+///
+/// __Examples:__
+///
+/// To look for a specific `String` in any log index, the best solution is to use
+/// [hasLog], but the behavior can be mimicked by passing in the correct `Iterable`
+/// matchers.
+/// ```dart
+///   expect(callbackFunction, logsToConsole(anyElement(contains('I expect this log'))));
+/// ```
+///
+/// When passed a `List`, the matcher will do an equality check on the actual
+/// log `List`.
+///
+/// Alternatively, the `String` can be wrapped in a `contains` to check the
+/// if the comparable index contains that substring.
+/// ```dart
+///   expect(callbackFunction, logsToConsole(['I expect this log', 'And this Log']));
+///   expect(callbackFunction, logsToConsole([
+///     contains('I expect'),
+///     contains('And this'),
+///   ]));
+/// ```
+///
+/// All usual `Iterable` matchers can also be used.
+/// ```dart
+///   expect(callbackFunction, logsToConsole(containsAll(['I expect this log'])));
+///   expect(callbackFunction, logsToConsole(containsAllInOrder(['I expect this log'])));
+///   expect(callbackFunction, logsToConsole(hasLength(1)));
+/// ```
+///
+/// Related: [hasLog], [hasNoLogs]
+Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
+    _LoggingFunctionMatcher(expected, config: consoleConfig);
+
+/// A matcher to verify that a callback function does not emit any logs.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught and ignored.
+///
+/// Related: [logsToConsole]
+final Matcher hasNoLogs = _LoggingFunctionMatcher(isEmpty);
+
+/// The string used to identify a `propType` error.
+const _propTypeErrorPrefix = 'Failed prop type';
+
+/// A matcher used to assert an actual `List` contains expected `propType`
+/// warnings.
+///
+/// The actual value can be a callback function, which will result in the matcher
+/// asserting that the expected `propType` warnings appear during the runtime
+/// of the callback.
+///
+/// Related: [_LoggingFunctionMatcher]
+class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
+  _PropTypeLogMatcher(expected)
+      : super(expected,
+      description: 'emits the propType warning',
+      name: 'propType warning');
+
+  final _filter = contains(_propTypeErrorPrefix);
+
+  @override
+  featureValueOf(actual) {
+    if (actual is! Function() && actual is! List) {
+      throw ArgumentError('The actual value must be a callback or a List.');
+    }
+
+    var logs = actual is List ? actual : recordConsoleLogs(actual, configuration: errorConfig);
+    return logs.where((log) => _filter.matches(log, {})).toList();
+  }
+}
+
+/// Matcher used to check for a specific `propType` warning being emitted during
+/// the runtime of a callback function.
+///
+/// Has the same underlying logic as [hasLog], with the difference being that the
+/// console configuration is set to `errorConfig` and non-`propType` related warnings
+/// are filtered out of the list.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
+///
+/// Related: [logsPropTypeWarnings], [logsNoPropTypeWarnings], [hasLog]
+_PropTypeLogMatcher logsPropTypeWarning(String expected) =>
+    _PropTypeLogMatcher(anyElement(contains(expected)));
+
+/// Matcher used to check for specific `propType` warnings being emitted during
+/// the runtime of a callback function.
+///
+/// Has the same underlying logic as [logsToConsole], with the difference being that
+/// console configuration is set to `errorConfig` and non-propType related warnings
+/// are filtered out of the list.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
+///
+/// Related: [logsPropTypeWarning], [logsNoPropTypeWarnings], [logsToConsole]
+_PropTypeLogMatcher logsPropTypeWarnings(dynamic expected) =>
+    _PropTypeLogMatcher(expected);
+
+/// Matcher used enforce that there are no `propType` warnings.
+///
+/// In the case the actual value is a callback that is run, any errors caused by
+/// the callback will be caught. Because the console configuration
+/// is set to `errorConfig`, the actual list of logs will include the error
+/// message from the caught error.
+///
+/// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
+final _PropTypeLogMatcher logsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
+
+/// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
+///
+/// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
+/// of running a provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError] in the resulting logs.
+_PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
+  return logsPropTypeWarning('PropError: Prop $propName $message'.trim());
+}
+
+/// A matcher to verify that a [PropError].required is thrown with a provided `propName` and `message`.
+///
+/// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
+/// of running a provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError] in the resulting logs.
+_PropTypeLogMatcher logsPropRequiredError(String propName, [String message = '']) {
+  return logsPropTypeWarning('RequiredPropError: Prop $propName is required. $message'.trim());
+}
+
+/// A matcher to verify that a [PropError].value is thrown with a provided `invalidValue`, `propName`, and `message`.
+///
+/// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
+/// of running a provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError] in the resulting logs.
+_PropTypeLogMatcher logsPropValueError(dynamic invalidValue, String propName, [String message = '']) {
+  return logsPropTypeWarning('InvalidPropValueError: Prop $propName set to $invalidValue. '
+      '$message'.trim());
+}
+
+/// A matcher to verify that a [PropError] is thrown with a provided `propName`, `prop2Name`, and `message`.
+///
+/// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
+/// of running a provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError] in the resulting logs.
+_PropTypeLogMatcher logsPropCombinationError(String propName, String prop2Name, [String message = '']) {
+  return logsPropTypeWarning('InvalidPropCombinationError: Prop $propName and prop $prop2Name are set to '
+      'incompatible values. $message'.trim());
 }
