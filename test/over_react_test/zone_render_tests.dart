@@ -35,27 +35,27 @@ void sharedZoneRenderTests(Function renderFunction) {
           contains('threw TestFailure'));
     });
 
-    group('Errors thrown when unmounting fail tests', () {
+    group('Errors thrown when unmounting fails tests', () {
       // For this group, we need to test that an error is thrown during test
       // teardown. To do that, we rely on an error being thrown during unmount,
       // failing a test that should pass. The test also mutates variables outside
       // its local scope. We can then verify that those variables show that the
       // test had to be retried.
-      var unmountThrewError = false;
+      var shouldError = true;
       var tryCount = 0;
 
       group('when the unmount happens automatically', () {
         tearDownAll(() {
-          unmountThrewError = false;
+          shouldError = true;
           tryCount = 0;
         });
 
         test('', () {
-          if (unmountThrewError) {
+          if (!shouldError) {
             tryCount++;
             expect(true, isTrue);
           } else {
-            unmountThrewError = true;
+            shouldError = false;
             tryCount++;
             renderFunction((Sample()..shouldErrorInUnmount = true)());
             expect(true, isTrue);
@@ -64,7 +64,6 @@ void sharedZoneRenderTests(Function renderFunction) {
 
         test('verify a retry was needed to pass the last test', () {
           expect(tryCount, 2);
-          expect(unmountThrewError, isTrue);
         });
       });
 
@@ -80,16 +79,16 @@ void sharedZoneRenderTests(Function renderFunction) {
         });
 
         tearDownAll(() {
-          unmountThrewError = false;
+          shouldError = true;
           tryCount = 0;
         });
 
         test('', () {
-          if (unmountThrewError) {
+          if (!shouldError) {
             tryCount++;
             expect(true, isTrue);
           } else {
-            unmountThrewError = true;
+            shouldError = false;
             tryCount++;
             componentInstance =
                 renderFunction((Sample()..shouldErrorInUnmount = true)());
@@ -99,7 +98,6 @@ void sharedZoneRenderTests(Function renderFunction) {
 
         test('verify a retry was needed to pass the last test', () {
           expect(tryCount, 2);
-          expect(unmountThrewError, isTrue);
         });
       });
     });
