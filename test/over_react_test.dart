@@ -26,6 +26,7 @@ import 'over_react_test/dom_util_test.dart' as test_util_dom_util_test;
 import 'over_react_test/jacket_test.dart' as jacket_test;
 import 'over_react_test/react_util_test.dart' as react_util_test;
 import 'over_react_test/validation_util_test.dart' as validation_util_test;
+import 'over_react_test/zone_render_tests.dart' as zone_render_tests;
 
 main() {
   setClientConfiguration();
@@ -39,4 +40,5 @@ main() {
   jacket_test.main();
   react_util_test.main();
   validation_util_test.main();
+  zone_render_tests.main();
 }

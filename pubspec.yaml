@@ -20,6 +20,12 @@ dev_dependencies:
   dependency_validator: ^1.4.0
   pedantic: ^1.8.0
 
+dependency_overrides:
+  react:
+    git:
+      url: git@github.com:cleandart/react-dart.git
+      ref: CPLAT-8698-expose-componentZone
+
 transformers:
   - over_react
   - test/pub_serve:

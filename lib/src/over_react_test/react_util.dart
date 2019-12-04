@@ -15,6 +15,7 @@
 @JS()
 library over_react_test.react_util;
 
+import 'dart:async';
 import 'dart:collection';
 import 'dart:html';
 
@@ -58,10 +59,12 @@ export 'package:over_react/src/util/react_wrappers.dart';
   var renderedInstance;
   component = component is component_base.UiProps ? component.build() : component;
 
+  // ignore: invalid_use_of_visible_for_testing_member
+  currentComponentZone = Zone.current;
+
   if (container == null) {
     renderedInstance = react_test_utils.renderIntoDocument(component);
   } else {
-    // orcm_ignore
     renderedInstance = react_dom.render(component, container);
   }
 
@@ -153,6 +156,9 @@ List<Element> _attachedReactContainers = [];
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
+  // ignore: invalid_use_of_visible_for_testing_member
+  currentComponentZone = Zone.current;
+
   document.body.append(container);
 
   if (autoTearDown) {
@@ -165,7 +171,6 @@ List<Element> _attachedReactContainers = [];
     _attachedReactContainers.add(container);
   }
 
-  // orcm_ignore
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
