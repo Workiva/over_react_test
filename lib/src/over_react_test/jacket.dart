@@ -21,7 +21,7 @@ import 'package:react/react_test_utils.dart' as react_test_utils;
 
 import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 
-import '../../over_react_test.dart';
+import './zone_util.dart';
 
 // Notes
 // ---------------------------------------------------------------------------

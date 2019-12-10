@@ -51,7 +51,6 @@ void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) r
         test('', () {
           if (!shouldError) {
             tryCount++;
-            expect(true, isTrue);
           } else {
             shouldError = false;
             tryCount++;
@@ -76,13 +75,11 @@ void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) r
           test('', () {
             if (!shouldError) {
               tryCount++;
-              expect(true, isTrue);
             } else {
               shouldError = false;
               tryCount++;
               componentInstance =
                   renderFunction((Sample()..shouldErrorInUnmount = true)(), autoTearDown: false);
-              expect(true, isTrue);
             }
 
             componentInstance is TestJacket
@@ -110,13 +107,11 @@ void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) r
           test('', () {
             if (!shouldError) {
               tryCount++;
-              expect(true, isTrue);
             } else {
               shouldError = false;
               tryCount++;
               componentInstance =
                   renderFunction((Sample()..shouldErrorInUnmount = true)(), autoTearDown: false);
-              expect(true, isTrue);
             }
           }, retry: 2);
 
