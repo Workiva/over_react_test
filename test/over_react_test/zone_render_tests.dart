@@ -1,4 +1,5 @@
 import 'package:over_react_test/over_react_test.dart';
+import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
 
 import 'custom_matchers_test.dart';
@@ -6,22 +7,19 @@ import 'helper_components/sample_component.dart';
 
 main() {
   group('TestJacket mount', () {
-    sharedZoneRenderTests((component, {autoTeardown = true}) =>
-        mount(component, autoTearDown: autoTeardown));
+    sharedZoneRenderTests(mount);
   });
 
   group('render', () {
-    sharedZoneRenderTests((component, {autoTeardown = true}) =>
-        render(component, autoTearDown: autoTeardown));
+    sharedZoneRenderTests(render);
   });
 
   group('renderAttachedToDocument', () {
-    sharedZoneRenderTests((component, {autoTeardown = true}) =>
-        renderAttachedToDocument(component, autoTearDown: autoTeardown));
+    sharedZoneRenderTests(renderAttachedToDocument);
   });
 }
 
-void sharedZoneRenderTests(Function renderFunction) {
+void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) renderFunction) {
   group('sharedZoneRenderTests:', () {
     test('Failing expects work in Component2 lifecycle methods', () {
       void testCallback() {
@@ -58,7 +56,6 @@ void sharedZoneRenderTests(Function renderFunction) {
             shouldError = false;
             tryCount++;
             renderFunction((Sample()..shouldErrorInUnmount = true)());
-            expect(true, isTrue);
           }
         }, retry: 2);
 
@@ -70,34 +67,62 @@ void sharedZoneRenderTests(Function renderFunction) {
       group('when the unmount happens explicitly', () {
         dynamic componentInstance;
 
-        tearDown(() {
-          try {
-            if (componentInstance != null) componentInstance.unmount();
-          } on NoSuchMethodError {
-            unmount(componentInstance);
-          }
+        group('in the test', () {
+          tearDownAll(() {
+            shouldError = true;
+            tryCount = 0;
+          });
+
+          test('', () {
+            if (!shouldError) {
+              tryCount++;
+              expect(true, isTrue);
+            } else {
+              shouldError = false;
+              tryCount++;
+              componentInstance =
+                  renderFunction((Sample()..shouldErrorInUnmount = true)(), autoTearDown: false);
+              expect(true, isTrue);
+            }
+
+            componentInstance is TestJacket
+                ? componentInstance.unmount()
+                : unmount(componentInstance);
+          }, retry: 2);
+
+          test('verify a retry was needed to pass the last test', () {
+            expect(tryCount, 2);
+          });
         });
 
-        tearDownAll(() {
-          shouldError = true;
-          tryCount = 0;
-        });
+        group('in a tear down', () {
+          tearDown(() {
+            componentInstance is TestJacket
+                ? componentInstance.unmount()
+                : unmount(componentInstance);
+          });
 
-        test('', () {
-          if (!shouldError) {
-            tryCount++;
-            expect(true, isTrue);
-          } else {
-            shouldError = false;
-            tryCount++;
-            componentInstance =
-                renderFunction((Sample()..shouldErrorInUnmount = true)());
-            expect(true, isTrue);
-          }
-        }, retry: 2);
+          tearDownAll(() {
+            shouldError = true;
+            tryCount = 0;
+          });
 
-        test('verify a retry was needed to pass the last test', () {
-          expect(tryCount, 2);
+          test('', () {
+            if (!shouldError) {
+              tryCount++;
+              expect(true, isTrue);
+            } else {
+              shouldError = false;
+              tryCount++;
+              componentInstance =
+                  renderFunction((Sample()..shouldErrorInUnmount = true)(), autoTearDown: false);
+              expect(true, isTrue);
+            }
+          }, retry: 2);
+
+          test('verify a retry was needed to pass the last test', () {
+            expect(tryCount, 2);
+          });
         });
       });
     });

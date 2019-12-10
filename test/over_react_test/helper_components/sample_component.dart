@@ -71,7 +71,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
   componentDidMount() {
     window.console.warn('Just a lil warning');
     if (props.shouldErrorInMount) throw Error();
-    if (props.componentDidMountCallback != null) props.componentDidMountCallback();
+    props.componentDidMountCallback?.call();
   }
 
   @override

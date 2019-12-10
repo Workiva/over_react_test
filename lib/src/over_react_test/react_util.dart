@@ -15,7 +15,6 @@
 @JS()
 library over_react_test.react_util;
 
-import 'dart:async';
 import 'dart:collection';
 import 'dart:html';
 
@@ -29,6 +28,8 @@ import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
+
+import '../../over_react_test.dart';
 
 export 'package:over_react/src/util/react_wrappers.dart';
 
@@ -59,8 +60,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
   var renderedInstance;
   component = component is component_base.UiProps ? component.build() : component;
 
-  // ignore: invalid_use_of_visible_for_testing_member
-  currentComponentZone = Zone.current;
+  setComponentZone();
 
   if (container == null) {
     renderedInstance = react_test_utils.renderIntoDocument(component);
@@ -156,8 +156,7 @@ List<Element> _attachedReactContainers = [];
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
-  // ignore: invalid_use_of_visible_for_testing_member
-  currentComponentZone = Zone.current;
+  setComponentZone();
 
   document.body.append(container);
 

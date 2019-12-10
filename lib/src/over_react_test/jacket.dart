@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:async';
 import 'dart:html';
 
 import 'package:over_react/over_react.dart' as over_react;
 import 'package:react/react.dart' as react;
-import 'package:react/react_client.dart';
 import 'package:react/react_client/react_interop.dart' show ReactComponent;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 
 import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
+
+import '../../over_react_test.dart';
 
 // Notes
 // ---------------------------------------------------------------------------
@@ -74,8 +74,8 @@ class TestJacket<T extends react.Component> {
   bool _isMounted = false;
 
   void _render(over_react.ReactElement reactElement) {
-    // ignore: invalid_use_of_visible_for_testing_member
-    currentComponentZone = Zone.current;
+    setComponentZone();
+
     _isMounted = true;
     _renderedInstance = attachedToDocument
         ? react_util.renderAttachedToDocument(reactElement,

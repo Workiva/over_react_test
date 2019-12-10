@@ -14,6 +14,7 @@
 
 import 'dart:async';
 
+import 'package:react/react_client.dart';
 import 'package:test/test.dart';
 
 Zone _zone;
@@ -43,4 +44,12 @@ void zonedExpect(actual, matcher, {String reason}) {
   return _zone.run(() {
     expect(actual, matcher, reason: reason);
   });
+}
+
+/// Sets the zone that React components are run in.
+///
+/// By default, tests and React run in differing zones. This can be used to force
+/// tests and components to be run in the same zone.
+void setComponentZone([Zone zone]) {
+  componentZone = zone ?? Zone.current;
 }
