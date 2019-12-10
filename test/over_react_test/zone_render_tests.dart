@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:over_react_test/over_react_test.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
@@ -21,6 +23,10 @@ main() {
 
 void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) renderFunction) {
   group('sharedZoneRenderTests:', () {
+    setUp(() {
+      setComponentZone(Zone.root);
+    });
+
     test('Failing expects work in Component2 lifecycle methods', () {
       void testCallback() {
         expect(true, isFalse);
