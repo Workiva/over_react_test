@@ -18,6 +18,8 @@ import 'package:over_react/over_react.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
+import 'helper_components/sample_function_component.dart';
+
 // ignore: uri_has_not_been_generated
 part 'jacket_test.over_react.g.dart';
 
@@ -167,7 +169,7 @@ main() {
     });
   });
 
-  group('TestJacket:', () {
+  group('TestJacket: composite component:', () {
     TestJacket<SampleComponent> jacket;
 
     setUp(() {
@@ -203,6 +205,106 @@ main() {
       jacket.setState(jacket.getDartInstance().newState()..bar = true);
 
       expect(jacket.getDartInstance().state.bar, isTrue);
+    });
+
+    test('unmount', () {
+      expect(jacket.isMounted, isTrue);
+
+      jacket.unmount();
+
+      expect(jacket.isMounted, isFalse);
+    });
+  });
+
+  group('TestJacket: DOM component:', () {
+    Element mountNode;
+    TestJacket jacket;
+
+    setUp(() {
+      mountNode = DivElement();
+      jacket = mount(Dom.span()(),
+        mountNode: mountNode,
+        attachedToDocument: true
+      );
+
+      expect(mountNode.children.single, isA<SpanElement>());
+    });
+
+    tearDown(() {
+      mountNode.remove();
+      mountNode = null;
+    });
+
+    test('rerender', () {
+      jacket.rerender((Dom.span()..id = 'foo')());
+
+      expect(mountNode.children.single.id, 'foo');
+    });
+
+    test('getProps throws a StateError', () {
+      expect(() => jacket.getProps(), throwsStateError);
+    });
+
+    test('getNode', () {
+      expect(jacket.getNode(), mountNode.children.single);
+    });
+
+    test('getDartInstance returns null', () {
+      expect(jacket.getDartInstance(), isNull);
+    });
+
+    test('setState throws a StateError', () {
+      expect(() => jacket.setState({}), throwsStateError);
+    });
+
+    test('unmount', () {
+      expect(jacket.isMounted, isTrue);
+
+      jacket.unmount();
+
+      expect(jacket.isMounted, isFalse);
+    });
+  });
+
+  group('TestJacket: function component:', () {
+    Element mountNode;
+    TestJacket jacket;
+
+    setUp(() {
+      mountNode = DivElement();
+      jacket = mount(testFunctionComponent({'id': 'foo'}),
+        mountNode: mountNode,
+        attachedToDocument: true
+      );
+
+      expect(mountNode.children.single.id, 'foo');
+    });
+
+    tearDown(() {
+      mountNode.remove();
+      mountNode = null;
+    });
+
+    test('rerender', () {
+      jacket.rerender(testFunctionComponent({'id': 'bar'}));
+
+      expect(mountNode.children.single.id, 'bar');
+    });
+
+    test('getProps throws a StateError', () {
+      expect(() => jacket.getProps(), throwsStateError);
+    });
+
+    test('getNode throws a StateError', () {
+      expect(() => jacket.getNode(), throwsStateError);
+    });
+
+    test('getDartInstance throws a StateError', () {
+      expect(() => jacket.getDartInstance(), throwsStateError);
+    });
+
+    test('setState throws a StateError', () {
+      expect(() => jacket.setState({}), throwsStateError);
     });
 
     test('unmount', () {
