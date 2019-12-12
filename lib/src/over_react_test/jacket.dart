@@ -71,6 +71,9 @@ class TestJacket<T extends react.Component> {
   final bool autoTearDown;
   bool _isMounted = false;
 
+  bool get _isCompositeComponent => react_test_utils.isCompositeComponent(_renderedInstance);
+  bool get _isDomComponent => react_test_utils.isDOMComponent(_renderedInstance);
+
   void _render(over_react.ReactElement reactElement) {
     _isMounted = true;
     _renderedInstance = attachedToDocument
@@ -89,28 +92,90 @@ class TestJacket<T extends react.Component> {
     _render(reactElement);
   }
 
-  /// Returns the mounted React component instance.
+  /// Returns the mounted React composite component instance.
+  ///
+  /// > If you are rendering a function component using [mount], calling [getInstance] will throw a `StateError`.
+  /// >
+  /// > * If you are trying to access an instance rendered by the function component:
+  /// >   * Use `forwardRef` to pass refs through the tree.
+  /// > * If you are trying to access / query for a DOM node rendered by the function component, try using:
+  /// >
+  /// >   ```
+  /// >   queryByTestId(jacket.mountNode, yourTestId)
+  /// >   ```
   ReactComponent getInstance() {
-    if (!react_test_utils.isCompositeComponent(_renderedInstance)) {
-      throw UnsupportedError('Not a composite component');
+    // [1] Adding an additional check for dom components here because the current behavior when `_renderedInstance` is
+    //     a DOM component (Element) - does not throw. The cast to `ReactComponent` - while not "sound", is harmless
+    //     since it is an anonymous JS interop class - not a Dart type.
+    if (!_isCompositeComponent && /*[1]*/!_isDomComponent) {
+      throw StateError(
+          'getInstance() is only supported when the rendered object is a composite (class based) component. '
+          'If you are rendering a function component, and are trying to:\n\n'
+          '1. Access an instance rendered by the function component: use `forwardRef` to pass refs through the tree.\n'
+          '2. Access / query for a DOM node rendered by the function component: try using\n'
+          '    queryByTestId(jacket.mountNode, yourTestId)');
     }
 
     return _renderedInstance as ReactComponent;
   }
 
-  /// Returns the props associated with the mounted React component instance.
+  /// Returns the props associated with the mounted React composite component instance.
+  ///
+  /// > If you are rendering a function or DOM component using [mount], calling [getProps] will throw a `StateError`.
+  /// >
+  /// > See [getInstance] for more information about this limitation.
   Map getProps() {
+    if (!_isCompositeComponent) {
+      throw StateError(
+          'getProps() is only supported when the rendered object is a composite (class based) component.');
+    }
+
     return over_react.getProps(getInstance());
   }
 
-  /// Returns the DOM node associated with the mounted React component instance.
+  /// Returns the DOM node associated with the mounted React composite / DOM component instance.
+  ///
+  /// > If you are rendering a function component using [mount], calling [getNode] will throw a `StateError`.
+  /// >
+  /// > Try using one of the following instead:
+  /// >
+  /// > ```
+  /// > jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode);
+  /// > ```
+  /// >
+  /// > ```
+  /// > queryByTestId(jacket.mountNode, yourRootNodeTestId);
+  /// > ```
   Element getNode() {
+    if (!_isCompositeComponent && !_isDomComponent) {
+      throw StateError(
+          'getNode() is only supported when the rendered object is a DOM or composite (class based) component. '
+          'If you are rendering a function component, try using \n'
+          '    jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode) \n'
+          '    // or'
+          '    queryByTestId(jacket.mountNode, yourRootNodeTestId)');
+    }
+
     return over_react.findDomNode(_renderedInstance);
   }
 
-  /// Returns the native Dart component associated with the mounted React component instance, or null if the component
-  /// is not Dart based.
+  /// Returns the native Dart component associated with the mounted React composite component instance,
+  /// or null if the component is not Dart based.
+  ///
+  /// > If you are rendering a function component using [mount], calling [getDartInstance] will throw a `StateError`.
+  /// >
+  /// > See [getInstance] for more information about this limitation.
   T getDartInstance() {
+    // [1] Adding an additional check for dom components here because the current behavior when `_renderedInstance` is
+    //     a DOM component (Element) - is to return `null`. While that will most likely cause null exceptions once the
+    //     consumer attempts to make a call on the "Dart instance" they have requested - we don't want this change
+    //     to cause new exceptions in a scenario where the consumer was storing a null value and then simply
+    //     not using it in their test.
+    if (!_isCompositeComponent && /*[1]*/!_isDomComponent) {
+      throw StateError(
+          'getDartInstance() is only supported when the rendered object is a composite (class based) component.');
+    }
+
     return over_react.getDartComponent(_renderedInstance) as T;
   }
 
@@ -124,7 +189,16 @@ class TestJacket<T extends react.Component> {
   /// Also allows [newState] to be used as a transactional `setState` callback.
   ///
   /// See: <https://facebook.github.io/react/docs/react-component.html#setstate>
+  ///
+  /// > If you are rendering a function or DOM component using [mount], calling [setState] will throw a `StateError`.
+  /// >
+  /// > See [getInstance] for more information about this limitation.
   void setState(newState, [callback()]) {
+    if (!_isCompositeComponent) {
+      throw StateError(
+          'setState() is only supported when the rendered object is a composite (class based) component.');
+    }
+
     getDartInstance().setState(newState, callback);
   }
 
