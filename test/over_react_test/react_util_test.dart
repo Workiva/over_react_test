@@ -20,7 +20,8 @@ import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_test_utils.dart' as rtu;
 import 'package:test/test.dart';
 
-import './utils/nested_component.dart';
+import 'helper_components/sample_function_component.dart';
+import 'utils/nested_component.dart';
 
 // ignore: uri_has_not_been_generated
 part 'react_util_test.over_react.g.dart';
@@ -90,6 +91,34 @@ main() {
       );
 
       expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+    });
+
+    group('renderAndGetDom', () {
+      test('renders and returns the root node of a composite component', () {
+        expect(renderAndGetDom(Test()()), isA<Element>());
+      });
+
+      test('renders and returns a Dom component node', () {
+        expect(renderAndGetDom(Dom.div()()), isA<Element>());
+      });
+
+      test('throws a StateError if the provided component is a function component', () {
+        expect(() => renderAndGetDom(testFunctionComponent({})), throwsStateError);
+      });
+    });
+
+    group('renderAndGetComponent', () {
+      test('renders and returns a Dart component instance when a composite component is provided', () {
+        expect(renderAndGetComponent(Test()()), isA<TestComponent>());
+      });
+
+      test('renders and returns null when a DOM component is provided', () {
+        expect(renderAndGetComponent(Dom.div()()), isNull);
+      });
+
+      test('throws a StateError if the provided component is a function component', () {
+        expect(() => renderAndGetComponent(testFunctionComponent({})), throwsStateError);
+      });
     });
 
     group('click', () {

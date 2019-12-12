@@ -132,14 +132,43 @@ void unmount(dynamic instanceOrContainerNode) {
 ///
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false.
+///
+/// > If [component] is a function component, calling [renderAndGetDom] will throw a `StateError`.
+/// >
+/// > See `TestJacket.getNode` for more information about this limitation.
 Element renderAndGetDom(dynamic component, {bool autoTearDown = true, Callback autoTearDownCallback}) {
-  return findDomNode(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
+  final renderedInstance = render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback);
+
+  if (!react_test_utils.isCompositeComponent(renderedInstance) && !react_test_utils.isDOMComponent(renderedInstance)) {
+    throw StateError(
+      'renderAndGetDom() is only supported when the rendered object is a DOM or composite (class based) component.');
+  }
+
+  return findDomNode(renderedInstance);
 }
 
-/// Renders a React component or builder into a detached node and returns the associtated Dart component.
+/// Renders a React component or builder into a detached node and returns the associated Dart component.
+///
+/// > If [component] is a function component, calling [renderAndGetComponent] will throw a `StateError`.
+/// >
+/// > See `TestJacket.getInstance` for more information about this limitation.
 react.Component renderAndGetComponent(dynamic component,
-        {bool autoTearDown = true, Callback autoTearDownCallback}) =>
-    getDartComponent(render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback));
+        {bool autoTearDown = true, Callback autoTearDownCallback}) {
+  final renderedInstance = render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback);
+
+  // [1] Adding an additional check for dom components here because the current behavior when `renderedInstance` is
+  //     a DOM component (Element) - is to return `null`. While that will most likely cause null exceptions once the
+  //     consumer attempts to make a call on the "Dart instance" they have requested - we don't want this change
+  //     to cause new exceptions in a scenario where the consumer was storing a null value and then simply
+  //     not using it in their test.
+  if (!react_test_utils.isCompositeComponent(renderedInstance) &&
+      /*[1]*/!react_test_utils.isDOMComponent(renderedInstance)) {
+    throw StateError(
+      'renderAndGetComponent() is only supported when the rendered object is a composite (class based) component.');
+  }
+
+  return getDartComponent(renderedInstance);
+}
 
 /// List of elements attached to the DOM and used as mount points in previous calls to [renderAttachedToDocument].
 List<Element> _attachedReactContainers = [];
@@ -242,7 +271,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// This method works for:
 ///
-/// * `ReactComponent` render trees (output of [render])
+/// * `ReactComponent` (composite component) render trees (output of [render])
 /// * [ReactElement] trees (output of [renderShallow]/`Component.render`)
 ///
 /// __Example:__
