@@ -121,7 +121,7 @@ class TestJacket<T extends react.Component> {
 
   /// Returns the props associated with the mounted React composite component instance.
   ///
-  /// > If you are rendering a function component using [mount], calling [getProps] will throw a `StateError`.
+  /// > If you are rendering a function or DOM component using [mount], calling [getProps] will throw a `StateError`.
   /// >
   /// > See [getInstance] for more information about this limitation.
   Map getProps() {
@@ -190,7 +190,7 @@ class TestJacket<T extends react.Component> {
   ///
   /// See: <https://facebook.github.io/react/docs/react-component.html#setstate>
   ///
-  /// > If you are rendering a function component using [mount], calling [setState] will throw a `StateError`.
+  /// > If you are rendering a function or DOM component using [mount], calling [setState] will throw a `StateError`.
   /// >
   /// > See [getInstance] for more information about this limitation.
   void setState(newState, [callback()]) {
