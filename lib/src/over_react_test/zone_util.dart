@@ -50,6 +50,29 @@ void zonedExpect(actual, matcher, {String reason}) {
 ///
 /// By default, tests and React run in differing zones. This can be used to force
 /// tests and components to be run in the same zone.
+///
+/// __NOTE:__ This is not needed when using `render` (or any function that
+/// utilizes it) or `mount` because it is built in to those utilities.
+///
+/// __EXAMPLE:__
+///
+///     test('test that requires zones to be the same', () {
+///       // Reset the zone back to the default after the test is run.
+///       addTearDown(() => setComponentZone(Zone.root));
+///
+///       void shouldFailTest() => expect(true, isFalse);
+///       void shouldPassTest() => expect(true, isTrue);
+///
+///       renderIntoDocument((
+///           TestComponent()..onComponentDidMount = shouldFailTest)()); // Throws bad state error
+///
+///       setComponentZone();
+///
+///       renderIntoDocument((
+///           TestComponent()..onComponentDidMount = shouldFailTest)()); // Fails
+///       renderIntoDocument((
+///           TestComponent()..onComponentDidMount = shouldPassTest)()); // Passes
+///     });
 void setComponentZone([Zone zone]) {
   componentZone = zone ?? Zone.current;
 }

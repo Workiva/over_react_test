@@ -25,7 +25,7 @@ class _$SampleProps extends UiProps {
 
   bool addExtraLogAndWarn;
 
-  Function() componentDidMountCallback;
+  Function() onComponentDidMount;
 
   bool shouldLog;
 }
@@ -71,7 +71,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
   componentDidMount() {
     window.console.warn('Just a lil warning');
     if (props.shouldErrorInMount) throw Error();
-    props.componentDidMountCallback?.call();
+    props.onComponentDidMount?.call();
   }
 
   @override

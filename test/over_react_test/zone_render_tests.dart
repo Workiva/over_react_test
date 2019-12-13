@@ -27,14 +27,16 @@ void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) r
       setComponentZone(Zone.root);
     });
 
-    test('Failing expects work in Component2 lifecycle methods', () {
+    test(
+        'Component lifecycle methods can call `expect` statements passed in within a callback',
+        () {
       void testCallback() {
         expect(true, isFalse);
       }
 
       shouldFail(
           () => renderFunction(
-              (Sample()..componentDidMountCallback = testCallback)()),
+              (Sample()..onComponentDidMount = testCallback)()),
           returnsNormally,
           contains('threw TestFailure'));
     });
