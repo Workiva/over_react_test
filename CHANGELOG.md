@@ -1,6 +1,34 @@
 # OverReact Test Changelog
 
-## 2.0.0
+## 2.7.0
+* Add propTypes testing utilities
+
+## 2.6.0
+* Drop support for React 15 
+* Support Component2 in commonComponentTests
+
+## 2.5.2
+* Add support for React 16 (raise upper bound of `react` to allow 5.x, `over_react` to allow 3.x)
+* Fix documentation link
+
+## 2.5.1
+* Accommodate findAllInRenderedTree being passed text nodes in React 16
+
+## 2.5.0
+* Update references to old JS interop helpers
+* Update contributing docs
+
+## 2.4.1
+* Work around a bug in DDC where SvgElement className isn't String
+
+## 2.3.0
+* Widen over_react range to allow 2.0.0
+
+## 2.2.0
+* Update component boilerplate in preparation for over_react 2.0.0
+
+## 2.1.0
+* Update component boilerplate in preparation for over_react 2.0.0
 
 __New Features__
 
