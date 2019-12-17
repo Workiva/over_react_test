@@ -172,7 +172,7 @@ main() {
 
     test('handles errors as expected when mounting', () {
       var logs = recordConsoleLogs(
-          () => mount((Sample()..shouldError = true)()),
+          () => mount((Sample()..shouldErrorInRender = true)()),
           configuration: errorConfig);
 
       expect(logs, hasLength(2));
@@ -233,7 +233,7 @@ main() {
         mount(
             (Sample()
               ..shouldAlwaysBeFalse = true
-              ..shouldError = true)(),
+              ..shouldErrorInRender = true)(),
             attachedToDocument: true);
       }, configuration: errorConfig);
 
@@ -248,7 +248,7 @@ main() {
         await Future.delayed(Duration(milliseconds: 5));
 
         jacket.rerender((Sample()
-          ..shouldError = true
+          ..shouldErrorInRender = true
           ..shouldAlwaysBeFalse = true)());
       }, configuration: errorConfig);
 

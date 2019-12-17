@@ -21,6 +21,8 @@ import 'package:react/react_test_utils.dart' as react_test_utils;
 
 import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 
+import './zone_util.dart';
+
 // Notes
 // ---------------------------------------------------------------------------
 //
@@ -75,6 +77,8 @@ class TestJacket<T extends react.Component> {
   bool get _isDomComponent => react_test_utils.isDOMComponent(_renderedInstance);
 
   void _render(over_react.ReactElement reactElement) {
+    setComponentZone();
+
     _isMounted = true;
     _renderedInstance = attachedToDocument
         ? react_util.renderAttachedToDocument(reactElement,

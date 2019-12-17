@@ -17,9 +17,15 @@ class _$SampleProps extends UiProps {
 
   bool shouldAlwaysBeFalse;
 
-  bool shouldError;
+  bool shouldErrorInRender;
+
+  bool shouldErrorInMount;
+
+  bool shouldErrorInUnmount;
 
   bool addExtraLogAndWarn;
+
+  Function() onComponentDidMount;
 
   bool shouldLog;
 }
@@ -29,7 +35,9 @@ class SampleComponent extends UiComponent2<SampleProps> {
   @override
   Map get defaultProps => (newProps()
     ..shouldAlwaysBeFalse = false
-    ..shouldError = false
+    ..shouldErrorInRender = false
+    ..shouldErrorInMount = false
+    ..shouldErrorInUnmount = false
     ..addExtraLogAndWarn = false
     ..shouldLog = true);
 
@@ -62,12 +70,14 @@ class SampleComponent extends UiComponent2<SampleProps> {
   @override
   componentDidMount() {
     window.console.warn('Just a lil warning');
+    if (props.shouldErrorInMount) throw Error();
+    props.onComponentDidMount?.call();
   }
 
   @override
   render() {
     window.console.warn('A second warning');
-    if (props.shouldError) {
+    if (props.shouldErrorInRender) {
       throw Error();
     } else {
       if (props.addExtraLogAndWarn) {
@@ -88,6 +98,13 @@ class SampleComponent extends UiComponent2<SampleProps> {
   void _handleOnClick(_) {
     window.console.log('Clicking');
     window.console.warn('I have been clicked');
+  }
+
+  @override
+  void componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (props.shouldErrorInUnmount) throw Error();
   }
 }
 

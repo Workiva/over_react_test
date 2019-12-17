@@ -29,6 +29,8 @@ import 'package:react/react_client/js_interop_helpers.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
+import '../../over_react_test.dart';
+
 export 'package:over_react/src/util/react_wrappers.dart';
 
 // Notes
@@ -58,10 +60,11 @@ export 'package:over_react/src/util/react_wrappers.dart';
   var renderedInstance;
   component = component is component_base.UiProps ? component.build() : component;
 
+  setComponentZone();
+
   if (container == null) {
     renderedInstance = react_test_utils.renderIntoDocument(component);
   } else {
-    // orcm_ignore
     renderedInstance = react_dom.render(component, container);
   }
 
@@ -182,6 +185,8 @@ List<Element> _attachedReactContainers = [];
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
+  setComponentZone();
+
   document.body.append(container);
 
   if (autoTearDown) {
@@ -194,7 +199,6 @@ List<Element> _attachedReactContainers = [];
     _attachedReactContainers.add(container);
   }
 
-  // orcm_ignore
   return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
 }
 
