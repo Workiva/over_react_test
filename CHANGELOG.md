@@ -1,5 +1,9 @@
 # OverReact Test Changelog
 
+## 2.8.0
+* Update mount, render, and renderAttachedToDocument to automatically run component lifecycle in the same zone as the test.
+    * This fixes some `print` statements from being swallowed and some failing `expect`s from not failing tests properly
+
 ## 2.7.0
 * Add propTypes testing utilities
 
