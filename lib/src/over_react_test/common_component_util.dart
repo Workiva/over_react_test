@@ -79,10 +79,12 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestClassNameOverrides = true,
   bool ignoreDomProps = true,
   bool shouldTestRequiredProps = true,
+  @Deprecated('This flag is not needed as the test will auto detect the version')
   bool isComponent2 = false,
   dynamic childrenFactory()
 }) {
   childrenFactory ??= _defaultChildrenFactory;
+  isComponent2 = ReactDartComponentVersion.fromType((factory()()).type) == '2' || isComponent2;
 
   Iterable flatten(Iterable iterable) =>
       iterable.expand((item) => item is Iterable ? flatten(item) : [item]);
