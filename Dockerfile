@@ -1,4 +1,4 @@
-FROM google/dart:2.5 as dart2
+FROM google/dart:2.7 as dart2
 # Build Environment Vars
 ARG BUILD_ID
 ARG BUILD_NUMBER
