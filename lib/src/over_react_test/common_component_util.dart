@@ -91,30 +91,32 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   childrenFactory ??= _defaultChildrenFactory;
   isComponent2 = ReactDartComponentVersion.fromType((factory()()).type) == '2' || isComponent2;
 
-  final meta = getPropsMeta(factory()(childrenFactory()));
-  if (meta != null) {
-    if (getUnconsumedPropKeys != null) {
-      unconsumedPropKeys = getUnconsumedPropKeys(meta);
-    }
-    if (getSkippedPropKeys != null) {
-      skippedPropKeys = getSkippedPropKeys(meta);
-    }
+  if (shouldTestPropForwarding) {
+    final meta = getPropsMeta(factory()(childrenFactory()));
+    if (meta != null) {
+      if (getUnconsumedPropKeys != null) {
+        unconsumedPropKeys = getUnconsumedPropKeys(meta);
+      }
+      if (getSkippedPropKeys != null) {
+        skippedPropKeys = getSkippedPropKeys(meta);
+      }
 
-    _testPropForwarding(
-      factory,
-      childrenFactory,
-      meta: meta,
-      unconsumedPropKeys: unconsumedPropKeys,
-      ignoreDomProps: ignoreDomProps,
-      skippedPropKeys: skippedPropKeys,
-      nonDefaultForwardingTestProps: nonDefaultForwardingTestProps,
-    );
-  } else {
-    if (getUnconsumedPropKeys != null || getSkippedPropKeys != null) {
-      throw ArgumentError(
-          'This component does not correspond to a mixin-based syntax component,'
-          ' and thus cannot be used with the function syntax to specify '
-          'unconsumedPropKeys/skippedPropKeys');
+      _testPropForwarding(
+        factory,
+        childrenFactory,
+        meta: meta,
+        unconsumedPropKeys: unconsumedPropKeys,
+        ignoreDomProps: ignoreDomProps,
+        skippedPropKeys: skippedPropKeys,
+        nonDefaultForwardingTestProps: nonDefaultForwardingTestProps,
+      );
+    } else {
+      if (getUnconsumedPropKeys != null || getSkippedPropKeys != null) {
+        throw ArgumentError(
+            'This component does not correspond to a mixin-based syntax component,'
+            ' and thus cannot be used with the function syntax to specify '
+            'unconsumedPropKeys/skippedPropKeys');
+      }
     }
   }
 
