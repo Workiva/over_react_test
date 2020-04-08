@@ -101,6 +101,9 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
         skippedPropKeys = getSkippedPropKeys(meta);
       }
 
+      unconsumedPropKeys = _flatten(unconsumedPropKeys).toList();
+      skippedPropKeys = _flatten(skippedPropKeys).toList();
+
       _testPropForwarding(
         factory,
         childrenFactory,
