@@ -209,18 +209,19 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       ..remove('children');
 
     // TODO: Account for alias components.
-    Map propsThatShouldNotGetForwarded = {}
-      ..addAll(Map.fromIterable(meta.keys, value: (_) => null))
+    final propsThatShouldNotGetForwarded = {
+      for (var key in meta.keys) key:  null,
       // Add defaults afterwards so that components don't blow up when they have unexpected null props.
-      ..addAll(defaultProps)
-      ..addAll(nonDefaultForwardingTestProps);
+      ...defaultProps,
+      ...nonDefaultForwardingTestProps,
+    };
 
-      unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
+    unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
 
-      if (ignoreDomProps) {
-        // Remove DomProps because they should be forwarded.
-        DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
-      }
+    if (ignoreDomProps) {
+      // Remove DomProps because they should be forwarded.
+      DomPropsMixin.meta.keys.forEach(propsThatShouldNotGetForwarded.remove);
+    }
 
     var shallowRenderer = react_test_utils.createRenderer();
 
@@ -271,8 +272,16 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
 
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
-        // ignore: avoid_as
-        var forwardingTargetDefaults = ((forwardingTarget as ReactElement).type as ReactClass).dartDefaultProps;
+        final forwardingTargetType = (forwardingTarget as ReactElement).type as ReactClass;
+        Map forwardingTargetDefaults;
+        switch (forwardingTargetType.dartComponentVersion) { // ignore: invalid_use_of_protected_member
+          case ReactDartComponentVersion.component: // ignore: invalid_use_of_protected_member
+            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps; // ignore: deprecated_member_use
+            break;
+          case ReactDartComponentVersion.component2: // ignore: invalid_use_of_protected_member
+            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps);
+            break;
+        }
 
         var commonForwardedAndDefaults = propKeysThatShouldNotGetForwarded
             .intersection(forwardingTargetDefaults.keys.toSet());
@@ -280,7 +289,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         /// Don't count these as unexpected keys in later assertions; we'll verify them within this block.
         unexpectedKeys.removeAll(commonForwardedAndDefaults);
 
-        commonForwardedAndDefaults.forEach((propKey) {
+        for (final propKey in commonForwardedAndDefaults) {
           var defaultTargetValue = forwardingTargetDefaults[propKey];
           var potentiallyForwardedValue = propsThatShouldNotGetForwarded[propKey];
 
@@ -293,7 +302,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
             /// ...otherwise, we can't be certain that the value isn't being forwarded.
             ambiguousProps[propKey] = defaultTargetValue;
           }
-        });
+        }
       }
 
       expect(unexpectedKeys, isEmpty, reason: 'Should filter out all consumed props');
