@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:collection';
 import 'dart:html';
 import 'dart:js';
 
@@ -615,41 +616,31 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRe
     throw Exception('forwardedPropBeacon must begin with "data-" so that is a valid HTML attribute.');
   }
 
-  List forwardingTargets = [];
+  List forwardingTargets;
 
   if (shallowRendered) {
-    getTargets(root) {
-      var rootProps = getProps(root);
-      if (rootProps.containsKey(forwardedPropBeacon)) {
-        forwardingTargets.add(root);
+    forwardingTargets = [];
+
+    final descendantsToProcess = Queue<dynamic>()..add(reactInstance);
+    while (descendantsToProcess.isNotEmpty) {
+      final descendant = descendantsToProcess.removeFirst();
+
+      if (descendant is Iterable) {
+        descendantsToProcess.addAll(descendant);
+        continue;
       }
 
-      final children = rootProps['children'];
-
-      if (children is List) {
-        flattenChildren(List _children) {
-          for (var _child in children) {
-            if (_child != null && isValidElement(_child)) {
-              getProps(_child).forEach((propKey, propValue) {
-                // Some props may be of type Function, and will produce interop errors if passed into isValidElement
-                if (propKey != 'children' && propValue is! Function && isValidElement(propValue)) {
-                  getTargets(propValue);
-                }
-              });
-              getTargets(_child);
-            }  else if (_child is List) {
-              flattenChildren(_child);
-            }
-          }
+      // Some props may be of type Function, and will produce interop errors if passed into isValidElement
+      if (descendant is! Function && isValidElement(descendant)) {
+        final props = getProps(descendant);
+        if (props.containsKey(forwardedPropBeacon)) {
+          forwardingTargets.add(descendant);
         }
 
-        flattenChildren(children);
-      } else if (isValidElement(children)) {
-        getTargets(children);
+        // Most importantly, this includes children, but also includes other props that could contain React content.
+        descendantsToProcess.addAll(props.values);
       }
     }
-
-    getTargets(reactInstance);
   } else {
     // Filter out non-DOM components (e.g., React.DOM.Button uses composite components to render)
     forwardingTargets = findDescendantsWithProp(reactInstance, forwardedPropBeacon);
@@ -657,7 +648,8 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRe
   }
 
   if (forwardingTargets.length != expectedTargetCount) {
-    throw StateError('Unexpected number of forwarding targets: ${forwardingTargets.length}.');
+    throw StateError('Unexpected number of forwarding targets: ${forwardingTargets.length};'
+        ' make sure a component with addUnconsumedProps/addUnconsumedDomProps is being rendered.');
   }
   return forwardingTargets;
 }
