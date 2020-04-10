@@ -76,8 +76,8 @@ import './react_util.dart';
 /// _(which gets flattened into a 1D array of strings)_.
 void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestPropForwarding = true,
-  dynamic unconsumedPropKeys = const [],
-  dynamic skippedPropKeys = const [],
+  List unconsumedPropKeys = const [],
+  List skippedPropKeys = const [],
   List Function(PropsMetaCollection) getUnconsumedPropKeys,
   List Function(PropsMetaCollection) getSkippedPropKeys,
   Map nonDefaultForwardingTestProps = const {},
