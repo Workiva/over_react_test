@@ -23,7 +23,7 @@ import 'package:react/react_client/react_interop.dart';
 PropsMetaCollection getPropsMeta(ReactElement el) {
   // ignore: invalid_use_of_protected_member
   final isComponent2 = ReactDartComponentVersion.fromType(el.type) == '2';
-  if (isComponent2) return null;
+  if (!isComponent2) return null;
 
   // Can't auto-tear down here because we're not inside a test.
   // Use a try-finally instead
