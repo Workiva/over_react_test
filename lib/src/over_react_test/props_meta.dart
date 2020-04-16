@@ -14,12 +14,17 @@
 
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/jacket.dart';
+import 'package:react/react_client/react_interop.dart';
 
 /// Returns the [UiComponent2.propsMeta] obtained by rendering [el].
 ///
 /// Returns `null` if [el] does not render a UiComponent2 or does not use the
 /// new mixin syntax (determined by whether accessing propsMeta throws).
 PropsMetaCollection getPropsMeta(ReactElement el) {
+  // ignore: invalid_use_of_protected_member
+  final isComponent2 = ReactDartComponentVersion.fromType(el.type) == '2';
+  if (!isComponent2) return null;
+
   // Can't auto-tear down here because we're not inside a test.
   // Use a try-finally instead
   final jacket = mount(el, autoTearDown: false);
