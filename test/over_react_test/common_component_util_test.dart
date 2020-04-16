@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:over_react_test/src/over_react_test/props_meta.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
 import './utils/test_common_component.dart';
+import './utils/test_common_component_new_boilerplate.dart' as new_boilerplate;
 import './utils/test_common_component_required_props.dart';
 import './utils/test_common_component_required_props_commponent2.dart';
 
@@ -23,10 +25,36 @@ import './utils/test_common_component_required_props_commponent2.dart';
 main() {
   group('commonComponentTests', () {
     // TODO: Improve / expand upon these tests.
-    group('should pass when the correct unconsumed props are specified', () {
+    group('should be a noop and pass when used with a legacy boilerplate component', () {
       commonComponentTests(TestCommon, unconsumedPropKeys: [
         PropsThatShouldBeForwarded.meta.keys,
       ]);
+    });
+
+    group('should pass when the correct unconsumed props are specified', () {
+      commonComponentTests(
+        new_boilerplate.TestCommonForwarding,
+        getUnconsumedPropKeys: (meta) => [
+          ...meta.forMixin(new_boilerplate.ShouldBeForwardedProps).keys,
+        ],
+      );
+    });
+
+    group('should skip checking for certain props', () {
+      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()());
+      final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
+      final skippedKey = consumedKeys.first;
+
+      commonComponentTests(
+        () => new_boilerplate.TestCommonForwarding()
+          ..propKeysToForwardAnyways = [skippedKey],
+        getUnconsumedPropKeys: (meta) => [
+          ...meta.forMixin(new_boilerplate.ShouldBeForwardedProps).keys,
+        ],
+        getSkippedPropKeys: (meta) => [
+          skippedKey,
+        ],
+      );
     });
 
     group('should pass when the correct required props are specified', () {
