@@ -93,35 +93,16 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   isComponent2 = ReactDartComponentVersion.fromType((factory()()).type) == '2' || isComponent2;
 
   if (shouldTestPropForwarding) {
-    final meta = getPropsMeta(factory()(childrenFactory()));
-    if (meta != null) {
-      if (getUnconsumedPropKeys != null) {
-        unconsumedPropKeys = getUnconsumedPropKeys(meta);
-      }
-      if (getSkippedPropKeys != null) {
-        skippedPropKeys = getSkippedPropKeys(meta);
-      }
-
-      unconsumedPropKeys = _flatten(unconsumedPropKeys).toList();
-      skippedPropKeys = _flatten(skippedPropKeys).toList();
-
-      _testPropForwarding(
-        factory,
-        childrenFactory,
-        meta: meta,
-        unconsumedPropKeys: unconsumedPropKeys,
-        ignoreDomProps: ignoreDomProps,
-        skippedPropKeys: skippedPropKeys,
-        nonDefaultForwardingTestProps: nonDefaultForwardingTestProps,
-      );
-    } else {
-      if (getUnconsumedPropKeys != null || getSkippedPropKeys != null) {
-        throw ArgumentError(
-            'This component does not correspond to a mixin-based syntax component,'
-            ' and thus cannot be used with the function syntax to specify '
-            'unconsumedPropKeys/skippedPropKeys');
-      }
-    }
+    _testPropForwarding(
+      factory,
+      childrenFactory,
+      unconsumedPropKeys: unconsumedPropKeys,
+      skippedPropKeys: skippedPropKeys,
+      getUnconsumedPropKeys: getUnconsumedPropKeys,
+      getSkippedPropKeys: getSkippedPropKeys,
+      ignoreDomProps: ignoreDomProps,
+      nonDefaultForwardingTestProps: nonDefaultForwardingTestProps,
+    );
   }
 
   if (shouldTestClassNameMerging) {
@@ -173,20 +154,43 @@ void expectCleanTestSurfaceAtEnd() {
 
 /// Common test for verifying that unconsumed props are forwarded as expected.
 ///
-/// [meta] must contain all props mixed in by the component
-/// (e.g., [UiComponent2.propsMeta]).
-///
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// todo make this public again if there's a need to expose it, once the API has stabilized
 void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
-  @required component_base.PropsMetaCollection meta,
-  List unconsumedPropKeys = const [],
-  bool ignoreDomProps = true,
-  List skippedPropKeys = const [],
-  Map nonDefaultForwardingTestProps = const {}
+  @required List unconsumedPropKeys,
+  @required List skippedPropKeys,
+  @required List Function(PropsMetaCollection) getUnconsumedPropKeys,
+  @required List Function(PropsMetaCollection) getSkippedPropKeys,
+  @required ignoreDomProps,
+  @required nonDefaultForwardingTestProps,
 }) {
   test('forwards unconsumed props as expected', () {
+    // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
+    // in case childrenFactory relies on variables set up in the consumer's setUp blocks.
+    final meta = getPropsMeta((factory())(childrenFactory()));
+
+    // We can't test this component if it doesn't have meta.
+    if (meta == null) {
+      if (getUnconsumedPropKeys != null || getSkippedPropKeys != null) {
+        throw ArgumentError(
+            'This component does not correspond to a mixin-based syntax component,'
+                ' and thus cannot be used with the function syntax to specify '
+                'unconsumedPropKeys/skippedPropKeys');
+      }
+
+      return;
+    }
+
+    if (getUnconsumedPropKeys != null) {
+      unconsumedPropKeys = getUnconsumedPropKeys(meta);
+    }
+    if (getSkippedPropKeys != null) {
+      skippedPropKeys = getSkippedPropKeys(meta);
+    }
+    unconsumedPropKeys = _flatten(unconsumedPropKeys).toList();
+    skippedPropKeys = _flatten(skippedPropKeys).toList();
+
     const Map extraProps = {
       // Add this so we find the right component(s) with [getForwardingTargets] later.
       forwardedPropBeacon: true,
