@@ -89,18 +89,31 @@ main() {
         BuilderOnlyUiFactory factory, {
         List Function(PropsMetaCollection) getUnconsumedPropKeys,
       }) {
-        var wasFactoryCalledBeforeSetup = false;
+        var wasFactoryCalled = false;
 
-        // This needs to be before any setup within commonComponentTests is called,
-        // or it will fail when it shouldn't.
+        // These needs to be before declared before commonComponentTests is called,
+        // or these tests may fail when they shouldn't.
+
+        // Test both setUpAll/setUp since they have different timings relative
+        // to commonComponent test setup blocks.
+        //
+        // setUp is the important one, but might as well test both while we're
+        // here!
+
         setUpAll(() {
-          expect(wasFactoryCalledBeforeSetup, isFalse,
+          expect(wasFactoryCalled, isFalse,
+              reason: 'factory arg was called within group, '
+                  'before consumer setUpAll blocks are called');
+        });
+
+        setUp(() {
+          expect(wasFactoryCalled, isFalse,
               reason: 'factory arg was called within group, '
                   'before consumer setUp blocks are called');
         });
 
         commonComponentTests(() {
-          wasFactoryCalledBeforeSetup = true;
+          wasFactoryCalled = true;
           return factory();
         }, getUnconsumedPropKeys: getUnconsumedPropKeys);
       }
