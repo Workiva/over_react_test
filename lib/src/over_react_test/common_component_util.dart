@@ -429,20 +429,20 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   bool isComponent2;
 
-  setUpAll(() {
+  var keyToErrorMessage = {};
+  var nullableProps = <String>[];
+  var requiredProps = <String>[];
+
+  setUp(() {
+    // This can't go in a setUpAll since it would be called before consumer setUps.
+    //
     // ignore: invalid_use_of_protected_member
     final version = ReactDartComponentVersion.fromType(
       (factory()(childrenFactory())).type,
     );
     // ignore: invalid_use_of_protected_member
     isComponent2 = version == ReactDartComponentVersion.component2;
-  });
 
-  var keyToErrorMessage = {};
-  var nullableProps = <String>[];
-  var requiredProps = <String>[];
-
-  setUp(() {
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
     var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
     jacket.unmount();
