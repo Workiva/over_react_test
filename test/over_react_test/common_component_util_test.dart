@@ -106,10 +106,16 @@ main() {
                   'before consumer setUpAll blocks are called');
         });
 
+        int setUpCallCount = 0;
         setUp(() {
-          expect(wasFactoryCalled, isFalse,
-              reason: 'factory arg was called within group, '
-                  'before consumer setUp blocks are called');
+          // Only do this the first time, since it gets called before every
+          // test inside commonComponentTests.
+          if (setUpCallCount == 0) {
+            expect(wasFactoryCalled, isFalse,
+                reason: 'factory arg was called within group, '
+                    'before consumer setUp blocks are called');
+          }
+          setUpCallCount++;
         });
 
         commonComponentTests(() {
