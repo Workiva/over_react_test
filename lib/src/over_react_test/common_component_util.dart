@@ -86,11 +86,10 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool ignoreDomProps = true,
   bool shouldTestRequiredProps = true,
   @Deprecated('This flag is not needed as the test will auto detect the version')
-  bool isComponent2 = false,
+  bool isComponent2,
   dynamic childrenFactory()
 }) {
   childrenFactory ??= _defaultChildrenFactory;
-  isComponent2 = ReactDartComponentVersion.fromType((factory()()).type) == '2' || isComponent2;
 
   if (shouldTestPropForwarding) {
     _testPropForwarding(
@@ -112,7 +111,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
     testClassNameOverrides(factory, childrenFactory);
   }
   if (shouldTestRequiredProps) {
-    testRequiredProps(factory, childrenFactory, isComponent2);
+    testRequiredProps(factory, childrenFactory);
   }
 }
 
@@ -427,13 +426,23 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// __Note__: All required props must be provided by [factory].
-void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
-    bool isComponent2) {
+void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
+  bool isComponent2;
+
   var keyToErrorMessage = {};
   var nullableProps = <String>[];
   var requiredProps = <String>[];
 
   setUp(() {
+    // This can't go in a setUpAll since it would be called before consumer setUps.
+    //
+    // ignore: invalid_use_of_protected_member
+    final version = ReactDartComponentVersion.fromType(
+      (factory()(childrenFactory())).type,
+    );
+    // ignore: invalid_use_of_protected_member
+    isComponent2 = version == ReactDartComponentVersion.component2;
+
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
     var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
     jacket.unmount();
@@ -451,37 +460,37 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
     }
   });
 
-  if (!isComponent2) {
-    test('throws when the required prop is not set or is null', () {
-        for (var propKey in requiredProps) {
-          final reactComponentFactory = factory()
-              .componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
+  test('throws (component1) or logs the correct errors (component2) when the required prop is not set or is null', () {
+    void component1RequiredPropsTest(){
+      for (var propKey in requiredProps) {
+        final reactComponentFactory = factory()
+            .componentFactory as ReactDartComponentFactoryProxy; // ignore: avoid_as
 
-          // Props that are defined in the default props map will never not be set.
-          if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
-            var badRenderer = () =>
-                render((factory()
-                  ..remove(propKey)
-                )(childrenFactory()));
-
-            expect(badRenderer,
-                throwsPropError_Required(propKey, keyToErrorMessage[propKey]),
-                reason: '$propKey is not set');
-          }
-
-          var propsToAdd = {propKey: null};
+        // Props that are defined in the default props map will never not be set.
+        if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
           var badRenderer = () =>
               render((factory()
-                ..addAll(propsToAdd)
+                ..remove(propKey)
               )(childrenFactory()));
 
           expect(badRenderer,
               throwsPropError_Required(propKey, keyToErrorMessage[propKey]),
-              reason: '$propKey is set to null');
+              reason: '$propKey is not set');
         }
-    });
-  } else {
-    test('logs the correct errors when the required prop is not set or is null', () {
+
+        var propsToAdd = {propKey: null};
+        var badRenderer = () =>
+            render((factory()
+              ..addAll(propsToAdd)
+            )(childrenFactory()));
+
+        expect(badRenderer,
+            throwsPropError_Required(propKey, keyToErrorMessage[propKey]),
+            reason: '$propKey is set to null');
+      }
+    }
+
+    void component2RequiredPropsTest() {
       PropTypes.resetWarningCache();
 
       List<String> consoleErrors = [];
@@ -534,8 +543,10 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory(),
         consoleErrors = [];
         PropTypes.resetWarningCache();
       }
-    });
-  }
+    }
+
+    isComponent2 ? component2RequiredPropsTest() : component1RequiredPropsTest();
+  });
 
   test('nullable props', () {
     if (!isComponent2) {

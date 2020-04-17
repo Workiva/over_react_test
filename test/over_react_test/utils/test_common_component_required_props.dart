@@ -51,6 +51,7 @@ class TestCommonRequiredComponent extends UiComponent<TestCommonRequiredProps> {
   render() {
     return (Dom.div()
       ..addProps(copyUnconsumedDomProps())
+      ..className = forwardingClassNameBuilder().toClassName()
     )(props.children);
   }
 }

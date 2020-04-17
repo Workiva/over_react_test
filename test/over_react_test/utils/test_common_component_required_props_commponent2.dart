@@ -49,6 +49,7 @@ class TestCommonRequiredComponent2 extends
   render() {
     return (Dom.div()
       ..modifyProps(addUnconsumedDomProps)
+      ..className = forwardingClassNameBuilder().toClassName()
     )(props.children);
   }
 }
