@@ -49,11 +49,11 @@ class SampleComponent extends UiComponent2<SampleProps> {
           }
 
           if (props.shouldLog == false && props.shouldAlwaysBeFalse == false) {
-            return PropError.combination('shoudLog', 'shouldAlwaysBeFalse', 'logging is required');
+            return PropError.combination('shouldLog', 'shouldAlwaysBeFalse', 'logging is required');
           }
 
           if (props.shouldNeverBeNull == false) {
-            return PropError('shouldNeverBeNull should not be false');
+            return PropError('shouldNeverBeNull', 'should not be false');
           }
 
           return null;

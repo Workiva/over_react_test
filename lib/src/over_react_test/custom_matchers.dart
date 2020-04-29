@@ -525,7 +525,7 @@ final _PropTypeLogMatcher logsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
 /// of running a provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
 _PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
-  return logsPropTypeWarning('PropError: Prop $propName $message'.trim());
+  return logsPropTypeWarning('PropError: Prop $propName. $message'.trim());
 }
 
 /// A matcher to verify that a [PropError].required is thrown with a provided `propName` and `message`.
