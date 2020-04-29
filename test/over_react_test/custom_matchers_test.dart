@@ -820,7 +820,7 @@ main() {
             ..shouldAlwaysBeFalse = false
             ..shouldLog = false)()),
           logsPropCombinationError(
-              'shoudLog', 'shouldAlwaysBeFalse', 'logging is required'));
+              'shouldLog', 'shouldAlwaysBeFalse', 'logging is required'));
     });
   });
 }
