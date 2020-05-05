@@ -29,6 +29,18 @@ part 'react_util_test.over_react.g.dart';
 /// Main entry point for ReactUtil testing
 main() {
   group('ReactUtil', () {
+    group('render behaves as expected when a UiProps instance is provided', () {
+      test('(UiComponent)', () {
+        final renderedInstance = render(Test());
+        expect(Test(getProps(renderedInstance)).children, isEmpty);
+      });
+
+      test('(UiComponent2)', () {
+        final renderedInstance = render(Test2());
+        expect(Test2(getProps(renderedInstance)).children, isEmpty);
+      });
+    });
+
     test('renderShallow renders a shallow instance of a component', () {
       var shallowInstance = renderShallow(Test()());
       expect(shallowInstance.type, 'div', reason: 'should be the div ReactElement returned by render()');
@@ -1252,4 +1264,15 @@ class TestComponent extends UiComponent<TestProps> {
 class TestProps extends _$TestProps with _$TestPropsAccessorsMixin {
   // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
   static const PropsMeta meta = _$metaForTestProps;
+}
+
+UiFactory<Test2Props> Test2 =
+    // ignore: undefined_identifier
+    _$Test2;
+
+mixin Test2Props on UiProps {}
+
+class Test2Component extends UiComponent2<Test2Props> {
+  @override
+  render() => (Dom.div()..addProp('isRenderResult', true))();
 }
