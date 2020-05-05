@@ -292,13 +292,13 @@ class _IsFocused extends Matcher {
 /// A matcher that matches the currently focused element (`document.activeElement`).
 const Matcher isFocused = _IsFocused();
 
-/// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
+/// A matcher to verify that a [PropError] is thrown with the provided [propName] and optional [message].
 ///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
+/// This matcher will not work on [PropError]s found within [UiComponent2.propTypes]. When testing
+/// prop type validation - use [logsPropError].
+///
+/// __Note__: The [message] is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
-///
-/// __Deprecated.__ Use [logsPropError] in conjunction with `UiComponent2.propTypes` instead.
-@Deprecated('3.0.0')
 Matcher throwsPropError(String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -306,13 +306,13 @@ Matcher throwsPropError(String propName, [String message = '']) {
   ));
 }
 
-/// A matcher to verify that a [PropError].required is thrown with a provided `propName` and `message`.
+/// A matcher to verify that a [PropError.required] is thrown with the provided [propName] and optional [message].
 ///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
+/// This matcher will not work on [PropError.required]s found within [UiComponent2.propTypes]. When testing
+/// prop type validation - use [logsPropRequiredError].
+///
+/// __Note__: The [message] is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
-///
-/// __Deprecated.__ Use [logsPropRequiredError] in conjunction with `UiComponent2.propTypes` instead.
-@Deprecated('3.0.0')
 Matcher throwsPropError_Required(String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -320,13 +320,14 @@ Matcher throwsPropError_Required(String propName, [String message = '']) {
   ));
 }
 
-/// A matcher to verify that a [PropError].value is thrown with a provided `invalidValue`, `propName`, and `message`.
+/// A matcher to verify that a [PropError.value] is thrown with the provided [invalidValue], [propName],
+/// and optional [message].
 ///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
+/// This matcher will not work on [PropError.value]s found within [UiComponent2.propTypes]. When testing
+/// prop type validation - use [logsPropValueError].
+///
+/// __Note__: The [message] is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
-///
-/// __Deprecated.__ Use [logsPropValueError] in conjunction with `UiComponent2.propTypes` instead.
-@Deprecated('3.0.0')
 Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -336,13 +337,14 @@ Matcher throwsPropError_Value(dynamic invalidValue, String propName, [String mes
   ));
 }
 
-/// A matcher to verify that a [PropError] is thrown with a provided `propName`, `prop2Name`, and `message`.
+/// A matcher to verify that a [PropError.combination] is thrown with the provided [propName], [prop2Name],
+/// and optional [message].
 ///
-/// __Note__: The message is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
+/// This matcher will not work on [PropError.combination]s found within [UiComponent2.propTypes]. When testing
+/// prop type validation - use [logsPropCombinationError].
+///
+/// __Note__: The [message] is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
-///
-/// __Deprecated.__ Use [logsPropCombinationError] in conjunction with `UiComponent2.propTypes` instead.
-@Deprecated('3.0.0')
 Matcher throwsPropError_Combination(String propName, String prop2Name, [String message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
@@ -519,39 +521,58 @@ _PropTypeLogMatcher logsPropTypeWarnings(dynamic expected) =>
 /// Related: [logsPropTypeWarning], [logsPropTypeWarnings]
 final _PropTypeLogMatcher logsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
 
-/// A matcher to verify that a [PropError] is thrown with a provided `propName` and `message`.
+/// A matcher to verify that a [PropError] is returned within [UiComponent2.propTypes]
+/// with the provided [propName] and optional [message].
+///
+/// This matcher only works for [PropError]s that are returned within [UiComponent2.propTypes].
+/// If you are testing a [PropError] that is thrown anywhere else within a component, use [throwsPropError].
 ///
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
-/// of running a provided callback, swallowing errors that occur, and looking
+/// of running the provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
 _PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
   return logsPropTypeWarning('PropError: Prop $propName. $message'.trim());
 }
 
-/// A matcher to verify that a [PropError].required is thrown with a provided `propName` and `message`.
+/// A matcher to verify that a [PropError.required] is returned within [UiComponent2.propTypes]
+/// with the provided [propName] and optional [message].
+///
+/// This matcher only works for [PropError.required]s that are returned within [UiComponent2.propTypes].
+/// If you are testing a [PropError.required] that is thrown anywhere else within a component,
+/// use [throwsPropError_Required].
 ///
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
-/// of running a provided callback, swallowing errors that occur, and looking
-/// for the expected [PropError] in the resulting logs.
+/// of running the provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError.required] in the resulting logs.
 _PropTypeLogMatcher logsPropRequiredError(String propName, [String message = '']) {
   return logsPropTypeWarning('RequiredPropError: Prop $propName is required. $message'.trim());
 }
 
-/// A matcher to verify that a [PropError].value is thrown with a provided `invalidValue`, `propName`, and `message`.
+/// A matcher to verify that a [PropError.value] is thrown with the provided [invalidValue], [propName],
+/// and optional [message].
+///
+/// This matcher only works for [PropError.value]s that are returned within [UiComponent2.propTypes].
+/// If you are testing a [PropError.value] that is thrown anywhere else within a component,
+/// use [throwsPropError_Value].
 ///
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
-/// of running a provided callback, swallowing errors that occur, and looking
-/// for the expected [PropError] in the resulting logs.
+/// of running the provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError.value] in the resulting logs.
 _PropTypeLogMatcher logsPropValueError(dynamic invalidValue, String propName, [String message = '']) {
   return logsPropTypeWarning('InvalidPropValueError: Prop $propName set to $invalidValue. '
       '$message'.trim());
 }
 
-/// A matcher to verify that a [PropError] is thrown with a provided `propName`, `prop2Name`, and `message`.
+/// A matcher to verify that a [PropError.combination] is thrown with the provided [propName], [prop2Name],
+/// and optional [message].
+///
+/// This matcher only works for [PropError.combination]s that are returned within [UiComponent2.propTypes].
+/// If you are testing a [PropError.combination] that is thrown anywhere else within a component,
+/// use [throwsPropError_Combination].
 ///
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
-/// of running a provided callback, swallowing errors that occur, and looking
-/// for the expected [PropError] in the resulting logs.
+/// of running the provided callback, swallowing errors that occur, and looking
+/// for the expected [PropError.combination] in the resulting logs.
 _PropTypeLogMatcher logsPropCombinationError(String propName, String prop2Name, [String message = '']) {
   return logsPropTypeWarning('InvalidPropCombinationError: Prop $propName and prop $prop2Name are set to '
       'incompatible values. $message'.trim());
