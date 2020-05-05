@@ -58,7 +58,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
     Element container,
     Callback autoTearDownCallback}) {
   var renderedInstance;
-  component = component is component_base.UiProps ? component.build() : component;
+  component = component is component_base.UiProps ? component() : component;
 
   setComponentZone();
 
