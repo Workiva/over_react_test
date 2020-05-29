@@ -1,5 +1,22 @@
 # OverReact Test Changelog
 
+## 2.9.4
+* Normalize the behavior of the `render()` utility function between `UiComponent` and `UiComponent2` components.
+* Un-deprecate the `throwsPropError*` matchers.
+
+## 2.9.3
+* Fix typo in `logsPropError` matcher to ensure consumers can easily migrate from `throwsPropError` when appropriate.
+
+## 2.9.2
+* Move `isComponent2` call inside a `test` block to address consumer issues when the provided factory accesses values that are initialized within `setUp`.  
+
+## 2.9.1
+* Move `getPropsMeta` call inside a `test` block to address consumer issues when the provided factory has required props that come from `setUp`-initialized variables.  
+
+## 2.9.0
+* Add Component Version Auto Detection
+* Re-instate prop forwarding tests for new over_react component boilerplate
+
 ## 2.8.0
 * Update mount, render, and renderAttachedToDocument to automatically run component lifecycle in the same zone as the test.
     * This fixes some `print` statements from being swallowed and some failing `expect`s from not failing tests properly
