@@ -1,5 +1,8 @@
 # OverReact Test Changelog
 
+## 2.9.5
+* Add `Object.values` shim for MSIE 11.
+
 ## 2.9.4
 * Normalize the behavior of the `render()` utility function between `UiComponent` and `UiComponent2` components.
 * Un-deprecate the `throwsPropError*` matchers.

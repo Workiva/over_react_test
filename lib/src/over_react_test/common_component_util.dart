@@ -652,8 +652,15 @@ List getForwardingTargets(reactInstance, {int expectedTargetCount = 1, shallowRe
           forwardingTargets.add(descendant);
         }
 
+        Iterable<dynamic> propValues;
+        try {
+          propValues = props.values;
+        } catch (_) {
+          // IE 11 doesn't support Object.values
+          propValues = props.keys.map((key) => props[key]);
+        }
         // Most importantly, this includes children, but also includes other props that could contain React content.
-        descendantsToProcess.addAll(props.values);
+        descendantsToProcess.addAll(propValues);
       }
     }
   } else {
