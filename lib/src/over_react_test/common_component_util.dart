@@ -74,6 +74,7 @@ import './react_util.dart';
 /// > If [nonDefaultForwardingTestProps] can't be used for some reason, you can skip prop forwarding tests altogether
 /// for certain props by specifying their keys in [skippedPropKeys] (or [getSkippedPropKeys] for new boilerplate)
 /// _(which gets flattened into a 1D array of strings)_.
+@isTestGroup
 void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestPropForwarding = true,
   List unconsumedPropKeys = const [],
@@ -113,6 +114,12 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   if (shouldTestRequiredProps) {
     testRequiredProps(factory, childrenFactory);
   }
+}
+
+String getPropKeyNamespaceFromPropKey(String propKey) {
+  final indexOfNamespaceSeparator = propKey.indexOf('.');
+  if (indexOfNamespaceSeparator == -1) return null;
+  return propKey.substring(0, indexOfNamespaceSeparator);
 }
 
 Iterable _flatten(Iterable iterable) =>
@@ -156,13 +163,14 @@ void expectCleanTestSurfaceAtEnd() {
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// todo make this public again if there's a need to expose it, once the API has stabilized
+@isTest
 void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
   @required List unconsumedPropKeys,
   @required List skippedPropKeys,
   @required List Function(PropsMetaCollection) getUnconsumedPropKeys,
   @required List Function(PropsMetaCollection) getSkippedPropKeys,
-  @required ignoreDomProps,
-  @required nonDefaultForwardingTestProps,
+  @required bool ignoreDomProps,
+  @required Map nonDefaultForwardingTestProps,
 }) {
   test('forwards unconsumed props as expected', () {
     // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
@@ -212,7 +220,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     const String ref = 'testRefThatShouldNotBeForwarded';
 
     /// Get defaults from a ReactElement to account for default props and any props added by the factory.
-    Map defaultProps = Map.from(getProps(factory()()))
+    Map defaultProps = Map.from(getProps(factory()(childrenFactory())))
       ..remove('children');
 
     // TODO: Account for alias components.
@@ -221,6 +229,11 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // Add defaults afterwards so that components don't blow up when they have unexpected null props.
       ...defaultProps,
       ...nonDefaultForwardingTestProps,
+    };
+
+    /// The props we expect to be present on the `forwardingTarget`.
+    final unconsumedProps = <String, dynamic>{
+      for (var key in unconsumedPropKeys) key: defaultProps[key],
     };
 
     unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
@@ -233,6 +246,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     var shallowRenderer = react_test_utils.createRenderer();
 
     var instance = (factory()
+      ..addProps(unconsumedProps)
       ..addProps(propsThatShouldNotGetForwarded)
       ..addProps(extraProps)
       ..addProps(otherProps)
@@ -249,15 +263,59 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     for (var forwardingTarget in forwardingTargets) {
       Map actualProps = getProps(forwardingTarget);
 
-      // If the forwarding target is a DOM element it will should not have invalid DOM props forwarded to it.
+      // If the forwarding target is a DOM element it should not have invalid DOM props forwarded to it.
       if (isDomElement(forwardingTarget)) {
         otherProps.forEach((key, value) {
-          expect(actualProps, isNot(containsPair(key, value)));
+          expect(actualProps[key], isNull, reason: unindent('''
+            The following mock key/value pair(s) added by this test were found on 
+            a DOM component that props were forwarded to:
+            
+                $key: ${actualProps[key]}
+                 
+            This means that `addUnconsumedProps` is mistakenly being used 
+            instead of `addUnconsumedDomProps` on a DOM component.
+          '''));
         });
       } else {
         otherProps.forEach((key, value) {
           expect(actualProps, containsPair(key, value));
         });
+
+        final missingUnconsumedPropKeys = unconsumedProps.keys.where((key) => !actualProps.containsKey(key));
+        final mixinNamesOfMissingUnconsumedPropKeys = missingUnconsumedPropKeys.map(getPropKeyNamespaceFromPropKey).where((name) => name != null).toSet();
+        expect(mixinNamesOfMissingUnconsumedPropKeys, isEmpty, reason: unindent('''
+          These prop keys were not found within the props of the forwarding target: 
+            
+              ${missingUnconsumedPropKeys.join(',\n    ')}
+          
+          But they were expected to be there since they live within one of the prop mixins specified
+          in the list returned to `commonComponentTests.getUnconsumedPropKeys()` in your test. 
+          
+          If these props should be forwarded to the forwarding target rendered by this component, 
+          the value of `UiComponent2.consumedProps` must be overridden to exclude those keys:
+          
+              // Option 1: forward everything
+              @override
+              get consumedProps => [];
+              
+              // Option 2: specify the prop mixins that should be consumed:
+              @override
+              get consumedProps => propsMeta.forMixins({
+                SomeOtherPropsMixin,
+                // leave out ${mixinNamesOfMissingUnconsumedPropKeys.join(', ')}
+              });
+              
+              // Option 3: specify the prop mixins that should NOT be consumed:
+              @override
+              get consumedProps => propsMeta.allExceptForMixins({
+                ${mixinNamesOfMissingUnconsumedPropKeys.join(',\n      ')}
+              });
+              
+          If these props should NOT be forwarded to the forwarding target rendered by this component, 
+          remove these lines from the list returned to `commonComponentTests.getUnconsumedPropKeys()`:
+          
+              ${mixinNamesOfMissingUnconsumedPropKeys.map((mixin) => 'propsMeta.forMixin($mixin).keys').join(',\n    ')}
+        '''));
       }
 
       // Expect the target to have all forwarded props.
@@ -275,7 +333,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // Don't test any keys specified by skippedPropKeys.
       propKeysThatShouldNotGetForwarded.removeAll(skippedPropKeys);
 
-      Set unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded);
+      Set<String> unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded).cast<String>();
 
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
@@ -312,7 +370,37 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         }
       }
 
-      expect(unexpectedKeys, isEmpty, reason: 'Should filter out all consumed props');
+      final propMixinsThatAreUnconsumed = unexpectedKeys.map(getPropKeyNamespaceFromPropKey).toSet().toList();
+      expect(unexpectedKeys, isEmpty, reason: unindent('''
+            One or more props from the following prop mixin(s) were found within the props of 
+            the forwarding target: 
+            
+                ${propMixinsThatAreUnconsumed.join(',\n    ')}
+            
+            But they were not expected to be there since they are not specified
+            in the list returned to `commonComponentTests.getUnconsumedPropKeys()` in your test. 
+            
+            If props from the mixin(s) listed above should be forwarded to the forwarding target rendered 
+            by this component, add these to the list returned to `commonComponentTests.getUnconsumedPropKeys()`: 
+            
+                ${propMixinsThatAreUnconsumed.map((mixin) => 'propsMeta.forMixin($mixin).keys').join(',\n    ')}
+            
+            If props from the mixin(s) listed above should NOT be forwarded to the forwarding target rendered 
+            by this component, the value of `UiComponent2.consumedProps` must be overridden to include those mixin(s):
+            
+                // Option 1: specify that the prop mixin(s) should be consumed:
+                @override
+                get consumedProps => propsMeta.forMixins({
+                  ${propMixinsThatAreUnconsumed.map((mixin) => '$mixin').join(',\n      ')}
+                });
+                
+                // Option 2: specify the prop mixins that should NOT be consumed:
+                @override
+                get consumedProps => propsMeta.allExceptForMixins({
+                  SomeOtherPropsMixin,
+                  // Leave out the mixin(s) in question.
+                });
+          '''));
 
       if (ambiguousProps.isNotEmpty) {
         fail(unindent(
@@ -334,6 +422,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// > Related: [testClassNameOverrides]
+@isTestGroup
 void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   test('merges classes as expected', () {
     var builder = factory()
@@ -374,6 +463,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// > Related: [testClassNameMerging]
+@isTestGroup
 void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   Set<String> classesToOverride;
   var error;
@@ -426,6 +516,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// __Note__: All required props must be provided by [factory].
+@isTestGroup
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   bool isComponent2;
 
