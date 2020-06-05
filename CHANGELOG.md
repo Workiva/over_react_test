@@ -1,5 +1,31 @@
 # OverReact Test Changelog
 
+## 2.9.6
+* Fix prop forwarding tests false positives
+  
+  Tests that had `commonComponentTests.getUnconsumedPropKeys()` returning a list of
+  keys that included keys within mixins that were actually being consumed by the component
+  were not failing as expected.
+  
+  e.g. this situation should have resulted in test failures, but it did not:
+  
+  Component's consumedProps:
+  ```dart
+  @override
+  get consumedProps => propsMeta.forMixins({
+    SomePropsMixin,
+  });
+  ```
+  
+  Component's commonComponentTests:
+  ```dart  
+  group('common component tests', () {
+    commonComponentTests(ComponentFactory, getUnconsumedProps: (propsMeta) => [
+      ...propsMeta.forMixin(SomePropsMixin).keys,
+    ]);
+  });
+  ``` 
+
 ## 2.9.5
 * Add `Object.values` shim for MSIE 11.
 
