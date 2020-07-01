@@ -17,15 +17,16 @@ import 'package:over_react/over_react.dart';
 import './test_common_component.dart';
 import './test_common_component_nested2.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component_nested.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
 UiFactory<TestCommonNestedProps> TestCommonNested =
-    // ignore: undefined_identifier
-    _$TestCommonNested;
+    
+    _$TestCommonNested; // ignore: undefined_identifier
 
+// FIXME: `TestCommonNestedProps` could not be auto-migrated to the new over_react boilerplate because `TestCommonNestedComponent` does not extend from `UiComponent2`.
+// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$TestCommonNestedProps extends UiProps with PropsThatShouldBeForwarded {}
 

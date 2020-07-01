@@ -2,17 +2,14 @@ import 'dart:html';
 
 import 'package:over_react/over_react.dart';
 
-// ignore: uri_has_not_been_generated
 part 'sample_component2.over_react.g.dart';
 
-@Factory()
 // ignore: undefined_identifier
 UiFactory<Sample2Props> Sample2 =
-// ignore: undefined_identifier
-    _$Sample2;
 
-@Props()
-class _$Sample2Props extends UiProps {
+    _$Sample2; // ignore: undefined_identifier
+
+mixin Sample2Props on UiProps {
   bool shouldNeverBeNull;
 }
 
@@ -44,9 +41,4 @@ class SampleComponent2 extends UiComponent2<Sample2Props> {
   }
 }
 
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class Sample2Props extends _$Sample2Props with _$Sample2PropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForSample2Props;
-}
+

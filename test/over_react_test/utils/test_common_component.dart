@@ -16,15 +16,16 @@ import 'package:over_react/over_react.dart';
 
 import './test_common_component_nested.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
 UiFactory<TestCommonProps> TestCommon =
-    // ignore: undefined_identifier
-    _$TestCommon;
+    
+    _$TestCommon; // ignore: undefined_identifier
 
+// FIXME: `TestCommonProps` could not be auto-migrated to the new over_react boilerplate because `TestCommonComponent` does not extend from `UiComponent2`.
+// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$TestCommonProps extends UiProps with
     PropsThatShouldBeForwarded,
@@ -51,26 +52,18 @@ class TestCommonComponent extends UiComponent<TestCommonProps> {
   }
 }
 
-@PropsMixin()
-abstract class PropsThatShouldBeForwarded {
-  // To ensure the codemod regression checking works properly, please keep this
-  // field at the top of the class!
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForPropsThatShouldBeForwarded;
+ mixin PropsThatShouldBeForwarded on UiProps {
+  
 
-  Map get props;
+  
 
   bool foo;
 }
 
-@PropsMixin()
-abstract class PropsThatShouldNotBeForwarded {
-  // To ensure the codemod regression checking works properly, please keep this
-  // field at the top of the class!
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForPropsThatShouldNotBeForwarded;
+ mixin PropsThatShouldNotBeForwarded on UiProps {
+  
 
-  Map get props;
+  
 
   bool bar;
 }

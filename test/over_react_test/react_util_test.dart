@@ -23,7 +23,6 @@ import 'package:test/test.dart';
 import 'helper_components/sample_function_component.dart';
 import 'utils/nested_component.dart';
 
-// ignore: uri_has_not_been_generated
 part 'react_util_test.over_react.g.dart';
 
 /// Main entry point for ReactUtil testing
@@ -1247,9 +1246,11 @@ main() {
 @Factory()
 // ignore: undefined_identifier
 UiFactory<TestProps> Test =
-    // ignore: undefined_identifier
-    _$Test;
+    
+    _$Test; // ignore: undefined_identifier
 
+// FIXME: `TestProps` could not be auto-migrated to the new over_react boilerplate because `TestComponent` does not extend from `UiComponent2`.
+// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$TestProps extends UiProps {}
 
@@ -1267,8 +1268,8 @@ class TestProps extends _$TestProps with _$TestPropsAccessorsMixin {
 }
 
 UiFactory<Test2Props> Test2 =
-    // ignore: undefined_identifier
-    _$Test2;
+    
+    _$Test2; // ignore: undefined_identifier
 
 mixin Test2Props on UiProps {}
 

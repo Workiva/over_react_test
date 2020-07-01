@@ -14,15 +14,16 @@
 
 import 'package:over_react/over_react.dart';
 
-// ignore: uri_has_not_been_generated
 part 'nested_component.over_react.g.dart';
 
 @Factory()
 // ignore: undefined_identifier
 UiFactory<NestedProps> Nested =
-    // ignore: undefined_identifier
-    _$Nested;
+    
+    _$Nested; // ignore: undefined_identifier
 
+// FIXME: `NestedProps` could not be auto-migrated to the new over_react boilerplate because `NestedComponent` does not extend from `UiComponent2`.
+// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$NestedProps extends UiProps {}
 
