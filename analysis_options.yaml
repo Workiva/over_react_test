@@ -1,5 +1,11 @@
 include: package:pedantic/analysis_options.1.8.0.yaml
 
+analyzer:
+  errors:
+    # Ignore ungenerated uri error:
+    # See: https://github.com/Workiva/over_react/blob/master/doc/new_boilerplate_migration.md#ignore-ungenerated-warnings-project-wide.
+    uri_has_not_been_generated: ignore
+
 linter:
   rules:
     # - always_declare_return_types
