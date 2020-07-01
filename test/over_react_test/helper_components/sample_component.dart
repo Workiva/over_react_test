@@ -6,7 +6,6 @@ part 'sample_component.over_react.g.dart';
 
 // ignore: undefined_identifier
 UiFactory<SampleProps> Sample =
-
     _$Sample; // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
@@ -103,5 +102,3 @@ class SampleComponent extends UiComponent2<SampleProps> {
     if (props.shouldErrorInUnmount) throw Error();
   }
 }
-
-

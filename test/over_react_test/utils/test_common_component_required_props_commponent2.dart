@@ -17,7 +17,6 @@ import 'package:over_react/over_react.dart';
 part 'test_common_component_required_props_commponent2.over_react.g.dart';
 
 UiFactory<TestCommonRequiredProps2> TestCommonRequired2 =
-    
     _$TestCommonRequired2; // ignore: undefined_identifier
 
 mixin TestCommonRequiredProps2 on UiProps {

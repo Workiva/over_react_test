@@ -19,10 +19,9 @@ part 'test_common_component_required_props.over_react.g.dart';
 @Factory()
 // ignore: undefined_identifier
 UiFactory<TestCommonRequiredProps> TestCommonRequired =
-    
     _$TestCommonRequired; // ignore: undefined_identifier
 
-// FIXME: `TestCommonRequiredProps` could not be auto-migrated to the new over_react boilerplate because `TestCommonRequiredComponent` does not extend from `UiComponent2`.
+// TODO: `TestCommonRequiredProps` could not be auto-migrated to the new over_react boilerplate because `TestCommonRequiredComponent` does not extend from `UiComponent2`.
 // For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$TestCommonRequiredProps extends UiProps {

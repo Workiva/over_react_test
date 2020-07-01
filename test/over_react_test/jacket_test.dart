@@ -318,17 +318,16 @@ main() {
 
 // ignore: undefined_identifier
 UiFactory<SampleProps> Sample =
-    
     _$Sample; // ignore: undefined_identifier
 
-// FIXME: `SampleProps` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
+// TODO: `SampleProps` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
 // For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$SampleProps extends UiProps {
   bool foo;
 }
 
-// FIXME: `SampleState` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
+// TODO: `SampleState` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
 // For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @State()
 class _$SampleState extends UiState {

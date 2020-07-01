@@ -22,10 +22,9 @@ part 'wrapper_component.over_react.g.dart';
 @Factory()
 // ignore: undefined_identifier
 UiFactory<UiProps> Wrapper =
-    
     _$Wrapper; // ignore: undefined_identifier
 
-// FIXME: `WrapperProps` could not be auto-migrated to the new over_react boilerplate because `WrapperComponent` does not extend from `UiComponent2`.
+// TODO: `WrapperProps` could not be auto-migrated to the new over_react boilerplate because `WrapperComponent` does not extend from `UiComponent2`.
 // For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$WrapperProps extends UiProps {}
