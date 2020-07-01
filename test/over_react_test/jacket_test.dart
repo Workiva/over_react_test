@@ -320,44 +320,23 @@ main() {
 UiFactory<SampleProps> Sample =
     _$Sample; // ignore: undefined_identifier
 
-// TODO: `SampleProps` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
-// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
-@Props()
-class _$SampleProps extends UiProps {
+mixin SampleProps on UiProps {
   bool foo;
 }
 
-// TODO: `SampleState` could not be auto-migrated to the new over_react boilerplate because `SampleComponent` does not extend from `UiComponent2`.
-// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
-@State()
-class _$SampleState extends UiState {
+mixin SampleState on UiState {
   bool bar;
 }
 
-@Component()
-class SampleComponent extends UiStatefulComponent<SampleProps, SampleState> {
+class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {
   @override
-  Map getDefaultProps() => (newProps()..foo = false);
+   get defaultProps => (newProps()..foo = false);
 
   @override
-  Map getInitialState() => (newState()..bar = false);
+   get initialState => (newState()..bar = false);
 
   @override
   render() {
     return Dom.div()();
   }
-}
-
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class SampleProps extends _$SampleProps with _$SamplePropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForSampleProps;
-}
-
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class SampleState extends _$SampleState with _$SampleStateAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const StateMeta meta = _$metaForSampleState;
 }

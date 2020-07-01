@@ -16,32 +16,20 @@ import 'package:over_react/over_react.dart';
 
 part 'nested_component.over_react.g.dart';
 
-@Factory()
 // ignore: undefined_identifier
 UiFactory<NestedProps> Nested =
     _$Nested; // ignore: undefined_identifier
 
-// TODO: `NestedProps` could not be auto-migrated to the new over_react boilerplate because `NestedComponent` does not extend from `UiComponent2`.
-// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
-@Props()
-class _$NestedProps extends UiProps {}
+mixin NestedProps on UiProps {}
 
-@Component()
-class NestedComponent extends UiComponent<NestedProps> {
+class NestedComponent extends UiComponent2<NestedProps> {
   @override
   render() {
     return (Dom.div()..addTestId('outer'))(
       (Dom.div()
-        ..addProps(copyUnconsumedProps())
+        ..modifyProps(addUnconsumedProps)
         ..addTestId('inner')
       )()
     );
   }
-}
-
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class NestedProps extends _$NestedProps with _$NestedPropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForNestedProps;
 }

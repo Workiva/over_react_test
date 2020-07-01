@@ -1248,8 +1248,6 @@ main() {
 UiFactory<TestProps> Test =
     _$Test; // ignore: undefined_identifier
 
-// TODO: `TestProps` could not be auto-migrated to the new over_react boilerplate because `TestComponent` does not extend from `UiComponent2`.
-// For instructions on how to proceed, see: https://github.com/Workiva/over_react_codemod/tree/master/docs/boilerplate_upgrade.md#non-component2
 @Props()
 class _$TestProps extends UiProps {}
 
