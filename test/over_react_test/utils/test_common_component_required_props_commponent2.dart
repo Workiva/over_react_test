@@ -30,7 +30,6 @@ mixin TestCommonRequired2Props on UiProps {
   bool defaultFoo;
 }
 
-@Component2()
 class TestCommonRequired2Component extends
     UiComponent2<TestCommonRequired2Props> {
   @override
