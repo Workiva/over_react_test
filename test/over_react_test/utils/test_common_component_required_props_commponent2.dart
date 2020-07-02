@@ -16,10 +16,10 @@ import 'package:over_react/over_react.dart';
 
 part 'test_common_component_required_props_commponent2.over_react.g.dart';
 
-UiFactory<TestCommonRequiredProps2> TestCommonRequired2 =
+UiFactory<TestCommonRequired2Props> TestCommonRequired2 =
     _$TestCommonRequired2; // ignore: undefined_identifier
 
-mixin TestCommonRequiredProps2 on UiProps {
+mixin TestCommonRequired2Props on UiProps {
   @nullableRequiredProp
   bool foobar;
 
@@ -31,11 +31,11 @@ mixin TestCommonRequiredProps2 on UiProps {
 }
 
 @Component2()
-class TestCommonRequiredComponent2 extends
-    UiComponent2<TestCommonRequiredProps2> {
+class TestCommonRequired2Component extends
+    UiComponent2<TestCommonRequired2Props> {
   @override
   get consumedProps =>  [
-    propsMeta.forMixin(TestCommonRequiredProps2),
+    propsMeta.forMixin(TestCommonRequired2Props),
   ];
 
   @override
