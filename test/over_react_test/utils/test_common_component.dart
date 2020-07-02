@@ -49,11 +49,27 @@ class TestCommonComponent extends UiComponent<TestCommonProps> {
   }
 }
 
-mixin PropsThatShouldBeForwarded on UiProps {
+@PropsMixin()
+abstract class PropsThatShouldBeForwarded {
+  // To ensure the codemod regression checking works properly, please keep this
+  // field at the top of the class!
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = _$metaForPropsThatShouldBeForwarded;
+
+  Map get props;
+
   bool foo;
 }
 
-mixin PropsThatShouldNotBeForwarded on UiProps {
+@PropsMixin()
+abstract class PropsThatShouldNotBeForwarded {
+  // To ensure the codemod regression checking works properly, please keep this
+  // field at the top of the class!
+  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
+  static const PropsMeta meta = _$metaForPropsThatShouldNotBeForwarded;
+
+  Map get props;
+
   bool bar;
 }
 
