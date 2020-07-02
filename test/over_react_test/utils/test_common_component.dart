@@ -19,7 +19,6 @@ import './test_common_component_nested.dart';
 part 'test_common_component.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
 UiFactory<TestCommonProps> TestCommon =
     _$TestCommon; // ignore: undefined_identifier
 

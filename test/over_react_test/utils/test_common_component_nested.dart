@@ -20,7 +20,6 @@ import './test_common_component_nested2.dart';
 part 'test_common_component_nested.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
 UiFactory<TestCommonNestedProps> TestCommonNested =
     _$TestCommonNested; // ignore: undefined_identifier
 

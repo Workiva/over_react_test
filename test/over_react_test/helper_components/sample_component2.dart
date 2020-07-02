@@ -4,9 +4,7 @@ import 'package:over_react/over_react.dart';
 
 part 'sample_component2.over_react.g.dart';
 
-// ignore: undefined_identifier
-UiFactory<Sample2Props> Sample2 =
-    _$Sample2; // ignore: undefined_identifier
+UiFactory<Sample2Props> Sample2 = _$Sample2; // ignore: undefined_identifier
 
 mixin Sample2Props on UiProps {
   bool shouldNeverBeNull;

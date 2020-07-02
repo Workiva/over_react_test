@@ -17,7 +17,6 @@ import 'package:over_react/over_react.dart';
 part 'test_common_component_required_props.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
 UiFactory<TestCommonRequiredProps> TestCommonRequired =
     _$TestCommonRequired; // ignore: undefined_identifier
 
