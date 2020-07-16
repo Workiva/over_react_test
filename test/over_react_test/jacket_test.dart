@@ -20,7 +20,6 @@ import 'package:over_react_test/over_react_test.dart';
 
 import 'helper_components/sample_function_component.dart';
 
-// ignore: uri_has_not_been_generated
 part 'jacket_test.over_react.g.dart';
 
 /// Main entry point for TestJacket testing
@@ -317,46 +316,25 @@ main() {
   });
 }
 
-@Factory()
-// ignore: undefined_identifier
-UiFactory<SampleProps> Sample =
-    // ignore: undefined_identifier
-    _$Sample;
+UiFactory<SampleProps> Sample = _$Sample; // ignore: undefined_identifier
 
-@Props()
-class _$SampleProps extends UiProps {
+mixin SampleProps on UiProps {
   bool foo;
 }
 
-@State()
-class _$SampleState extends UiState {
+mixin SampleState on UiState {
   bool bar;
 }
 
-@Component()
-class SampleComponent extends UiStatefulComponent<SampleProps, SampleState> {
+class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {
   @override
-  Map getDefaultProps() => (newProps()..foo = false);
+   get defaultProps => (newProps()..foo = false);
 
   @override
-  Map getInitialState() => (newState()..bar = false);
+   get initialState => (newState()..bar = false);
 
   @override
   render() {
     return Dom.div()();
   }
-}
-
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class SampleProps extends _$SampleProps with _$SamplePropsAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForSampleProps;
-}
-
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class SampleState extends _$SampleState with _$SampleStateAccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const StateMeta meta = _$metaForSampleState;
 }

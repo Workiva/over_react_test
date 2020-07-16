@@ -15,7 +15,6 @@
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/src/over_react_test/wrapper_component.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component_new_boilerplate.over_react.g.dart';
 
 UiFactory<TestCommonForwardingProps> TestCommonForwarding =

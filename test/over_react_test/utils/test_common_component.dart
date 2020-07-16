@@ -16,14 +16,11 @@ import 'package:over_react/over_react.dart';
 
 import './test_common_component_nested.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
 UiFactory<TestCommonProps> TestCommon =
-    // ignore: undefined_identifier
-    _$TestCommon;
+    _$TestCommon; // ignore: undefined_identifier
 
 @Props()
 class _$TestCommonProps extends UiProps with

@@ -14,14 +14,11 @@
 
 import 'package:over_react/over_react.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component_required_props.over_react.g.dart';
 
 @Factory()
-// ignore: undefined_identifier
 UiFactory<TestCommonRequiredProps> TestCommonRequired =
-    // ignore: undefined_identifier
-    _$TestCommonRequired;
+    _$TestCommonRequired; // ignore: undefined_identifier
 
 @Props()
 class _$TestCommonRequiredProps extends UiProps {

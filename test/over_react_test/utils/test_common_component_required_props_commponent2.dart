@@ -14,16 +14,12 @@
 
 import 'package:over_react/over_react.dart';
 
-// ignore: uri_has_not_been_generated
 part 'test_common_component_required_props_commponent2.over_react.g.dart';
 
-@Factory()
-UiFactory<TestCommonRequiredProps2> TestCommonRequired2 =
-    // ignore: undefined_identifier
-    _$TestCommonRequired2;
+UiFactory<TestCommonRequired2Props> TestCommonRequired2 =
+    _$TestCommonRequired2; // ignore: undefined_identifier
 
-@Props()
-class _$TestCommonRequiredProps2 extends UiProps {
+mixin TestCommonRequired2Props on UiProps {
   @nullableRequiredProp
   bool foobar;
 
@@ -34,12 +30,11 @@ class _$TestCommonRequiredProps2 extends UiProps {
   bool defaultFoo;
 }
 
-@Component2()
-class TestCommonRequiredComponent2 extends
-    UiComponent2<TestCommonRequiredProps2> {
+class TestCommonRequired2Component extends
+    UiComponent2<TestCommonRequired2Props> {
   @override
-  get consumedProps => const [
-    TestCommonRequiredProps2.meta,
+  get consumedProps =>  [
+    propsMeta.forMixin(TestCommonRequired2Props),
   ];
 
   @override
@@ -54,9 +49,4 @@ class TestCommonRequiredComponent2 extends
   }
 }
 
-// AF-3369 This will be removed once the transition to Dart 2 is complete.
-// ignore: mixin_of_non_class, undefined_class
-class TestCommonRequiredProps2 extends _$TestCommonRequiredProps2 with _$TestCommonRequiredProps2AccessorsMixin {
-  // ignore: undefined_identifier, undefined_class, const_initialized_with_non_constant_value
-  static const PropsMeta meta = _$metaForTestCommonRequiredProps2;
-}
+

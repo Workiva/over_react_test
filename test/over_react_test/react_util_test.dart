@@ -23,7 +23,6 @@ import 'package:test/test.dart';
 import 'helper_components/sample_function_component.dart';
 import 'utils/nested_component.dart';
 
-// ignore: uri_has_not_been_generated
 part 'react_util_test.over_react.g.dart';
 
 /// Main entry point for ReactUtil testing
@@ -1245,10 +1244,7 @@ main() {
 }
 
 @Factory()
-// ignore: undefined_identifier
-UiFactory<TestProps> Test =
-    // ignore: undefined_identifier
-    _$Test;
+UiFactory<TestProps> Test = _$Test; // ignore: undefined_identifier
 
 @Props()
 class _$TestProps extends UiProps {}
@@ -1266,9 +1262,7 @@ class TestProps extends _$TestProps with _$TestPropsAccessorsMixin {
   static const PropsMeta meta = _$metaForTestProps;
 }
 
-UiFactory<Test2Props> Test2 =
-    // ignore: undefined_identifier
-    _$Test2;
+UiFactory<Test2Props> Test2 = _$Test2; // ignore: undefined_identifier
 
 mixin Test2Props on UiProps {}
 
