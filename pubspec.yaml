@@ -25,3 +25,11 @@ transformers:
   - over_react
   - test/pub_serve:
       $include: test/**_test{.*,}.dart
+
+
+dependency_overrides:
+  react:
+    git:
+      url: git@github.com:cleandart/react-dart.git
+      ref: 95d63194956c211bd0a0b50071a4fca4960004f4 # from proptypes-only-in-ddc
+

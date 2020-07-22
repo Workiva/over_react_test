@@ -798,6 +798,16 @@ main() {
     test('logsPropError', () {
       expect(() => mount((Sample()..shouldNeverBeNull = false)()),
           logsPropError('shouldNeverBeNull', 'should not be false'));
+
+      if (!runningInDDC()) {
+        // The expectation is purposefully faulty so that we can assert the in dart2js runtimes,
+        // the logsPropError never results in failures since react compiles out propTypes.
+        expect(() => mount((Sample()..shouldNeverBeNull = true)()),
+            logsPropError('shouldNeverBeNull'));
+      } else {
+        expect(() => mount((Sample()..shouldNeverBeNull = true)()),
+            isNot(logsPropError('shouldNeverBeNull')), reason: 'test sanity check for ddc only matcher');
+      }
     });
 
     test('logsRequiredPropError', () {

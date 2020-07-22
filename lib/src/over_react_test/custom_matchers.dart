@@ -17,6 +17,7 @@ import 'dart:svg';
 
 import 'package:over_react/over_react.dart';
 import 'package:matcher/matcher.dart';
+import 'package:over_react_test/src/over_react_test/dart_util.dart';
 import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
@@ -361,12 +362,13 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
 /// and pass it to [recordConsoleLogs] to run the function and record the resulting
 /// logs that are emitted during the function runtime.
 class _LoggingFunctionMatcher extends CustomMatcher {
-  _LoggingFunctionMatcher(dynamic matcher, {this.config, description, name})
-      : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher));
+  _LoggingFunctionMatcher(dynamic matcher, {this.config, String description, String name, bool ddcOnly = false})
+      : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher, ddcOnly));
 
   final ConsoleConfiguration config;
 
-  static dynamic _wrapMatcherForSingleLog(dynamic expected) {
+  static dynamic _wrapMatcherForSingleLog(dynamic expected, [bool ddcOnly = false]) {
+    if (ddcOnly && !runningInDDC()) return anything;
     if (expected is Matcher || expected is List) return expected;
     return contains(expected);
   }
@@ -398,8 +400,8 @@ class _LoggingFunctionMatcher extends CustomMatcher {
 /// caught error.
 ///
 /// Related: [logsToConsole], [hasNoLogs]
-Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
-    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig);
+Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool ddcOnly = false}) =>
+    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig, ddcOnly: ddcOnly);
 
 /// A Matcher used to compare a list of logs against a provided matcher.
 ///
@@ -438,8 +440,8 @@ Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
 /// ```
 ///
 /// Related: [hasLog], [hasNoLogs]
-Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig}) =>
-    _LoggingFunctionMatcher(expected, config: consoleConfig);
+Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig, bool ddcOnly = false}) =>
+    _LoggingFunctionMatcher(expected, config: consoleConfig, ddcOnly: ddcOnly);
 
 /// A matcher to verify that a callback function does not emit any logs.
 ///
@@ -464,7 +466,8 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
   _PropTypeLogMatcher(expected)
       : super(expected,
       description: 'emits the propType warning',
-      name: 'propType warning');
+      name: 'propType warning',
+      ddcOnly: true);
 
   final _filter = contains(_propTypeErrorPrefix);
 
@@ -530,6 +533,9 @@ final _PropTypeLogMatcher logsNoPropTypeWarnings = _PropTypeLogMatcher(isEmpty);
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running the provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError] in the resulting logs.
+///
+/// __NOTE: Will only produce failures when tests are run using the `dartdevc` compiler__
+/// since the `react` package "tree shakes" `propTypes` from dart2js compiled output.
 _PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
   return logsPropTypeWarning('PropError: Prop $propName. $message'.trim());
 }
@@ -544,6 +550,9 @@ _PropTypeLogMatcher logsPropError(String propName, [String message = '']) {
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running the provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError.required] in the resulting logs.
+///
+/// __NOTE: Will only produce failures when tests are run using the `dartdevc` compiler__
+/// since the `react` package "tree shakes" `propTypes` from dart2js compiled output.
 _PropTypeLogMatcher logsPropRequiredError(String propName, [String message = '']) {
   return logsPropTypeWarning('RequiredPropError: Prop $propName is required. $message'.trim());
 }
@@ -558,6 +567,9 @@ _PropTypeLogMatcher logsPropRequiredError(String propName, [String message = '']
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running the provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError.value] in the resulting logs.
+///
+/// __NOTE: Will only produce failures when tests are run using the `dartdevc` compiler__
+/// since the `react` package "tree shakes" `propTypes` from dart2js compiled output.
 _PropTypeLogMatcher logsPropValueError(dynamic invalidValue, String propName, [String message = '']) {
   return logsPropTypeWarning('InvalidPropValueError: Prop $propName set to $invalidValue. '
       '$message'.trim());
@@ -573,6 +585,9 @@ _PropTypeLogMatcher logsPropValueError(dynamic invalidValue, String propName, [S
 /// This matcher is built on top of [logsPropTypeWarning] and has the same behavior
 /// of running the provided callback, swallowing errors that occur, and looking
 /// for the expected [PropError.combination] in the resulting logs.
+///
+/// __NOTE: Will only produce failures when tests are run using the `dartdevc` compiler__
+/// since the `react` package "tree shakes" `propTypes` from dart2js compiled output.
 _PropTypeLogMatcher logsPropCombinationError(String propName, String prop2Name, [String message = '']) {
   return logsPropTypeWarning('InvalidPropCombinationError: Prop $propName and prop $prop2Name are set to '
       'incompatible values. $message'.trim());
