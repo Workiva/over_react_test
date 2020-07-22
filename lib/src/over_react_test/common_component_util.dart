@@ -305,19 +305,19 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
               @override
               get consumedProps => propsMeta.forMixins({
                 SomeOtherPropsMixin,
-                // leave out ${mixinNamesOfMissingUnconsumedPropKeys.join(', ')}
+                // leave out the mixin(s) containing ${missingUnconsumedPropKeys.join(', ')}
               });
               
               // Option 3: specify the prop mixins that should NOT be consumed:
               @override
               get consumedProps => propsMeta.allExceptForMixins({
-                ${mixinNamesOfMissingUnconsumedPropKeys.join(',\n      ')}
+                // list the mixin(s) containing ${missingUnconsumedPropKeys.join(', ')}
               });
               
           If these props should NOT be forwarded to the forwarding target rendered by this component, 
           remove these lines from the list returned to `commonComponentTests.getUnconsumedPropKeys()`:
           
-              ${mixinNamesOfMissingUnconsumedPropKeys.map((mixin) => 'propsMeta.forMixin($mixin).keys').join(',\n    ')}
+              ${missingUnconsumedPropKeys.map((key) => 'propsMeta.forMixin(/* name of the mixin containing $key */).keys').join(',\n    ')}
         '''));
       }
 
