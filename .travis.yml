@@ -1,7 +1,7 @@
 language: dart
 
 dart:
-  - stable
+  - "2.8.4" # Change back to stable if we find a path forward with https://github.com/dart-lang/sdk/issues/42977
 
 # Re-use downloaded pub packages everywhere.
 cache:
