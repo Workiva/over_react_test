@@ -100,8 +100,16 @@ class TestJacket<T extends react.Component> {
   ///
   /// > If you are rendering a function component using [mount], calling [getInstance] will throw a `StateError`.
   /// >
-  /// > * If you are trying to access an instance rendered by the function component:
-  /// >   * Use `forwardRef` to pass refs through the tree.
+  /// > * If you are trying to access an instance of some other component rendered by the function component, then try either:
+  /// >
+  /// >     i. Wrapping the component in a class-based wrapper component (such as the `Wrapper` component exported by over_react_test):
+  /// >         ```
+  /// >         final jacket = mount(Wrapper()(
+  /// >           YourFunctionComponent(),
+  /// >         ));
+  /// >         ```
+  /// >     ii. Using `forwardRef` or a ref prop to pass a ref through to the component you need
+  /// >
   /// > * If you are trying to access / query for a DOM node rendered by the function component, try using:
   /// >
   /// >   ```
@@ -112,12 +120,21 @@ class TestJacket<T extends react.Component> {
     //     a DOM component (Element) - does not throw. The cast to `ReactComponent` - while not "sound", is harmless
     //     since it is an anonymous JS interop class - not a Dart type.
     if (!_isCompositeComponent && /*[1]*/!_isDomComponent) {
-      throw StateError(
-          'getInstance() is only supported when the rendered object is a composite (class based) component. '
-          'If you are rendering a function component, and are trying to:\n\n'
-          '1. Access an instance rendered by the function component: use `forwardRef` to pass refs through the tree.\n'
-          '2. Access / query for a DOM node rendered by the function component: try using\n'
-          '    queryByTestId(jacket.mountNode, yourTestId)');
+      throw StateError(over_react.unindent('''
+          getInstance() is only supported when the rendered object is a composite (class based) component.
+          
+          If you are rendering a function component, and are trying to:
+          
+          1. Access an instance of some other component rendered by it, then try either:
+              i. Wrapping the component in a class-based wrapper component (such as the `Wrapper` component exported by over_react_test):
+                  final jacket = mount(Wrapper()(
+                    YourFunctionComponent(),
+                  ));
+              ii. Using `forwardRef` or a ref prop to pass a ref through to the component you need
+              
+          2. Access / query for a DOM node rendered by the function component, then try using `queryByTestId` with `mountNode`:
+              queryByTestId(jacket.mountNode, 'yourTestId')
+      '''));
     }
 
     return _renderedInstance as ReactComponent;
@@ -141,23 +158,29 @@ class TestJacket<T extends react.Component> {
   ///
   /// > If you are rendering a function component using [mount], calling [getNode] will throw a `StateError`.
   /// >
-  /// > Try using one of the following instead:
+  /// > * Try using [mountNode] if it works for your application.
   /// >
-  /// > ```
-  /// > jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode);
-  /// > ```
+  /// > * Otherwise, try getting the root using one of the following instead:
   /// >
-  /// > ```
-  /// > queryByTestId(jacket.mountNode, yourRootNodeTestId);
-  /// > ```
+  /// >     ```
+  /// >     queryByTestId(jacket.mountNode, yourRootNodeTestId);
+  /// >     ```
+  /// >
+  /// >     ```
+  /// >     jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode);
+  /// >     ```
   Element getNode() {
     if (!_isCompositeComponent && !_isDomComponent) {
-      throw StateError(
-          'getNode() is only supported when the rendered object is a DOM or composite (class based) component. '
-          'If you are rendering a function component, try using \n'
-          '    jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode) \n'
-          '    // or'
-          '    queryByTestId(jacket.mountNode, yourRootNodeTestId)');
+      throw StateError(over_react.unindent('''
+        getNode() is only supported when the rendered object is a DOM or composite (class based) component.
+         
+        If you are rendering a function component:
+        1. Try using [mountNode] if it works for your application.
+        2. Otherwise, try getting the root using one of the following instead:
+            jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode)
+            // or
+            queryByTestId(jacket.mountNode, yourRootNodeTestId)
+      '''));
     }
 
     return over_react.findDomNode(_renderedInstance);
