@@ -1,0 +1,16 @@
+targets:
+  $default:
+    builders:
+      build_web_compilers|entrypoint:
+        generate_for:
+          # Only compile the top-level "aggregate" test runner
+          - test/*.browser_test.dart
+        options:
+          # List any dart2js specific args here, or omit it.
+          dart2js_args:
+            # Omit type checks TODO change to -O4 at some point (e.g., --trust-primitives)
+            - -O3
+            # Generate CSP-compliant code since it will be used most often in prod
+            - --csp
+            # Disable minification for dart2js tests
+            - --no-minify
