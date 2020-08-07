@@ -105,10 +105,10 @@ class TestJacket<T extends react.Component> {
   /// >     i. Wrapping the component in a class-based wrapper component (such as the `Wrapper` component exported by over_react_test):
   /// >         ```
   /// >         final jacket = mount(Wrapper()(
-  /// >           YourFunctionComponent(),
+  /// >           YourFunctionComponent()(),
   /// >         ));
   /// >         ```
-  /// >     ii. Using `forwardRef` or a ref prop to pass a ref through to the component you need
+  /// >     ii. Using `uiForwardRef` or a ref prop to pass a ref through to the component you need
   /// >
   /// > * If you are trying to access / query for a DOM node rendered by the function component, try using:
   /// >
@@ -128,9 +128,9 @@ class TestJacket<T extends react.Component> {
           1. Access an instance of some other component rendered by it, then try either:
               i. Wrapping the component in a class-based wrapper component (such as the `Wrapper` component exported by over_react_test):
                   final jacket = mount(Wrapper()(
-                    YourFunctionComponent(),
+                    YourFunctionComponent()(),
                   ));
-              ii. Using `forwardRef` or a ref prop to pass a ref through to the component you need
+              ii. Using `uiForwardRef` or a ref prop to pass a ref through to the component you need
               
           2. Access / query for a DOM node rendered by the function component, then try using `queryByTestId` with `mountNode`:
               queryByTestId(jacket.mountNode, 'yourTestId')
