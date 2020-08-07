@@ -110,7 +110,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   if (shouldTestClassNameOverrides) {
     testClassNameOverrides(factory, childrenFactory);
   }
-  if (shouldTestRequiredProps) {
+  if (shouldTestRequiredProps && runningInDDC()) {
     testRequiredProps(factory, childrenFactory);
   }
 }
