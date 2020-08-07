@@ -464,7 +464,7 @@ const _propTypeErrorPrefix = 'Failed prop type';
 /// Related: [_LoggingFunctionMatcher]
 class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
   _PropTypeLogMatcher(expected)
-      : super(expected,
+      : super(runningInDDC() ? expected : anything,
       description: 'emits the propType warning',
       name: 'propType warning',
       ddcOnly: true);

@@ -20,85 +20,94 @@ import './helper_components/sample_component.dart';
 import './helper_components/sample_component2.dart';
 
 main() {
+  bool runtimeSupportsPropTypeWarnings() => runningInDDC();
+
   group('recordConsoleLogs', () {
     group('captures all logs correctly', () {
       test('when mounting', () {
         var logs = recordConsoleLogs(() => mount(Sample()()));
-        expect(
-            logs,
-            unorderedEquals([
-              contains('SampleProps.shouldNeverBeNull is required.'),
-              contains('Logging a standard log'),
-              contains('A second warning'),
-              contains('And a third'),
-              contains('Just a lil warning'),
-            ]));
+        final expectedLogs = [
+          contains('Logging a standard log'),
+          contains('A second warning'),
+          contains('And a third'),
+          contains('Just a lil warning'),
+        ];
+
+        if (runtimeSupportsPropTypeWarnings()) {
+          expect(logs, unorderedEquals([...expectedLogs, contains('SampleProps.shouldNeverBeNull is required.')]));
+        } else {
+          expect(logs, unorderedEquals(expectedLogs));
+        }
       });
 
       test('when re-rendering', () {
         var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
 
         var logs = recordConsoleLogs(() => jacket.rerender(Sample()()));
+        final expectedLogs = [
+          contains('Logging a standard log'),
+          contains('A second warning'),
+          contains('And a third'),
+        ];
 
-        expect(
-            logs,
-            unorderedEquals([
-              contains('SampleProps.shouldNeverBeNull is required.'),
-              contains('Logging a standard log'),
-              contains('A second warning'),
-              contains('And a third'),
-            ]));
+        if (runtimeSupportsPropTypeWarnings()) {
+          expect(logs, unorderedEquals([...expectedLogs, contains('SampleProps.shouldNeverBeNull is required.')]));
+        } else {
+          expect(logs, unorderedEquals(expectedLogs));
+        }
       });
 
       test('with nested components', () {
         var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())));
-        expect(logs, hasLength(10));
+        expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 10 : 8));
       });
 
       test('with nested components that are the same', () {
         var logs = recordConsoleLogs(() => mount(Sample()(Sample()())));
-        expect(logs, hasLength(9));
+        expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 9 : 8));
       });
     });
 
-    group('captures errors correctly', () {
-      test('when mounting', () {
-        var logs = recordConsoleLogs(
-            () => mount((Sample()..shouldAlwaysBeFalse = true)()),
-            configuration: errorConfig);
+    if (runtimeSupportsPropTypeWarnings()) {
+      group('captures errors correctly', () {
+        test('when mounting', () {
+          var logs = recordConsoleLogs(
+              () => mount((Sample()..shouldAlwaysBeFalse = true)()),
+              configuration: errorConfig);
 
-        expect(logs, hasLength(2));
-        expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')),
-            contains('set to true'));
+          expect(logs, hasLength(2));
+          expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')),
+              contains('set to true'));
+        });
+
+        test('when re-rendering', () {
+          // Will cause one error
+          var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
+
+          // Should clear the error from mounting and not create any more
+          var logs = recordConsoleLogs(
+              () => jacket.rerender((Sample()..shouldNeverBeNull = true)()),
+              configuration: errorConfig);
+
+          expect(logs, hasLength(0));
+        });
+
+        test('with nested components', () {
+          var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())),
+              configuration: errorConfig);
+
+          expect(logs, hasLength(2));
+        });
+
+        test('with nested components that are the same', () {
+          var logs = recordConsoleLogs(() => mount(Sample()(Sample()())),
+              configuration: errorConfig);
+
+          expect(logs, hasLength(1),
+              reason: 'React will only show a particular props error once');
+        });
       });
-
-      test('when re-rendering', () {
-        // Will cause one error
-        var jacket = mount((Sample()..shouldAlwaysBeFalse = true)());
-
-        // Should clear the error from mounting and not create any more
-        var logs = recordConsoleLogs(
-            () => jacket.rerender((Sample()..shouldNeverBeNull = true)()),
-            configuration: errorConfig);
-
-        expect(logs, hasLength(0));
-      });
-
-      test('with nested components', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample2()())),
-            configuration: errorConfig);
-
-        expect(logs, hasLength(2));
-      });
-
-      test('with nested components that are the same', () {
-        var logs = recordConsoleLogs(() => mount(Sample()(Sample()())),
-            configuration: errorConfig);
-
-        expect(logs, hasLength(1),
-            reason: 'React will only show a particular props error once');
-      });
-    });
+    }
 
     group('captures logs correctly', () {
       test('when mounting', () {
@@ -170,45 +179,47 @@ main() {
       });
     });
 
-    test('handles errors as expected when mounting', () {
-      var logs = recordConsoleLogs(
-          () => mount((Sample()..shouldErrorInRender = true)()),
-          configuration: errorConfig);
-
-      expect(logs, hasLength(2));
-    });
-
-    group('handles propType warnings as expected with shouldResetWarningCache',
-        () {
-      test('left as true', () {
-        var logs = recordConsoleLogs(() => mount(Sample()()),
+    if (runtimeSupportsPropTypeWarnings()) {
+      test('handles errors as expected when mounting', () {
+        var logs = recordConsoleLogs(
+            () => mount((Sample()..shouldErrorInRender = true)()),
             configuration: errorConfig);
 
-        expect(logs, hasLength(1));
+        expect(logs, hasLength(2));
       });
 
-      test('set to false', () {
-        var logs = recordConsoleLogs(() => mount(Sample()()),
-            configuration: errorConfig);
+      group('handles propType warnings as expected with shouldResetWarningCache',
+          () {
+        test('left as true', () {
+          var logs = recordConsoleLogs(() => mount(Sample()()),
+              configuration: errorConfig);
 
-        expect(logs, hasLength(1));
+          expect(logs, hasLength(1));
+        });
 
-        logs = recordConsoleLogs(() => mount(Sample()()),
-            configuration: errorConfig,
-            shouldResetPropTypesWarningCache: false);
-        expect(logs, hasLength(0),
-            reason:
-                'Because the last test triggered the same propType warning, '
-                'without resetting the cache the warning will not be logged.');
+        test('set to false', () {
+          var logs = recordConsoleLogs(() => mount(Sample()()),
+              configuration: errorConfig);
 
-        PropTypes.resetWarningCache();
+          expect(logs, hasLength(1));
 
-        logs = recordConsoleLogs(() => mount(Sample()()),
-            configuration: errorConfig,
-            shouldResetPropTypesWarningCache: false);
-        expect(logs, hasLength(1));
+          logs = recordConsoleLogs(() => mount(Sample()()),
+              configuration: errorConfig,
+              shouldResetPropTypesWarningCache: false);
+          expect(logs, hasLength(0),
+              reason:
+                  'Because the last test triggered the same propType warning, '
+                  'without resetting the cache the warning will not be logged.');
+
+          PropTypes.resetWarningCache();
+
+          logs = recordConsoleLogs(() => mount(Sample()()),
+              configuration: errorConfig,
+              shouldResetPropTypesWarningCache: false);
+          expect(logs, hasLength(1));
+        });
       });
-    });
+    }
   });
 
   group('recordConsoleLogsAsync', () {
@@ -237,7 +248,7 @@ main() {
             attachedToDocument: true);
       }, configuration: errorConfig);
 
-      expect(logs, hasLength(3));
+      expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 3 : 1));
     });
 
     test('handles errors caused when re-rendering', () async {
@@ -252,7 +263,7 @@ main() {
           ..shouldAlwaysBeFalse = true)());
       }, configuration: errorConfig);
 
-      expect(logs, hasLength(3));
+      expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 3 : 1));
     });
 
     test('handles re-renders when the mount is outside of the function',
@@ -265,7 +276,7 @@ main() {
         jacket.rerender((Sample()..shouldAlwaysBeFalse = true)());
       }, configuration: errorConfig);
 
-      expect(logs, hasLength(2));
+      expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 2 : 0));
     });
 
     test('handles re-renders when the mount is inside of the function',
@@ -280,7 +291,7 @@ main() {
           ..shouldNeverBeNull = false)());
       }, configuration: errorConfig);
 
-      expect(logs, hasLength(3));
+      expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 3 : 0));
     });
 
     test('captures logs', () async {
@@ -322,7 +333,7 @@ main() {
               jacket.rerender(Sample()());
             }, configuration: errorConfig);
 
-            expect(logs, hasLength(1));
+            expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 1 : 0));
           });
 
           test('set to false', () async {
@@ -334,7 +345,7 @@ main() {
               jacket.rerender(Sample()());
             }, configuration: errorConfig);
 
-            expect(logs, hasLength(1));
+            expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 1 : 0));
 
             logs = await recordConsoleLogsAsync(() async {
               await Future.delayed(Duration(milliseconds: 5));
@@ -355,7 +366,7 @@ main() {
               jacket.rerender(Sample()());
             }, configuration: errorConfig, shouldResetPropTypesWarningCache: false);
 
-            expect(logs, hasLength(1));
+            expect(logs, hasLength(runtimeSupportsPropTypeWarnings() ? 1 : 0));
           });
         });
   });

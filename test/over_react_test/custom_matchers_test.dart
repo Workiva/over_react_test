@@ -24,6 +24,8 @@ import './helper_components/sample_component2.dart';
 
 /// Main entry point for CustomMatchers testing
 main() {
+  bool runtimeSupportsPropTypeWarnings() => runningInDDC();
+
   group('CustomMatcher', () {
     Element testElement;
 
@@ -453,8 +455,11 @@ main() {
             'random log',
             'pizza',
             'nonsense',
-            'Failed prop type: combination error',
           ];
+
+          if (runtimeSupportsPropTypeWarnings()) {
+            logs = [...logs, 'Failed prop type: combination error'];
+          }
         });
 
         group('- hasLog -', () {
@@ -485,7 +490,13 @@ main() {
           });
 
           test('when passed in a matcher looking for multiple logs', () {
-            shouldPass(logs, logsToConsole(containsAll([contains('random log1'), contains('combination error')])));
+            final expectedLogMatchers = [contains('random log1')];
+
+            if (runtimeSupportsPropTypeWarnings()) {
+              shouldPass(logs, logsToConsole(containsAll([...expectedLogMatchers, contains('combination error')])));
+            } else {
+              shouldPass(logs, logsToConsole(containsAll(expectedLogMatchers)));
+            }
           });
 
           test('when two expects are the same', () {
@@ -510,9 +521,11 @@ main() {
             shouldPass(logs, hasNoLogs);
           });
 
-          test('when there are prop type errors', () {
-            shouldFail(logs, hasNoLogs, contains("has logs with value ['random log', 'nonsense', 'random log 2']"));
-          });
+          if (runtimeSupportsPropTypeWarnings()) {
+            test('when there are prop type errors', () {
+              shouldFail(logs, hasNoLogs, contains("has logs with value ['random log', 'nonsense', 'random log 2']"));
+            });
+          }
         });
       });
 
@@ -527,9 +540,11 @@ main() {
               shouldPass(() => mount(Sample()()), hasLog('Just a lil warning', consoleConfig: warnConfig));
             });
 
-            test('simple usage with error config', () {
-              shouldPass(() => mount(Sample()()), hasLog('shouldNeverBeNull', consoleConfig: errorConfig));
-            });
+            if (runtimeSupportsPropTypeWarnings()) {
+              test('simple usage with error config', () {
+                shouldPass(() => mount(Sample()()), hasLog('shouldNeverBeNull', consoleConfig: errorConfig));
+              });
+            }
 
             test('when there are multiple logs', () {
               shouldPass(
@@ -562,15 +577,17 @@ main() {
               );
             });
 
-            test('simple usage with error config', () {
-              shouldPass(
-                  () => mount((Sample()..shouldAlwaysBeFalse = true)()),
-                  logsToConsole([
-                    contains('shouldNeverBeNull is required'),
-                    contains('shouldAlwaysBeFalse set to true'),
-                  ], consoleConfig: errorConfig)
-              );
-            });
+            if (runtimeSupportsPropTypeWarnings()) {
+              test('simple usage with error config', () {
+                shouldPass(
+                    () => mount((Sample()..shouldAlwaysBeFalse = true)()),
+                    logsToConsole([
+                      contains('shouldNeverBeNull is required'),
+                      contains('shouldAlwaysBeFalse set to true'),
+                    ], consoleConfig: errorConfig)
+                );
+              });
+            }
 
             test('when two actual logs are the same', () {
               shouldPass(() => mount(Sample()(Sample2()())),
@@ -588,11 +605,13 @@ main() {
               shouldPass(() => mount((Sample()..shouldLog = false)()), hasNoLogs);
             });
 
-            test('when there are prop type errors', () {
-              shouldFail(() => mount(Sample()()),
-                  hasNoLogs,
-                  contains("has logs with value"));
-            });
+            if (runtimeSupportsPropTypeWarnings()) {
+              test('when there are prop type errors', () {
+                shouldFail(() => mount(Sample()()),
+                    hasNoLogs,
+                    contains("has logs with value"));
+              });
+            }
           });
         });
       });
@@ -686,7 +705,11 @@ main() {
           });
 
           test('when there are prop type errors', () {
-            shouldFail(logs, logsNoPropTypeWarnings, contains('has propType warning with value'));
+            if (runtimeSupportsPropTypeWarnings()) {
+              shouldFail(logs, logsNoPropTypeWarnings, contains('has propType warning with value'));
+            } else {
+              shouldPass(logs, logsNoPropTypeWarnings);
+            }
           });
         });
       });
@@ -764,9 +787,13 @@ main() {
             });
 
             test('when there are prop type errors', () {
-              shouldFail(() => mount((Sample())()),
-                  logsNoPropTypeWarnings,
-                  contains('has propType warning with value'));
+              if (runtimeSupportsPropTypeWarnings()) {
+                shouldFail(() => mount((Sample())()),
+                    logsNoPropTypeWarnings,
+                    contains('has propType warning with value'));
+              } else {
+                shouldPass(() => mount((Sample())()), logsNoPropTypeWarnings);
+              }
             });
           });
         });
@@ -799,7 +826,7 @@ main() {
       expect(() => mount((Sample()..shouldNeverBeNull = false)()),
           logsPropError('shouldNeverBeNull', 'should not be false'));
 
-      if (!runningInDDC()) {
+      if (!runtimeSupportsPropTypeWarnings()) {
         // The expectation is purposefully faulty so that we can assert the in dart2js runtimes,
         // the logsPropError never results in failures since react compiles out propTypes.
         expect(() => mount((Sample()..shouldNeverBeNull = true)()),
