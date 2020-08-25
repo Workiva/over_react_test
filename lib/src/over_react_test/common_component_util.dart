@@ -21,6 +21,7 @@ import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
+import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
@@ -172,7 +173,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
   @required bool ignoreDomProps,
   @required Map nonDefaultForwardingTestProps,
 }) {
-  test('forwards unconsumed props as expected', () {
+  testFunction('forwards unconsumed props as expected', () {
     // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
     // in case childrenFactory relies on variables set up in the consumer's setUp blocks.
     final meta = getPropsMeta((factory())(childrenFactory()));
@@ -266,7 +267,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // If the forwarding target is a DOM element it should not have invalid DOM props forwarded to it.
       if (isDomElement(forwardingTarget)) {
         otherProps.forEach((key, value) {
-          expect(actualProps[key], isNull, reason: unindent('''
+          expect(actualProps[key], isNot(containsPair(key, value)), reason: unindent('''
             The following mock key/value pair(s) added by this test were found on 
             a DOM component that props were forwarded to:
             
@@ -284,6 +285,8 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         final missingUnconsumedPropKeys = unconsumedProps.keys.where((key) => !actualProps.containsKey(key));
         final mixinNamesOfMissingUnconsumedPropKeys = missingUnconsumedPropKeys.map(getPropKeyNamespaceFromPropKey).where((name) => name != null).toSet();
         expect(mixinNamesOfMissingUnconsumedPropKeys, isEmpty, reason: unindent('''
+          UnconsumedProps were not forwarded.
+        
           These prop keys were not found within the props of the forwarding target: 
             
               ${missingUnconsumedPropKeys.join(',\n    ')}
@@ -372,6 +375,8 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
 
       final propMixinsThatAreUnconsumed = unexpectedKeys.map(getPropKeyNamespaceFromPropKey).toSet().toList();
       expect(unexpectedKeys, isEmpty, reason: unindent('''
+            Unexpected keys on forwarding target.
+      
             One or more props from the following prop mixin(s) were found within the props of 
             the forwarding target: 
             
@@ -424,7 +429,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
 /// > Related: [testClassNameOverrides]
 @isTestGroup
 void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  test('merges classes as expected', () {
+  testFunction('merges classes as expected', () {
     var builder = factory()
       ..addProp(forwardedPropBeacon, true)
       ..className = 'custom-class-1 blacklisted-class-1 custom-class-2 blacklisted-class-2'
@@ -443,7 +448,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
     unmount(renderedInstance);
   });
 
-  test('adds custom classes to one and only one element', () {
+  testFunction('adds custom classes to one and only one element', () {
     const customClass = 'custom-class';
 
     var renderedInstance = render(
@@ -451,7 +456,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
     );
     var descendantsWithCustomClass = react_test_utils.scryRenderedDOMComponentsWithClass(renderedInstance, customClass);
 
-    expect(descendantsWithCustomClass, hasLength(1));
+    expect(descendantsWithCustomClass, hasLength(1), reason: 'expected a single element with the forwarded custom class');
 
     unmount(renderedInstance);
   });
@@ -491,7 +496,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
     unmount(reactInstanceWithoutOverrides);
   });
 
-  test('can override added class names', () {
+  testFunction('can override added class names', () {
     if (error != null) {
       throw error;
     }
@@ -551,7 +556,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     }
   });
 
-  test('throws (component1) or logs the correct errors (component2) when the required prop is not set or is null', () {
+  testFunction('throws (component1) or logs the correct errors (component2) when the required prop is not set or is null', () {
     void component1RequiredPropsTest(){
       for (var propKey in requiredProps) {
         final reactComponentFactory = factory()
@@ -639,7 +644,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 ? component2RequiredPropsTest() : component1RequiredPropsTest();
   });
 
-  test('nullable props', () {
+  testFunction('nullable props', () {
     if (!isComponent2) {
       for (var propKey in nullableProps) {
         final reactComponentFactory = factory().componentFactory as
