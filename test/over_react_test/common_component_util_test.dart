@@ -43,6 +43,10 @@ main() {
       );
     });
 
+    group('should pass when only dom props are forwarded to a dom element', () {
+      commonComponentTests(new_boilerplate.TestCommonDomOnlyForwarding);
+    });
+
     group('should skip checking for certain props', () {
       final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()());
       final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
