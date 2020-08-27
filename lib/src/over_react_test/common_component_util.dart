@@ -267,7 +267,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // If the forwarding target is a DOM element it should not have invalid DOM props forwarded to it.
       if (isDomElement(forwardingTarget)) {
         otherProps.forEach((key, value) {
-          expect(actualProps[key], isNot(containsPair(key, value)), reason: unindent('''
+          expect(actualProps, isNot(containsPair(key, value)), reason: unindent('''
             The following mock key/value pair(s) added by this test were found on 
             a DOM component that props were forwarded to:
             
