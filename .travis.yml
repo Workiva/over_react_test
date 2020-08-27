@@ -1,7 +1,7 @@
 language: dart
 
 dart:
-  - "2.8.4" # Change back to stable if we find a path forward with https://github.com/dart-lang/sdk/issues/42977
+  - stable
 
 # Re-use downloaded pub packages everywhere.
 cache:
@@ -10,6 +10,8 @@ cache:
   - $HOME/.dart_tool
 
 script:
+  # Must run a build before analyzing as of Dart 2.9.0: See: https://github.com/dart-lang/sdk/issues/42977
+  - pub run build_runner build
   - pub run dart_dev analyze
   - pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers,pedantic
   - pub run dart_dev test test/over_react_test.dart
