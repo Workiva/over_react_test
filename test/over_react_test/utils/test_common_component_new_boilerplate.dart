@@ -55,3 +55,19 @@ mixin ShouldNotBeForwardedProps on UiProps {
   bool bar;
   Iterable propKeysToForwardAnyways;
 }
+
+UiFactory<TestCommonDomOnlyForwardingProps> TestCommonDomOnlyForwarding =
+    _$TestCommonDomOnlyForwarding; // ignore: undefined_identifier
+
+class TestCommonDomOnlyForwardingProps = UiProps
+    with ShouldBeForwardedProps, ShouldNotBeForwardedProps;
+
+class TestCommonDomOnlyForwardingComponent extends UiComponent2<TestCommonDomOnlyForwardingProps> {
+  @override
+  render() {
+    return (Dom.div()
+      ..modifyProps(addUnconsumedDomProps)
+      ..className = forwardingClassNameBuilder().toClassName()
+    )(props.children);
+  }
+}

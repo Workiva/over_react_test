@@ -21,6 +21,7 @@ import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react_test/over_react_test.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
+import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
@@ -74,6 +75,7 @@ import './react_util.dart';
 /// > If [nonDefaultForwardingTestProps] can't be used for some reason, you can skip prop forwarding tests altogether
 /// for certain props by specifying their keys in [skippedPropKeys] (or [getSkippedPropKeys] for new boilerplate)
 /// _(which gets flattened into a 1D array of strings)_.
+@isTestGroup
 void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestPropForwarding = true,
   List unconsumedPropKeys = const [],
@@ -156,15 +158,16 @@ void expectCleanTestSurfaceAtEnd() {
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// todo make this public again if there's a need to expose it, once the API has stabilized
+@isTest
 void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
   @required List unconsumedPropKeys,
   @required List skippedPropKeys,
   @required List Function(PropsMetaCollection) getUnconsumedPropKeys,
   @required List Function(PropsMetaCollection) getSkippedPropKeys,
-  @required ignoreDomProps,
-  @required nonDefaultForwardingTestProps,
+  @required bool ignoreDomProps,
+  @required Map nonDefaultForwardingTestProps,
 }) {
-  test('forwards unconsumed props as expected', () {
+  testFunction('forwards unconsumed props as expected', () {
     // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
     // in case childrenFactory relies on variables set up in the consumer's setUp blocks.
     final meta = getPropsMeta((factory())(childrenFactory()));
@@ -212,7 +215,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     const String ref = 'testRefThatShouldNotBeForwarded';
 
     /// Get defaults from a ReactElement to account for default props and any props added by the factory.
-    Map defaultProps = Map.from(getProps(factory()()))
+    Map defaultProps = Map.from(getProps(factory()(childrenFactory())))
       ..remove('children');
 
     // TODO: Account for alias components.
@@ -221,6 +224,11 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // Add defaults afterwards so that components don't blow up when they have unexpected null props.
       ...defaultProps,
       ...nonDefaultForwardingTestProps,
+    };
+
+    /// The props we expect to be present on the `forwardingTarget`.
+    final unconsumedProps = <String, dynamic>{
+      for (var key in unconsumedPropKeys) key: defaultProps[key],
     };
 
     unconsumedPropKeys.forEach(propsThatShouldNotGetForwarded.remove);
@@ -233,6 +241,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     var shallowRenderer = react_test_utils.createRenderer();
 
     var instance = (factory()
+      ..addProps(unconsumedProps)
       ..addProps(propsThatShouldNotGetForwarded)
       ..addProps(extraProps)
       ..addProps(otherProps)
@@ -249,15 +258,60 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
     for (var forwardingTarget in forwardingTargets) {
       Map actualProps = getProps(forwardingTarget);
 
-      // If the forwarding target is a DOM element it will should not have invalid DOM props forwarded to it.
+      // If the forwarding target is a DOM element it should not have invalid DOM props forwarded to it.
       if (isDomElement(forwardingTarget)) {
         otherProps.forEach((key, value) {
-          expect(actualProps, isNot(containsPair(key, value)));
+          expect(actualProps, isNot(containsPair(key, value)), reason: unindent('''
+            The following mock key/value pair(s) added by this test were found on 
+            a DOM component that props were forwarded to:
+            
+                $key: ${actualProps[key]}
+                 
+            This means that `addUnconsumedProps` is mistakenly being used 
+            instead of `addUnconsumedDomProps` on a DOM component.
+          '''));
         });
       } else {
         otherProps.forEach((key, value) {
           expect(actualProps, containsPair(key, value));
         });
+
+        final missingUnconsumedPropKeys = unconsumedProps.keys.where((key) => !actualProps.containsKey(key));
+        expect(missingUnconsumedPropKeys, isEmpty, reason: unindent('''
+          UnconsumedProps were not forwarded.
+        
+          These prop keys were not found within the props of the forwarding target: 
+            
+              ${missingUnconsumedPropKeys.join(',\n    ')}
+          
+          But they were expected to be there since they live within one of the prop mixins specified
+          in the list returned to `commonComponentTests.getUnconsumedPropKeys()` in your test. 
+          
+          If these props should be forwarded to the forwarding target rendered by this component, 
+          the value of `UiComponent2.consumedProps` must be overridden to exclude those keys:
+          
+              // Option 1: forward everything
+              @override
+              get consumedProps => [];
+              
+              // Option 2: specify the prop mixins that should be consumed:
+              @override
+              get consumedProps => propsMeta.forMixins({
+                SomeOtherPropsMixin,
+                // leave out the mixin(s) containing ${missingUnconsumedPropKeys.join(', ')}
+              });
+              
+              // Option 3: specify the prop mixins that should NOT be consumed:
+              @override
+              get consumedProps => propsMeta.allExceptForMixins({
+                // list the mixin(s) containing ${missingUnconsumedPropKeys.join(', ')}
+              });
+              
+          If these props should NOT be forwarded to the forwarding target rendered by this component, 
+          remove these lines from the list returned to `commonComponentTests.getUnconsumedPropKeys()`:
+          
+              ${missingUnconsumedPropKeys.map((key) => 'propsMeta.forMixin(/* name of the mixin containing $key */).keys').join(',\n    ')}
+        '''));
       }
 
       // Expect the target to have all forwarded props.
@@ -275,7 +329,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       // Don't test any keys specified by skippedPropKeys.
       propKeysThatShouldNotGetForwarded.removeAll(skippedPropKeys);
 
-      Set unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded);
+      Set<String> unexpectedKeys = actualProps.keys.toSet().intersection(propKeysThatShouldNotGetForwarded).cast<String>();
 
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
@@ -312,7 +366,36 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         }
       }
 
-      expect(unexpectedKeys, isEmpty, reason: 'Should filter out all consumed props');
+      expect(unexpectedKeys, isEmpty, reason: unindent('''
+            Unexpected keys on forwarding target.
+            
+            These prop keys were found within the props of the forwarding target: 
+            
+                ${unexpectedKeys.join(',\n    ')}
+            
+            But they were not expected to be there since they are not specified
+            in the list returned to `commonComponentTests.getUnconsumedPropKeys()` in your test. 
+            
+            If props from the mixin(s) listed above should be forwarded to the forwarding target rendered 
+            by this component, add the name of the mixin that contains them to the list returned to 
+            `commonComponentTests.getUnconsumedPropKeys()`
+            
+            If props from the mixin(s) listed above should NOT be forwarded to the forwarding target rendered 
+            by this component, the value of `UiComponent2.consumedProps` must be overridden to include those mixin(s):
+            
+                // Option 1: specify that the prop mixin(s) should be consumed:
+                @override
+                get consumedProps => propsMeta.forMixins({
+                  // Add the names of the mixin(s) in question.
+                });
+                
+                // Option 2: specify the prop mixins that should NOT be consumed:
+                @override
+                get consumedProps => propsMeta.allExceptForMixins({
+                  SomeOtherPropsMixin,
+                  // Leave out the mixin(s) in question.
+                });
+          '''));
 
       if (ambiguousProps.isNotEmpty) {
         fail(unindent(
@@ -334,8 +417,9 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// > Related: [testClassNameOverrides]
+@isTestGroup
 void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  test('merges classes as expected', () {
+  testFunction('merges classes as expected', () {
     var builder = factory()
       ..addProp(forwardedPropBeacon, true)
       ..className = 'custom-class-1 blacklisted-class-1 custom-class-2 blacklisted-class-2'
@@ -354,7 +438,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
     unmount(renderedInstance);
   });
 
-  test('adds custom classes to one and only one element', () {
+  testFunction('adds custom classes to one and only one element', () {
     const customClass = 'custom-class';
 
     var renderedInstance = render(
@@ -362,7 +446,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
     );
     var descendantsWithCustomClass = react_test_utils.scryRenderedDOMComponentsWithClass(renderedInstance, customClass);
 
-    expect(descendantsWithCustomClass, hasLength(1));
+    expect(descendantsWithCustomClass, hasLength(1), reason: 'expected a single element with the forwarded custom class');
 
     unmount(renderedInstance);
   });
@@ -374,6 +458,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// > Related: [testClassNameMerging]
+@isTestGroup
 void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   Set<String> classesToOverride;
   var error;
@@ -401,7 +486,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
     unmount(reactInstanceWithoutOverrides);
   });
 
-  test('can override added class names', () {
+  testFunction('can override added class names', () {
     if (error != null) {
       throw error;
     }
@@ -426,6 +511,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// > Typically not consumed standalone. Use [commonComponentTests] instead.
 ///
 /// __Note__: All required props must be provided by [factory].
+@isTestGroup
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
   bool isComponent2;
 
@@ -460,7 +546,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     }
   });
 
-  test('throws (component1) or logs the correct errors (component2) when the required prop is not set or is null', () {
+  testFunction('throws (component1) or logs the correct errors (component2) when the required prop is not set or is null', () {
     void component1RequiredPropsTest(){
       for (var propKey in requiredProps) {
         final reactComponentFactory = factory()
@@ -548,7 +634,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 ? component2RequiredPropsTest() : component1RequiredPropsTest();
   });
 
-  test('nullable props', () {
+  testFunction('nullable props', () {
     if (!isComponent2) {
       for (var propKey in nullableProps) {
         final reactComponentFactory = factory().componentFactory as
