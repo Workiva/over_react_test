@@ -117,12 +117,6 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   }
 }
 
-String getPropKeyNamespaceFromPropKey(String propKey) {
-  final indexOfNamespaceSeparator = propKey.indexOf('.');
-  if (indexOfNamespaceSeparator == -1) return null;
-  return propKey.substring(0, indexOfNamespaceSeparator);
-}
-
 Iterable _flatten(Iterable iterable) =>
     iterable.expand((item) => item is Iterable ? _flatten(item) : [item]);
 
@@ -283,8 +277,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         });
 
         final missingUnconsumedPropKeys = unconsumedProps.keys.where((key) => !actualProps.containsKey(key));
-        final mixinNamesOfMissingUnconsumedPropKeys = missingUnconsumedPropKeys.map(getPropKeyNamespaceFromPropKey).where((name) => name != null).toSet();
-        expect(mixinNamesOfMissingUnconsumedPropKeys, isEmpty, reason: unindent('''
+        expect(missingUnconsumedPropKeys, isEmpty, reason: unindent('''
           UnconsumedProps were not forwarded.
         
           These prop keys were not found within the props of the forwarding target: 
@@ -373,22 +366,19 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         }
       }
 
-      final propMixinsThatAreUnconsumed = unexpectedKeys.map(getPropKeyNamespaceFromPropKey).toSet().toList();
       expect(unexpectedKeys, isEmpty, reason: unindent('''
             Unexpected keys on forwarding target.
-      
-            One or more props from the following prop mixin(s) were found within the props of 
-            the forwarding target: 
             
-                ${propMixinsThatAreUnconsumed.join(',\n    ')}
+            These prop keys were found within the props of the forwarding target: 
+            
+                ${unexpectedKeys.join(',\n    ')}
             
             But they were not expected to be there since they are not specified
             in the list returned to `commonComponentTests.getUnconsumedPropKeys()` in your test. 
             
             If props from the mixin(s) listed above should be forwarded to the forwarding target rendered 
-            by this component, add these to the list returned to `commonComponentTests.getUnconsumedPropKeys()`: 
-            
-                ${propMixinsThatAreUnconsumed.map((mixin) => 'propsMeta.forMixin($mixin).keys').join(',\n    ')}
+            by this component, add the name of the mixin that contains them to the list returned to 
+            `commonComponentTests.getUnconsumedPropKeys()`
             
             If props from the mixin(s) listed above should NOT be forwarded to the forwarding target rendered 
             by this component, the value of `UiComponent2.consumedProps` must be overridden to include those mixin(s):
@@ -396,7 +386,7 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
                 // Option 1: specify that the prop mixin(s) should be consumed:
                 @override
                 get consumedProps => propsMeta.forMixins({
-                  ${propMixinsThatAreUnconsumed.map((mixin) => '$mixin').join(',\n      ')}
+                  // Add the names of the mixin(s) in question.
                 });
                 
                 // Option 2: specify the prop mixins that should NOT be consumed:
