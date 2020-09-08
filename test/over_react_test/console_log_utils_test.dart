@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import 'package:over_react_test/over_react_test.dart';
+import 'package:over_react_test/src/over_react_test/dart_util.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
 
@@ -20,8 +21,6 @@ import './helper_components/sample_component.dart';
 import './helper_components/sample_component2.dart';
 
 main() {
-  bool runtimeSupportsPropTypeWarnings() => runningInDDC();
-
   group('recordConsoleLogs', () {
     group('captures all logs correctly', () {
       test('when mounting', () {

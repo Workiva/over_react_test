@@ -16,6 +16,7 @@ import 'dart:html';
 import 'dart:svg';
 
 import 'package:over_react/over_react.dart';
+import 'package:over_react_test/src/over_react_test/dart_util.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
@@ -24,8 +25,6 @@ import './helper_components/sample_component2.dart';
 
 /// Main entry point for CustomMatchers testing
 main() {
-  bool runtimeSupportsPropTypeWarnings() => runningInDDC();
-
   group('CustomMatcher', () {
     Element testElement;
 

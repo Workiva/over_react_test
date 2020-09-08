@@ -29,6 +29,7 @@ import 'package:test/test.dart';
 
 import './custom_matchers.dart';
 import './react_util.dart';
+import 'dart_util.dart';
 
 /// Run common component tests around default props, prop forwarding, class name merging, and class name overrides.
 ///
@@ -112,7 +113,7 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   if (shouldTestClassNameOverrides) {
     testClassNameOverrides(factory, childrenFactory);
   }
-  if (shouldTestRequiredProps && runningInDDC()) {
+  if (shouldTestRequiredProps && assertsEnabled()) {
     testRequiredProps(factory, childrenFactory);
   }
 }

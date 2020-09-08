@@ -368,7 +368,7 @@ class _LoggingFunctionMatcher extends CustomMatcher {
   final ConsoleConfiguration config;
 
   static dynamic _wrapMatcherForSingleLog(dynamic expected, [bool ddcOnly = false]) {
-    if (ddcOnly && !runningInDDC()) return anything;
+    if (ddcOnly && !assertsEnabled()) return anything;
     if (expected is Matcher || expected is List) return expected;
     return contains(expected);
   }
@@ -464,7 +464,7 @@ const _propTypeErrorPrefix = 'Failed prop type';
 /// Related: [_LoggingFunctionMatcher]
 class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
   _PropTypeLogMatcher(expected)
-      : super(runningInDDC() ? expected : anything,
+      : super(assertsEnabled() ? expected : anything,
       description: 'emits the propType warning',
       name: 'propType warning',
       ddcOnly: true);
