@@ -1,5 +1,9 @@
 # OverReact Test Changelog
 
+## 2.10.0
+* Only expect `propTypes` errors in DDC runtime.
+* Add new `runningInDDC()` utility that returns whether a test is running in the Dart Dev Compiler runtime environment.
+
 ## 2.9.6
 * Fix prop forwarding tests false positives
   
