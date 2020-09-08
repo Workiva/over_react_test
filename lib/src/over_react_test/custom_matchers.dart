@@ -362,13 +362,13 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
 /// and pass it to [recordConsoleLogs] to run the function and record the resulting
 /// logs that are emitted during the function runtime.
 class _LoggingFunctionMatcher extends CustomMatcher {
-  _LoggingFunctionMatcher(dynamic matcher, {this.config, String description, String name, bool ddcOnly = false})
-      : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher, ddcOnly));
+  _LoggingFunctionMatcher(dynamic matcher, {this.config, String description, String name, bool onlyIfAssertsAreEnabled = false})
+      : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher, onlyIfAssertsAreEnabled));
 
   final ConsoleConfiguration config;
 
-  static dynamic _wrapMatcherForSingleLog(dynamic expected, [bool ddcOnly = false]) {
-    if (ddcOnly && !assertsEnabled()) return anything;
+  static dynamic _wrapMatcherForSingleLog(dynamic expected, [bool onlyIfAssertsAreEnabled = false]) {
+    if (onlyIfAssertsAreEnabled && !assertsEnabled()) return anything;
     if (expected is Matcher || expected is List) return expected;
     return contains(expected);
   }
@@ -400,8 +400,8 @@ class _LoggingFunctionMatcher extends CustomMatcher {
 /// caught error.
 ///
 /// Related: [logsToConsole], [hasNoLogs]
-Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool ddcOnly = false}) =>
-    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig, ddcOnly: ddcOnly);
+Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
+    _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig, onlyIfAssertsAreEnabled: onlyIfAssertsAreEnabled);
 
 /// A Matcher used to compare a list of logs against a provided matcher.
 ///
@@ -440,8 +440,8 @@ Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool ddcOn
 /// ```
 ///
 /// Related: [hasLog], [hasNoLogs]
-Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig, bool ddcOnly = false}) =>
-    _LoggingFunctionMatcher(expected, config: consoleConfig, ddcOnly: ddcOnly);
+Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
+    _LoggingFunctionMatcher(expected, config: consoleConfig, onlyIfAssertsAreEnabled: onlyIfAssertsAreEnabled);
 
 /// A matcher to verify that a callback function does not emit any logs.
 ///
@@ -467,7 +467,7 @@ class _PropTypeLogMatcher extends _LoggingFunctionMatcher {
       : super(assertsEnabled() ? expected : anything,
       description: 'emits the propType warning',
       name: 'propType warning',
-      ddcOnly: true);
+      onlyIfAssertsAreEnabled: true);
 
   final _filter = contains(_propTypeErrorPrefix);
 
