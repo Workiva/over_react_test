@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:meta/meta.dart';
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
+import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
@@ -39,6 +41,10 @@ main() {
           ...meta.forMixin(new_boilerplate.ShouldBeForwardedProps).keys,
         ],
       );
+    });
+
+    group('should pass when only dom props are forwarded to a dom element', () {
+      commonComponentTests(new_boilerplate.TestCommonDomOnlyForwarding);
     });
 
     group('should skip checking for certain props', () {
@@ -70,15 +76,15 @@ main() {
         );
       });
 
-    group('when passed a UiComponent2', () {
-      commonComponentTests(() => (TestCommonRequired2()
-            ..bar = true
-            ..foobar = true),
-          shouldTestRequiredProps: true,
-          shouldTestClassNameMerging: false,
-          shouldTestClassNameOverrides: false,
-          shouldTestPropForwarding: false,
-      );
+      group('when passed a UiComponent2', () {
+        commonComponentTests(() => (TestCommonRequired2()
+              ..bar = true
+              ..foobar = true),
+            shouldTestRequiredProps: true,
+            shouldTestClassNameMerging: false,
+            shouldTestClassNameOverrides: false,
+            shouldTestPropForwarding: false,
+        );
       });
     });
 
@@ -147,5 +153,165 @@ main() {
         });
       });
     });
+
+    group('fails when a component', () {
+      /// Declares a [group] in which tests declared via [testFunction] are expected to fail
+      /// with an error matching [testFailureMatcher].
+      @isTestGroup
+      void expectedFailGroup(String description, void Function() groupBody, {@required dynamic testFailureMatcher}) {
+        group(description, () {
+          int totalTestCount = 0;
+          List<TestFailure> testFailureErrors;
+          setUpAll(() => testFailureErrors = []);
+
+          void testButReAndIgnoreExceptions(name, testBody) {
+            totalTestCount++;
+            test(name, () async {
+              try {
+                await testBody();
+              } on TestFailure catch (e) {
+                testFailureErrors.add(e);
+              } catch(e, st) {
+                fail('Unexpected test error: $e\n$st');
+              }
+            });
+          }
+
+          ;
+
+          testFunction = testButReAndIgnoreExceptions;
+          groupBody();
+          testFunction = test;
+
+          test('(tests fail check)', () {
+            expect(testFailureErrors, isNotEmpty, reason: 'Expected at least 1 of $totalTestCount tests to fail');
+            expect(
+                testFailureErrors,
+                everyElement(
+                    isA<TestFailure>().having((source) => source.message, 'error message', testFailureMatcher)));
+          });
+        });
+      }
+
+      final testPropsMeta = PropsMetaCollection({
+        DummyProps1: createTestPropsMeta(['Foo.prop1', 'Foo.prop2']),
+        DummyProps2: createTestPropsMeta(['Bar.prop1', 'Bar.prop2']),
+      });
+
+      expectedFailGroup('forwards consumed props -', () {
+        final factory = registerHelperComponent(
+          propsMeta: testPropsMeta,
+          consumedProps: testPropsMeta.all,
+          render: (component) => (Wrapper()..addAll(component.props))(),
+        );
+        commonComponentTests(
+          factory,
+          shouldTestClassNameMerging: false,
+          shouldTestRequiredProps: false,
+          shouldTestClassNameOverrides: false,
+        );
+      }, testFailureMatcher: contains('Unexpected keys on forwarding target'));
+
+      expectedFailGroup('does not forward all of the unconsumed props in propsMeta -', () {
+        var factory = registerHelperComponent(
+          propsMeta: testPropsMeta,
+          consumedProps: [],
+          render: (component) => (Wrapper()
+            ..addAll(component.props)
+            ..remove('Foo.prop1'))(),
+        );
+        commonComponentTests(
+          factory,
+          getUnconsumedPropKeys: (meta) => [
+            ...meta.forMixin(DummyProps1).keys,
+            ...meta.forMixin(DummyProps2).keys,
+          ],
+          shouldTestClassNameMerging: false,
+          shouldTestRequiredProps: false,
+          shouldTestClassNameOverrides: false,
+        );
+      }, testFailureMatcher: contains('UnconsumedProps were not forwarded'));
+    });
   });
+}
+
+abstract class DummyProps1 {}
+
+abstract class DummyProps2 {}
+
+PropsMeta createTestPropsMeta(List<String> keys) => PropsMeta(
+      keys: keys,
+      fields: keys.map((k) => PropDescriptor(k)).toList(),
+    );
+
+typedef HelperRenderFunction = dynamic Function(CommonHelperComponent component);
+
+const UiFactory<UiProps> arbitraryUiFactory = domProps;
+
+UiFactory<UiProps> registerHelperComponent({
+  @required HelperRenderFunction render,
+  Map defaultProps,
+  Iterable<ConsumedProps> consumedProps,
+  PropsMetaCollection propsMeta,
+}) {
+  final factory = registerComponent2(() {
+    return CommonHelperComponent(
+        defaultPropsValue: defaultProps,
+        consumedPropsValue: consumedProps,
+        propsMetaValue: propsMeta,
+        renderValue: render,
+      );
+  });
+
+  return ([Map backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
+}
+
+class CommonHelperComponent extends UiComponent2<UiProps> {
+  final Map defaultPropsValue;
+  final Iterable<ConsumedProps> consumedPropsValue;
+  final PropsMetaCollection propsMetaValue;
+  final HelperRenderFunction renderValue;
+
+  CommonHelperComponent({
+    @required Map defaultPropsValue,
+    @required Iterable<ConsumedProps> consumedPropsValue,
+    @required PropsMetaCollection propsMetaValue,
+    @required this.renderValue,
+  }) :
+    defaultPropsValue = defaultPropsValue ?? {},
+    propsMetaValue = propsMetaValue ?? const PropsMetaCollection({}),
+    consumedPropsValue = consumedPropsValue ?? propsMetaValue?.all ?? [];
+
+  @override
+  get defaultProps => defaultPropsValue; // ignore: over_react_pseudo_static_lifecycle
+
+  @override
+  get consumedProps => consumedPropsValue;
+
+  @override
+  get propsMeta => propsMetaValue;
+
+  @override
+  render()  => renderValue(this);
+
+  // Implement typically-generated members
+
+  @override
+  bool get $isClassGenerated => false;
+
+  @override
+  typedPropsFactory(map) => arbitraryUiFactory(map);
+
+  @override
+  typedPropsFactoryJs(map) => typedPropsFactory(map);
+
+  UiProps _cachedTypedProps;
+
+  @override
+  UiProps get props => _cachedTypedProps;
+
+  @override
+  set props(Map value) {
+    _cachedTypedProps = typedPropsFactory(value);
+  }
 }
