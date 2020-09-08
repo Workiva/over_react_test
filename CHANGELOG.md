@@ -1,5 +1,8 @@
 # OverReact Test Changelog
 
+## 2.9.7
+* Only expect `propTypes` errors in DDC runtime.
+
 ## 2.9.6
 * Fix prop forwarding tests false positives
   

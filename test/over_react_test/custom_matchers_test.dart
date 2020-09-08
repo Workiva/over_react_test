@@ -16,6 +16,7 @@ import 'dart:html';
 import 'dart:svg';
 
 import 'package:over_react/over_react.dart';
+import 'package:over_react_test/src/over_react_test/dart_util.dart';
 import 'package:test/test.dart';
 import 'package:over_react_test/over_react_test.dart';
 
@@ -528,7 +529,9 @@ main() {
             });
 
             test('simple usage with error config', () {
-              shouldPass(() => mount(Sample()()), hasLog('shouldNeverBeNull', consoleConfig: errorConfig));
+              shouldPass(() => mount((Sample()
+                ..shouldErrorInMount = true
+              )()), hasLog('error', consoleConfig: errorConfig));
             });
 
             test('when there are multiple logs', () {
@@ -564,10 +567,12 @@ main() {
 
             test('simple usage with error config', () {
               shouldPass(
-                  () => mount((Sample()..shouldAlwaysBeFalse = true)()),
+                  () => mount((Sample()
+                    ..shouldNeverBeNull = true
+                    ..shouldErrorInMount = true
+                  )()),
                   logsToConsole([
-                    contains('shouldNeverBeNull is required'),
-                    contains('shouldAlwaysBeFalse set to true'),
+                    contains('error'),
                   ], consoleConfig: errorConfig)
               );
             });
@@ -588,11 +593,13 @@ main() {
               shouldPass(() => mount((Sample()..shouldLog = false)()), hasNoLogs);
             });
 
-            test('when there are prop type errors', () {
-              shouldFail(() => mount(Sample()()),
-                  hasNoLogs,
-                  contains("has logs with value"));
-            });
+            if (runtimeSupportsPropTypeWarnings()) {
+              test('when there are prop type errors', () {
+                shouldFail(() => mount(Sample()()),
+                    hasNoLogs,
+                    contains("has logs with value"));
+              });
+            }
           });
         });
       });
@@ -686,7 +693,11 @@ main() {
           });
 
           test('when there are prop type errors', () {
-            shouldFail(logs, logsNoPropTypeWarnings, contains('has propType warning with value'));
+            if (runtimeSupportsPropTypeWarnings()) {
+              shouldFail(logs, logsNoPropTypeWarnings, contains('has propType warning with value'));
+            } else {
+              shouldPass(logs, logsNoPropTypeWarnings);
+            }
           });
         });
       });
@@ -764,9 +775,13 @@ main() {
             });
 
             test('when there are prop type errors', () {
-              shouldFail(() => mount((Sample())()),
-                  logsNoPropTypeWarnings,
-                  contains('has propType warning with value'));
+              if (runtimeSupportsPropTypeWarnings()) {
+                shouldFail(() => mount((Sample())()),
+                    logsNoPropTypeWarnings,
+                    contains('has propType warning with value'));
+              } else {
+                shouldPass(() => mount((Sample())()), logsNoPropTypeWarnings);
+              }
             });
           });
         });
@@ -798,6 +813,16 @@ main() {
     test('logsPropError', () {
       expect(() => mount((Sample()..shouldNeverBeNull = false)()),
           logsPropError('shouldNeverBeNull', 'should not be false'));
+
+      if (!runtimeSupportsPropTypeWarnings()) {
+        // The expectation is purposefully faulty so that we can assert that in dart2js runtimes,
+        // the logsPropError never results in failures since react compiles out propTypes.
+        expect(() => mount((Sample()..shouldNeverBeNull = true)()),
+            logsPropError('shouldNeverBeNull'));
+      } else {
+        expect(() => mount((Sample()..shouldNeverBeNull = true)()),
+            isNot(logsPropError('shouldNeverBeNull')), reason: 'test sanity check for ddc only matcher');
+      }
     });
 
     test('logsRequiredPropError', () {
