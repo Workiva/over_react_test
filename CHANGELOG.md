@@ -1,6 +1,9 @@
 # OverReact Test Changelog
 
-## 2.9.7
+## 2.10.1
+
+_Re-tag of 2.10.0 release which was not released correctly_
+
 * Only expect `propTypes` errors in DDC runtime.
 
 ## 2.9.6
