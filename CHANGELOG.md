@@ -1,5 +1,9 @@
 # OverReact Test Changelog
 
+## 2.10.2
+
+* Widen over_react and react version constraints in preparation for v4.0.0 and v6.0.0, respectively. 
+
 ## 2.10.1
 
 _Re-tag of 2.10.0 release which was not released correctly_
