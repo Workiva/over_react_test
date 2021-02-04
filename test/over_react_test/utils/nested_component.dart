@@ -16,7 +16,7 @@ import 'package:over_react/over_react.dart';
 
 part 'nested_component.over_react.g.dart';
 
-UiFactory<NestedProps> Nested = _$Nested; // ignore: undefined_identifier
+UiFactory<NestedProps> Nested = castUiFactory(_$Nested); // ignore: undefined_identifier
 
 mixin NestedProps on UiProps {}
 
