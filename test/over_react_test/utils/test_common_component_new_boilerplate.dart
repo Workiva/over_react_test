@@ -18,7 +18,7 @@ import 'package:over_react_test/src/over_react_test/wrapper_component.dart';
 part 'test_common_component_new_boilerplate.over_react.g.dart';
 
 UiFactory<TestCommonForwardingProps> TestCommonForwarding =
-    _$TestCommonForwarding; // ignore: undefined_identifier
+    castUiFactory(_$TestCommonForwarding); // ignore: undefined_identifier
 
 class TestCommonForwardingProps = UiProps
     with ShouldBeForwardedProps, ShouldNotBeForwardedProps;
@@ -57,7 +57,7 @@ mixin ShouldNotBeForwardedProps on UiProps {
 }
 
 UiFactory<TestCommonDomOnlyForwardingProps> TestCommonDomOnlyForwarding =
-    _$TestCommonDomOnlyForwarding; // ignore: undefined_identifier
+    castUiFactory(_$TestCommonDomOnlyForwarding); // ignore: undefined_identifier
 
 class TestCommonDomOnlyForwardingProps = UiProps
     with ShouldBeForwardedProps, ShouldNotBeForwardedProps;

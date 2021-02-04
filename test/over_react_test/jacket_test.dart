@@ -316,7 +316,7 @@ main() {
   });
 }
 
-UiFactory<SampleProps> Sample = _$Sample; // ignore: undefined_identifier
+UiFactory<SampleProps> Sample = castUiFactory(_$Sample); // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
   bool foo;

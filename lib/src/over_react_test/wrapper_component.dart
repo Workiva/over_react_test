@@ -19,7 +19,7 @@ part 'wrapper_component.over_react.g.dart';
 /// A helper component for use in tests where a component needs to be
 /// rendered inside a wrapper, but a composite component must be used
 /// for compatability with `getByTestId()`.
-UiFactory<WrapperProps> Wrapper = _$Wrapper; // ignore: undefined_identifier
+UiFactory<WrapperProps> Wrapper = castUiFactory(_$Wrapper); // ignore: undefined_identifier
 
 mixin WrapperProps on UiProps {}
 
