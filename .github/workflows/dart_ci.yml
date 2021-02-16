@@ -39,5 +39,5 @@ jobs:
         if: always() && steps.install.outcome == 'success'
 
       - name: Run tests (dart2js)
-        run: pub run dart_dev test -r
+        run: pub run dart_dev test --build-args="-r"
         if: always() && steps.install.outcome == 'success'
