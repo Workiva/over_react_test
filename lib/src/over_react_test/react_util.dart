@@ -53,10 +53,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// By default the rendered instance will be unmounted after the current test, to prevent this behavior set
 /// [autoTearDown] to false. If [autoTearDown] is set to true once it will, if provided, call [autoTearDownCallback]
 /// once the component has been unmounted.
-/* [1] */ render(dynamic component,
-    {bool autoTearDown = true,
-    Element container,
-    Callback autoTearDownCallback}) {
+/* [1] */ render(dynamic component, {bool autoTearDown = true, Element container, Callback autoTearDownCallback}) {
   var renderedInstance;
   component = component is component_base.UiProps ? component() : component;
 
@@ -110,10 +107,8 @@ void unmount(dynamic instanceOrContainerNode) {
 
   if (instanceOrContainerNode is Element) {
     containerNode = instanceOrContainerNode;
-  } else if (
-      react_test_utils.isCompositeComponent(instanceOrContainerNode) ||
-      react_test_utils.isDOMComponent(instanceOrContainerNode)
-  ) {
+  } else if (react_test_utils.isCompositeComponent(instanceOrContainerNode) ||
+      react_test_utils.isDOMComponent(instanceOrContainerNode)) {
     try {
       containerNode = findDomNode(instanceOrContainerNode)?.parent;
     } catch (e) {
@@ -121,8 +116,7 @@ void unmount(dynamic instanceOrContainerNode) {
     }
   } else {
     throw ArgumentError(
-        '`instanceOrNode` must be null, a ReactComponent instance, or an Element. Was: $instanceOrContainerNode.'
-    );
+        '`instanceOrNode` must be null, a ReactComponent instance, or an Element. Was: $instanceOrContainerNode.');
   }
 
   if (containerNode != null) react_dom.unmountComponentAtNode(containerNode);
@@ -141,7 +135,7 @@ Element renderAndGetDom(dynamic component, {bool autoTearDown = true, Callback a
 
   if (!react_test_utils.isCompositeComponent(renderedInstance) && !react_test_utils.isDOMComponent(renderedInstance)) {
     throw StateError(
-      'renderAndGetDom() is only supported when the rendered object is a DOM or composite (class based) component.');
+        'renderAndGetDom() is only supported when the rendered object is a DOM or composite (class based) component.');
   }
 
   return findDomNode(renderedInstance);
@@ -152,8 +146,7 @@ Element renderAndGetDom(dynamic component, {bool autoTearDown = true, Callback a
 /// > If [component] is a function component, calling [renderAndGetComponent] will throw a `StateError`.
 /// >
 /// > See `TestJacket.getInstance` for more information about this limitation.
-react.Component renderAndGetComponent(dynamic component,
-        {bool autoTearDown = true, Callback autoTearDownCallback}) {
+react.Component renderAndGetComponent(dynamic component, {bool autoTearDown = true, Callback autoTearDownCallback}) {
   final renderedInstance = render(component, autoTearDown: autoTearDown, autoTearDownCallback: autoTearDownCallback);
 
   // [1] Adding an additional check for dom components here because the current behavior when `renderedInstance` is
@@ -162,9 +155,9 @@ react.Component renderAndGetComponent(dynamic component,
   //     to cause new exceptions in a scenario where the consumer was storing a null value and then simply
   //     not using it in their test.
   if (!react_test_utils.isCompositeComponent(renderedInstance) &&
-      /*[1]*/!react_test_utils.isDOMComponent(renderedInstance)) {
+      /*[1]*/ !react_test_utils.isDOMComponent(renderedInstance)) {
     throw StateError(
-      'renderAndGetComponent() is only supported when the rendered object is a composite (class based) component.');
+        'renderAndGetComponent() is only supported when the rendered object is a composite (class based) component.');
   }
 
   return getDartComponent(renderedInstance);
@@ -177,9 +170,7 @@ List<Element> _attachedReactContainers = [];
 ///
 /// Returns the rendered component.
 /* [1] */ renderAttachedToDocument(dynamic component,
-    {bool autoTearDown = true,
-    Element container,
-    Callback autoTearDownCallback}) {
+    {bool autoTearDown = true, Element container, Callback autoTearDownCallback}) {
   container ??= DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
@@ -347,7 +338,7 @@ List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key = defa
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {
-    return _getAllByTestIdShallow(root, value, key: key);
+    return _jsGetAllByTestIdShallow(root, value, key: key);
   }
 
   return react_test_utils.findAllInRenderedTree(root, allowInterop((descendant) {
@@ -381,7 +372,8 @@ List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key = defa
 ///
 ///    // This returns [ `<Instance of 'ForwardsPropsComponent'>` ]
 ///    getAllComponentsByTestId(root, 'foo')
-List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value, {String key = defaultTestIdKey}) =>
+List<T> getAllComponentsByTestId<T extends react.Component>(dynamic root, String value,
+        {String key = defaultTestIdKey}) =>
     getAllByTestId(root, value, key: key)
         .map((element) => getDartComponent<T>(element)) // ignore: unnecessary_lambdas
         .where((component) => component != null)
@@ -509,7 +501,7 @@ Map getPropsByTestId(dynamic root, String value, {String key = defaultTestIdKey}
   return null;
 }
 
-List<ReactElement> _getAllByTestIdShallow(ReactElement root, String value, {String key = defaultTestIdKey}) {
+List<ReactElement> _jsGetAllByTestIdShallow(ReactElement root, String value, {String key = defaultTestIdKey}) {
   Iterable flattenChildren(dynamic children) sync* {
     if (children is Iterable) {
       yield* children.expand(flattenChildren);

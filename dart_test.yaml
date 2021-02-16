@@ -1,0 +1,11 @@
+# Specify chrome and VM as default platforms for running all tests,
+# then let the `@TestOn()` annotations determine which suites actually run
+platforms:
+  - chrome
+
+paths:
+  - test/over_react_test.dart
+  - test/react_testing_library_test.dart
+
+# Default concurrency of 4 for unit tests, integration preset will override
+concurrency: 4
