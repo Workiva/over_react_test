@@ -3,6 +3,7 @@ library over_react_test.testing_library_test.dom.configure_test;
 
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/react_testing_library.dart' as rtl;
+import 'package:over_react_test/src/testing_library/dom/config/configure.dart';
 import 'package:test/test.dart';
 
 main() {
@@ -62,6 +63,9 @@ main() {
       //   }
       // }, throwsA(TestFailure));
       // expect(failureMessage, endsWith('something custom'));
+
+      // Set things back to the initial value
+      jsConfigure(initialConfig);
     });
   });
 }

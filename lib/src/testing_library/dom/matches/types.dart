@@ -1,11 +1,16 @@
 @JS()
 library over_react_test.src.testing_library.dom.matches.types;
 
+import 'dart:developer';
 import 'dart:html';
 
 import 'package:js/js.dart';
+import 'package:meta/meta.dart';
 
+import 'package:over_react_test/src/testing_library/dom/config/configure.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/get_default_normalizer.dart';
+import 'package:over_react_test/src/testing_library/util/js_interop_helpers.dart';
+import 'package:test/test.dart';
 
 /// {@template TextMatchArgDescription}
 /// can be either a `String`, regex, or a function which returns `true` for a match and `false` for a mismatch.
@@ -20,15 +25,35 @@ class TextMatch {
   static dynamic parse(dynamic value) {
     if (value is RegExp) {
       RegExp regExp = value;
-      value = allowInterop((String content, Element _) => regExp.hasMatch(content));
+      final dartValue = (String content, Element _) => regExp.hasMatch(content);
+      _updateElementErrorMessageToPrintDartFnTextMatch(value);
+      value = allowInterop(dartValue);
     } else if (value is Function) {
-      value = allowInterop<bool Function(String, Element)>(value);
+      // TODO: Any way to get the actual string value of the function provided instead?
+      final fnStringValue = value.toString();
+      final consumerConditional = fnStringValue.substring(fnStringValue.lastIndexOf('=>') + 2).trim();
+      _updateElementErrorMessageToPrintDartFnTextMatch('$functionValueErrorMessage \n\n    $consumerConditional\n\n');
+      value = allowInterop<Function>(value);
     } else if (value is! String) {
       throw ArgumentError('Argument must be a String, a RegExp or a function that returns a bool.');
     }
 
     return value;
   }
+
+  static void _updateElementErrorMessageToPrintDartFnTextMatch(dynamic value) {
+    final existingElementErrorFn = getConfig().getElementError;
+    configure(
+        getElementError:
+            allowInterop((message, container) => getTextMatchDartFunctionElementError(message, container, value)));
+
+    addTearDown(() {
+      configure(getElementError: existingElementErrorFn);
+    });
+  }
+
+  @visibleForTesting
+  static const functionValueErrorMessage = 'that would result in the following conditional returning true:';
 }
 
 @JS()

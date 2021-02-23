@@ -8,4 +8,4 @@ paths:
   - test/react_testing_library_test.dart
 
 # Default concurrency of 4 for unit tests, integration preset will override
-concurrency: 4
+concurrency: 1

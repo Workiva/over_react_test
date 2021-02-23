@@ -19,18 +19,19 @@ void configure({
   bool defaultHidden,
   bool showOriginalStackTrace,
   bool throwSuggestions,
-  TestFailure getElementError(String message, Element container),
+  /*TestFailure*/ Function(String message, Element container) getElementError,
 }) {
+  final existingConfig = getConfig();
   return jsConfigure(JsConfig()
-        ..testIdAttribute = testIdAttribute
-        ..asyncUtilTimeout = asyncUtilTimeout
-        ..computedStyleSupportsPseudoElements = computedStyleSupportsPseudoElements
-        ..defaultHidden = defaultHidden
-        ..showOriginalStackTrace = showOriginalStackTrace
-        ..throwSuggestions = throwSuggestions
-      // TODO: Wrap this
-      //..getElementError = allowInterop(getElementError)
-      );
+    ..testIdAttribute = testIdAttribute ?? existingConfig.testIdAttribute
+    ..asyncUtilTimeout = asyncUtilTimeout ?? existingConfig.asyncUtilTimeout
+    ..computedStyleSupportsPseudoElements =
+        computedStyleSupportsPseudoElements ?? existingConfig.computedStyleSupportsPseudoElements
+    ..defaultHidden = defaultHidden ?? existingConfig.defaultHidden
+    ..showOriginalStackTrace = showOriginalStackTrace ?? existingConfig.showOriginalStackTrace
+    ..throwSuggestions = throwSuggestions ?? existingConfig.throwSuggestions
+    // TODO: Wrap this?
+    ..getElementError = getElementError != null ? allowInterop(getElementError) : existingConfig.getElementError);
 }
 
 @JS('rtl.configure')

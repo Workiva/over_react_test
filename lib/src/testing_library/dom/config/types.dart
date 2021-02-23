@@ -27,5 +27,6 @@ class JsConfig {
   external set throwSuggestions(bool value);
 
   // TODO: How should we interop this to get Dart errors?
-  external /*JsError*/ getElementError(String message, Element container);
+  external /*JsError*/ Function(String message, Element container) get getElementError;
+  external set getElementError(/*JsError*/ Function(String message, Element container) value);
 }
