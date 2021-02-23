@@ -1,14 +1,14 @@
 import 'dart:html' show document, Element;
 
 import 'package:over_react/over_react.dart';
-import 'package:over_react_test/src/testing_library/dom/dom_queries.dart' show DomQueries;
+import 'package:over_react_test/src/testing_library/dom/scoped_queries.dart' show ScopedQueries;
 import 'package:test/test.dart' show addTearDown, expect, isNotNull, isTrue;
 
-/// Queries scoped to the provided [element].
-class _WithinQueries extends DomQueries {
-  _WithinQueries(this.element) : super(() => element);
+/// Queries scoped to the provided [container].
+class _WithinQueries extends ScopedQueries {
+  _WithinQueries(this.container) : super(() => container);
 
-  final Element element;
+  final Element container;
 }
 
 /// Takes a DOM [element] and binds it to the raw query functions.

@@ -1,5 +1,4 @@
 @TestOn('browser')
-
 library react_testing_library_test;
 
 import 'dart:async';
@@ -11,91 +10,20 @@ import 'package:over_react_test/react_testing_library.dart' as rtl;
 import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
 
+import 'testing_library/dom/configure_test.dart' as configure_test;
+import 'testing_library/react/render_test.dart' as render_test;
+
 part 'react_testing_library_test.over_react.g.dart';
 
 main() {
   enableTestMode();
 
+  group('Testing Library', () {
+    configure_test.main();
+    render_test.main();
+  });
+
   group('React Testing Library', () {
-    group('render', () {
-      List<String> calls = [];
-
-      group('renders the provided element in a default container', () {
-        test('', () {
-          final renderedResult = rtl.render((Dom.div()..id = 'root')('oh hai'), autoTearDownCallback: () {
-            calls.add('autoTearDownCallback');
-          });
-          expect(document.body.contains(renderedResult.container), isTrue);
-          expect(renderedResult.container.children, hasLength(1));
-          expect(renderedResult.container.children.single.text, 'oh hai');
-        });
-
-        group('and then unmounts / removes it by default, also calling the provided autoTearDownCallback', () {
-          test('', () {
-            expect(document.body.children, isEmpty);
-            expect(calls, ['autoTearDownCallback']);
-            calls.clear();
-          });
-
-          group('unless autoTearDown is false', () {
-            rtl.RenderResult renderedResult;
-
-            tearDownAll(() {
-              renderedResult.unmount();
-              renderedResult.container.remove();
-            });
-
-            test('', () {
-              renderedResult = rtl.render((Dom.div()..id = 'root')('oh hai'), autoTearDown: false);
-            });
-
-            test('', () {
-              expect(document.body.children.contains(renderedResult.container), isTrue);
-            });
-          });
-        });
-      });
-
-      group('renders the provided element in the provided container', () {
-        Element customContainer;
-
-        test('', () {
-          customContainer = document.body.append(DivElement()..id = 'custom-container');
-          final renderedResult = rtl.render((Dom.div()..id = 'root')('oh hai'), container: customContainer);
-          expect(renderedResult.container, same(customContainer));
-          expect(document.body.contains(renderedResult.container), isTrue);
-          expect(renderedResult.container.children, hasLength(1));
-          expect(renderedResult.container.children.single.text, 'oh hai');
-        });
-
-        group('and then unmounts / removes it by default', () {
-          test('', () {
-            expect(document.body.children, isEmpty);
-          });
-
-          group('unless autoTearDown is false', () {
-            rtl.RenderResult renderedResult;
-
-            tearDownAll(() {
-              renderedResult.unmount();
-              renderedResult.container.remove();
-              customContainer = null;
-            });
-
-            test('', () {
-              customContainer = document.body.append(DivElement()..id = 'custom-container');
-              renderedResult =
-                  rtl.render((Dom.div()..id = 'root')('oh hai'), container: customContainer, autoTearDown: false);
-            });
-
-            test('', () {
-              expect(document.body.children.contains(renderedResult.container), isTrue);
-            });
-          });
-        });
-      });
-    });
-
     group('queries', () {
       rtl.RenderResult renderResultForDefaultQueries;
       rtl.RenderResult renderResultForScreenQueries;
@@ -174,10 +102,8 @@ main() {
             });
 
             test('text', () {
-              renderResultForDefaultQueries.getByText('bar',
-                  exact: false, container: renderResultForDefaultQueries.queryByText('default foo'));
-              renderResultForDefaultQueries.getByText('bar',
-                  exact: false, container: renderResultForDefaultQueries.queryByText('default baz'));
+              rtl.within(renderResultForDefaultQueries.queryByText('default foo')).getByText('bar', exact: false);
+              rtl.within(renderResultForDefaultQueries.queryByText('default baz')).getByText('bar', exact: false);
               final bars = renderResultForDefaultQueries.getAllByText('bar', exact: false);
               expect(bars, hasLength(2));
             });
@@ -334,8 +260,8 @@ main() {
             });
 
             test('text', () {
-              rtl.screen.getByText('bar', exact: false, container: rtl.screen.queryByText('screen foo'));
-              rtl.screen.getByText('bar', exact: false, container: rtl.screen.queryByText('screen baz'));
+              rtl.within(rtl.screen.queryByText('screen foo')).getByText('bar', exact: false);
+              rtl.within(rtl.screen.queryByText('screen baz')).getByText('bar', exact: false);
               final bars = rtl.screen.getAllByText('bar', exact: false);
               expect(bars, hasLength(4));
             });
@@ -467,10 +393,12 @@ main() {
             });
 
             test('text', () {
-              rtl.within(containerForWithinQueries).getByText('bar',
-                  exact: false, container: rtl.within(containerForWithinQueries).queryByText('default foo'));
-              rtl.within(containerForWithinQueries).getByText('bar',
-                  exact: false, container: rtl.within(containerForWithinQueries).queryByText('default baz'));
+              rtl
+                  .within(rtl.within(containerForWithinQueries).queryByText('default foo'))
+                  .getByText('bar', exact: false);
+              rtl
+                  .within(rtl.within(containerForWithinQueries).queryByText('default baz'))
+                  .getByText('bar', exact: false);
               final nestedBars = rtl.within(containerForWithinQueries).getAllByText('bar', exact: false);
               expect(nestedBars, hasLength(2));
               final allBars = rtl.screen.getAllByText('bar', exact: false);

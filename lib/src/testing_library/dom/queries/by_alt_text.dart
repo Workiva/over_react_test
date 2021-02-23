@@ -7,7 +7,6 @@ import 'dart:html' show Element, ImageElement, promiseToFuture;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -25,15 +24,20 @@ mixin ByAltTextQueries on IQueries {
   /// > Related: [getAllByAltText]
   ///
   /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   ImageElement getByAltText(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetByAltText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -43,15 +47,21 @@ mixin ByAltTextQueries on IQueries {
   ///
   /// > Related: [getByAltText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byalttext/
+  /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<ImageElement> getAllByAltText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetAllByAltText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a single [ImageElement] with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -62,14 +72,20 @@ mixin ByAltTextQueries on IQueries {
   /// > Related: [queryAllByAltText]
   ///
   /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   ImageElement queryByAltText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryByAltText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -79,15 +95,21 @@ mixin ByAltTextQueries on IQueries {
   ///
   /// > Related: [queryByAltText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byalttext/
+  /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<ImageElement> queryAllByAltText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByAltText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a future with a single [ImageElement] value with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -95,26 +117,40 @@ mixin ByAltTextQueries on IQueries {
   /// If there is a specific condition you want to wait for other than the DOM node being on the page, wrap
   /// a non-async query like [findByAltText] or [queryByAltText] in a `waitFor` function.
   ///
-  /// Throws if exactly one element is not found within the provided [container].
+  /// Throws if exactly one element is not found.
   ///
   /// > Related: [findAllByAltText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byalttext/
+  /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<ImageElement> findByAltText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindByAltText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
@@ -123,34 +159,47 @@ mixin ByAltTextQueries on IQueries {
   /// If there is a specific condition you want to wait for other than the DOM node being on the page, wrap
   /// a non-async query like [findByAltText] or [queryByAltText] in a `waitFor` function.
   ///
-  /// Throws if no elements are found within the provided [container].
+  /// Throws if no elements are found.
   ///
   /// > Related: [findByAltText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byalttext/
+  /// > See: <https://testing-library.com/docs/queries/byalttext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<ImageElement>> findAllByAltText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindAllByAltText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+        _jsFindAllByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByAltText')
 external ImageElement _jsGetByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -158,7 +207,7 @@ external ImageElement _jsGetByAltText(
 @JS('rtl.getAllByAltText')
 external List<ImageElement> _jsGetAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -166,7 +215,7 @@ external List<ImageElement> _jsGetAllByAltText(
 @JS('rtl.queryByAltText')
 external ImageElement _jsQueryByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -174,7 +223,7 @@ external ImageElement _jsQueryByAltText(
 @JS('rtl.queryAllByAltText')
 external List<ImageElement> _jsQueryAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -182,17 +231,17 @@ external List<ImageElement> _jsQueryAllByAltText(
 @JS('rtl.findByAltText')
 external /*Promise<Element>*/ _jsFindByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByAltText')
 external /*Promise<List<Element>>*/ _jsFindAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);

@@ -8,7 +8,6 @@ import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -41,17 +40,33 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [getAllByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element getByText(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsGetByText(container ?? getDefaultContainer(), text,
+      _jsGetByText(getContainerForScope(), TextMatch.parse(text),
           buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
@@ -61,16 +76,33 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [getByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> getAllByText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsGetAllByText(container ?? getDefaultContainer(), text,
+      _jsGetAllByText(getContainerForScope(), TextMatch.parse(text),
           buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
 
   /// Returns a single element with the given [text] content, defaulting to an [exact] match.
@@ -80,16 +112,33 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [queryAllByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element queryByText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsQueryByText(container ?? getDefaultContainer(), text,
+      _jsQueryByText(getContainerForScope(), TextMatch.parse(text),
           buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
@@ -99,16 +148,33 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [queryByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> queryAllByText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsQueryAllByText(container ?? getDefaultContainer(), text,
+      _jsQueryAllByText(getContainerForScope(), TextMatch.parse(text),
           buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
 
   /// Returns a future with a single element value with the given [text] content, defaulting to an [exact] match after
@@ -121,10 +187,34 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [findAllByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
@@ -132,13 +222,14 @@ mixin ByTextQueries on IQueries {
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindByText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match after
@@ -151,10 +242,34 @@ mixin ByTextQueries on IQueries {
   ///
   /// > Related: [findByText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytext/
+  /// > See: <https://testing-library.com/docs/queries/bytext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [ignore]
+  /// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+  /// This defaults to `'script'` because generally you don't want to select script tags, but if your
+  /// content is in an inline script file, then the script tag could be returned.
+  ///
+  /// If you'd rather disable this behavior, set to `false`.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
@@ -162,20 +277,21 @@ mixin ByTextQueries on IQueries {
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindAllByText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindAllByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByText')
 external Element _jsGetByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
 ]);
@@ -183,7 +299,7 @@ external Element _jsGetByText(
 @JS('rtl.getAllByText')
 external List<Element> _jsGetAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
 ]);
@@ -191,7 +307,7 @@ external List<Element> _jsGetAllByText(
 @JS('rtl.queryByText')
 external Element _jsQueryByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
 ]);
@@ -199,7 +315,7 @@ external Element _jsQueryByText(
 @JS('rtl.queryAllByText')
 external List<Element> _jsQueryAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
 ]);
@@ -207,19 +323,19 @@ external List<Element> _jsQueryAllByText(
 @JS('rtl.findByText')
 external /*Promise<Element>*/ _jsFindByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByText')
 external /*Promise<List<Element>>*/ _jsFindAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   ByTextOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS()

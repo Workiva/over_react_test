@@ -7,7 +7,6 @@ import 'dart:html' show Element, promiseToFuture;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -19,21 +18,26 @@ mixin ByTitleQueries on IQueries {
   /// Returns a single element with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
   ///
-  /// Throws if no element is found within the provided [container].
+  /// Throws if no element is found.
   /// Use [queryByTitle] if a RTE is not expected.
   ///
   /// > Related: [getAllByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element getByTitle(
-    // TODO: How to get regex expressions working for the title argument?
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetByTitle(
-          container ?? getDefaultContainer(), title, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of elements with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
@@ -43,15 +47,21 @@ mixin ByTitleQueries on IQueries {
   ///
   /// > Related: [getByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> getAllByTitle(
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetAllByTitle(
-          container ?? getDefaultContainer(), title, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a single element with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
@@ -61,15 +71,21 @@ mixin ByTitleQueries on IQueries {
   ///
   /// > Related: [queryAllByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element queryByTitle(
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryByTitle(
-          container ?? getDefaultContainer(), title, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of elements with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
@@ -79,15 +95,21 @@ mixin ByTitleQueries on IQueries {
   ///
   /// > Related: [queryByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> queryAllByTitle(
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByTitle(
-          container ?? getDefaultContainer(), title, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a future with a single element value with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -99,22 +121,36 @@ mixin ByTitleQueries on IQueries {
   ///
   /// > Related: [findAllByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByTitle(
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindByTitle(container ?? getDefaultContainer(), title, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindByTitle(getContainerForScope(), TextMatch.parse(title), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of elements with the given [title] as the value of the `title` attribute,
@@ -127,30 +163,43 @@ mixin ByTitleQueries on IQueries {
   ///
   /// > Related: [findByTitle]
   ///
-  /// > See: https://testing-library.com/docs/queries/bytitle/
+  /// > See: <https://testing-library.com/docs/queries/bytitle/>
+  ///
+  /// ## Options
+  ///
+  /// ### [title]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByTitle(
-    /*String|regex|bool Function(content, element)*/ title, {
-    Element container,
+    /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindAllByTitle(container ?? getDefaultContainer(), title, matcherOptions, waitForOptions));
+        _jsFindAllByTitle(getContainerForScope(), TextMatch.parse(title), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByTitle')
 external Element _jsGetByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
 ]);
@@ -158,7 +207,7 @@ external Element _jsGetByTitle(
 @JS('rtl.getAllByTitle')
 external List<Element> _jsGetAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
 ]);
@@ -166,7 +215,7 @@ external List<Element> _jsGetAllByTitle(
 @JS('rtl.queryByTitle')
 external Element _jsQueryByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
 ]);
@@ -174,7 +223,7 @@ external Element _jsQueryByTitle(
 @JS('rtl.queryAllByTitle')
 external List<Element> _jsQueryAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
 ]);
@@ -182,17 +231,17 @@ external List<Element> _jsQueryAllByTitle(
 @JS('rtl.findByTitle')
 external /*Promise<Element>*/ _jsFindByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByTitle')
 external /*Promise<List<Element>>*/ _jsFindAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   title, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);

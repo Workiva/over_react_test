@@ -7,7 +7,6 @@ import 'dart:html' show Element, promiseToFuture;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -24,16 +23,21 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [getAllByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element getByPlaceholderText(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetByPlaceholderText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match.
@@ -43,15 +47,21 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [getByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> getAllByPlaceholderText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetAllByPlaceholderText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a single element with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match.
@@ -61,15 +71,21 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [queryAllByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element queryByPlaceholderText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryByPlaceholderText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match.
@@ -79,15 +95,21 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [queryByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> queryAllByPlaceholderText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByPlaceholderText(
-          container ?? getDefaultContainer(), text, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a future with a single element value with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -99,23 +121,36 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [findAllByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByPlaceholderText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindByPlaceholderText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+        _jsFindByPlaceholderText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
@@ -128,30 +163,43 @@ mixin ByPlaceholderTextQueries on IQueries {
   ///
   /// > Related: [findByPlaceholderText]
   ///
-  /// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+  /// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByPlaceholderText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindAllByPlaceholderText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+        _jsFindAllByPlaceholderText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByPlaceholderText')
 external Element _jsGetByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -159,7 +207,7 @@ external Element _jsGetByPlaceholderText(
 @JS('rtl.getAllByPlaceholderText')
 external List<Element> _jsGetAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -167,7 +215,7 @@ external List<Element> _jsGetAllByPlaceholderText(
 @JS('rtl.queryByPlaceholderText')
 external Element _jsQueryByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -175,7 +223,7 @@ external Element _jsQueryByPlaceholderText(
 @JS('rtl.queryAllByPlaceholderText')
 external List<Element> _jsQueryAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
 ]);
@@ -183,17 +231,17 @@ external List<Element> _jsQueryAllByPlaceholderText(
 @JS('rtl.findByPlaceholderText')
 external /*Promise<Element>*/ _jsFindByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByPlaceholderText')
 external /*Promise<List<Element>>*/ _jsFindAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);

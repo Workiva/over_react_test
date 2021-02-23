@@ -8,7 +8,6 @@ import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -22,7 +21,7 @@ mixin ByRoleQueries on IQueries {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -35,7 +34,7 @@ mixin ByRoleQueries on IQueries {
       ..exact = matcherOptions.exact
       ..normalizer = matcherOptions.normalizer
       ..hidden = hidden;
-    if (name != null) byRoleOptions.name = name;
+    if (name != null) byRoleOptions.name = TextMatch.parse(name);
     if (selected != null) byRoleOptions.selected = selected;
     if (checked != null) byRoleOptions.checked = checked;
     if (pressed != null) byRoleOptions.pressed = pressed;
@@ -54,10 +53,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [getAllByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -66,13 +69,11 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
   Element getByRole(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -81,8 +82,8 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       _jsGetByRole(
-          container ?? getDefaultContainer(),
-          role,
+          getContainerForScope(),
+          TextMatch.parse(role),
           buildByRoleOptions(
               exact: exact,
               normalizer: normalizer,
@@ -103,10 +104,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [getByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -115,12 +120,11 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
   List<Element> getAllByRole(
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -129,8 +133,8 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       _jsGetAllByRole(
-          container ?? getDefaultContainer(),
-          role,
+          getContainerForScope(),
+          TextMatch.parse(role),
           buildByRoleOptions(
               exact: exact,
               normalizer: normalizer,
@@ -151,10 +155,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [queryAllByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -163,12 +171,11 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
   Element queryByRole(
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -177,8 +184,8 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       _jsQueryByRole(
-          container ?? getDefaultContainer(),
-          role,
+          getContainerForScope(),
+          TextMatch.parse(role),
           buildByRoleOptions(
               exact: exact,
               normalizer: normalizer,
@@ -200,10 +207,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [queryByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -212,12 +223,11 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
   List<Element> queryAllByRole(
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -226,8 +236,8 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       _jsQueryAllByRole(
-          container ?? getDefaultContainer(),
-          role,
+          getContainerForScope(),
+          TextMatch.parse(role),
           buildByRoleOptions(
               exact: exact,
               normalizer: normalizer,
@@ -252,10 +262,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [findAllByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -263,13 +277,19 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByRole(
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -279,7 +299,7 @@ mixin ByRoleQueries on IQueries {
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
         exact: exact,
@@ -295,7 +315,8 @@ mixin ByRoleQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindByRole(container ?? getDefaultContainer(), role, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of elements with the given [role] value, defaulting to an [exact] match after
@@ -310,10 +331,14 @@ mixin ByRoleQueries on IQueries {
   ///
   /// > Related: [findByRole]
   ///
-  /// > See: https://testing-library.com/docs/queries/byrole/
+  /// > See: <https://testing-library.com/docs/queries/byrole/>
   ///
   /// ## Options
   ///
+  /// ### [role]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -321,13 +346,19 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByRole(
-    /*String|regex|bool Function(content, element)*/ role, {
-    Element container,
+    /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     bool hidden = false,
-    /*String|regex|bool Function(content, element)*/ dynamic name,
+    /*TextMatch*/ dynamic name,
     bool selected,
     bool checked,
     bool pressed,
@@ -337,7 +368,7 @@ mixin ByRoleQueries on IQueries {
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
         exact: exact,
@@ -353,14 +384,15 @@ mixin ByRoleQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(_jsFindAllByRole(container ?? getDefaultContainer(), role, matcherOptions, waitForOptions));
+    return promiseToFuture(
+        _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByRole')
 external Element _jsGetByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
 ]);
@@ -368,7 +400,7 @@ external Element _jsGetByRole(
 @JS('rtl.getAllByRole')
 external List<Element> _jsGetAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
 ]);
@@ -376,7 +408,7 @@ external List<Element> _jsGetAllByRole(
 @JS('rtl.queryByRole')
 external Element _jsQueryByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
 ]);
@@ -384,7 +416,7 @@ external Element _jsQueryByRole(
 @JS('rtl.queryAllByRole')
 external List<Element> _jsQueryAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
 ]);
@@ -392,19 +424,19 @@ external List<Element> _jsQueryAllByRole(
 @JS('rtl.findByRole')
 external /*Promise<Element>*/ _jsFindByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByRole')
 external /*Promise<List<Element>>*/ _jsFindAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   role, [
   ByRoleOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS()
@@ -420,8 +452,8 @@ class ByRoleOptions extends MatcherOptions {
   ///
   /// See: <https://testing-library.com/docs/queries/byrole#api> for more details and examples.
   /// {@endtemplate}
-  external /*String|regex|bool Function(content, element)*/ dynamic get name;
-  external set name(/*String|regex|bool Function(content, element)*/ dynamic value);
+  external /*TextMatch*/ dynamic get name;
+  external set name(/*TextMatch*/ dynamic value);
 
   /// {@template byRoleOptionsHidden}
   /// ### hidden

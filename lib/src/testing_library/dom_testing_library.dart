@@ -1,8 +1,10 @@
 /// https://testing-library.com/docs/dom-testing-library/intro
 library over_react_test.src.dom_testing_library;
 
-export 'dom/async/wait_for.dart' show waitFor, waitForElementToBeRemoved;
-// export 'dom/config/configure.dart' show Config, configure, getConfig;
+export 'dom/async/types.dart' show MutationObserverOptions;
+export 'dom/async/wait_for.dart' show waitFor, waitForElementToBeRemoved, waitForElementsToBeRemoved;
+export 'dom/config/configure.dart' show configure, getConfig;
+export 'dom/matches/get_default_normalizer.dart' show getDefaultNormalizer;
 export 'dom/pretty_dom.dart' show prettyDOM;
 export 'dom/screen.dart' show screen;
 export 'dom/within.dart' show within;

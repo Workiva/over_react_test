@@ -1,6 +1,7 @@
 import 'dart:html' show Element, ImageElement, InputElement, LabelElement, SelectElement, TextAreaElement;
 
-import 'package:over_react_test/src/testing_library/dom/async/types.dart' show MutationObserverInit;
+import 'package:over_react_test/src/testing_library/dom/async/types.dart'
+    show MutationObserverOptions, defaultMutationObserverOptions;
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart' show NormalizerFn, NormalizerOptions;
 import 'package:over_react_test/src/testing_library/dom/within.dart' show within;
 
@@ -17,14 +18,20 @@ import 'package:over_react_test/src/testing_library/dom/within.dart' show within
 /// > Related: [getAllByAltText]
 ///
 /// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 ImageElement getByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getByAltText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getByAltText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
 /// defaulting to an [exact] match.
@@ -34,15 +41,21 @@ ImageElement getByAltText(
 ///
 /// > Related: [getByAltText]
 ///
-/// > See: https://testing-library.com/docs/queries/byalttext/
+/// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<ImageElement> getAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getAllByAltText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getAllByAltText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a single [ImageElement] with the given [text] as the value of the `alt` attribute,
 /// defaulting to an [exact] match.
@@ -53,14 +66,20 @@ List<ImageElement> getAllByAltText(
 /// > Related: [queryAllByAltText]
 ///
 /// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 ImageElement queryByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryByAltText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryByAltText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
 /// defaulting to an [exact] match.
@@ -70,15 +89,21 @@ ImageElement queryByAltText(
 ///
 /// > Related: [queryByAltText]
 ///
-/// > See: https://testing-library.com/docs/queries/byalttext/
+/// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<ImageElement> queryAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryAllByAltText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryAllByAltText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single [ImageElement] value with the given [text] as the value of the `alt` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -90,26 +115,38 @@ List<ImageElement> queryAllByAltText(
 ///
 /// > Related: [findAllByAltText]
 ///
-/// > See: https://testing-library.com/docs/queries/byalttext/
+/// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<ImageElement> findByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByAltText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByAltText(text,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -121,26 +158,38 @@ Future<ImageElement> findByAltText(
 ///
 /// > Related: [findByAltText]
 ///
-/// > See: https://testing-library.com/docs/queries/byalttext/
+/// > See: <https://testing-library.com/docs/queries/byalttext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<ImageElement>> findAllByAltText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByAltText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByAltText(text,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByDisplayValue
@@ -154,15 +203,21 @@ Future<List<ImageElement>> findAllByAltText(
 ///
 /// > Related: [getAllByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getByDisplayValue(value, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getByDisplayValue(value, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -172,15 +227,21 @@ Element getByDisplayValue(
 ///
 /// > Related: [getByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getAllByDisplayValue(value, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getAllByDisplayValue(value, exact: exact, normalizer: normalizer);
 
 /// Returns a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -190,15 +251,21 @@ List<Element> getAllByDisplayValue(
 ///
 /// > Related: [queryAllByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryByDisplayValue(value, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryByDisplayValue(value, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -208,15 +275,21 @@ Element queryByDisplayValue(
 ///
 /// > Related: [queryByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryAllByDisplayValue(value, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryAllByDisplayValue(value, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -228,26 +301,38 @@ List<Element> queryAllByDisplayValue(
 ///
 /// > Related: [findAllByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByDisplayValue(value,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByDisplayValue(value,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -259,26 +344,38 @@ Future<Element> findByDisplayValue(
 ///
 /// > Related: [findByDisplayValue]
 ///
-/// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+/// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+///
+/// ## Options
+///
+/// __[value]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/ value, {
+  /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByDisplayValue(value,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByDisplayValue(value,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByLabelText
@@ -292,17 +389,26 @@ Future<List<Element>> findAllByDisplayValue(
 ///
 /// > Related: [getAllByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
-}) {
-  return within(container)
-      .getByLabelText(text, container: container, exact: exact, normalizer: normalizer, selector: selector);
-}
+}) =>
+    within(container).getByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -312,17 +418,26 @@ Element getByLabelText(
 ///
 /// > Related: [getByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
-}) {
-  return within(container)
-      .getAllByLabelText(text, container: container, exact: exact, normalizer: normalizer, selector: selector);
-}
+}) =>
+    within(container).getAllByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a single element that is associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -332,17 +447,26 @@ List<Element> getAllByLabelText(
 ///
 /// > Related: [queryAllByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
-}) {
-  return within(container)
-      .queryByLabelText(text, container: container, exact: exact, normalizer: normalizer, selector: selector);
-}
+}) =>
+    within(container).queryByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -352,17 +476,26 @@ Element queryByLabelText(
 ///
 /// > Related: [queryByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
-}) {
-  return within(container)
-      .queryAllByLabelText(text, container: container, exact: exact, normalizer: normalizer, selector: selector);
-}
+}) =>
+    within(container).queryAllByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a future with a single element that is associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -374,28 +507,44 @@ List<Element> queryAllByLabelText(
 ///
 /// > Related: [findAllByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByLabelText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      selector: selector,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByLabelText(text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -407,28 +556,44 @@ Future<Element> findByLabelText(
 ///
 /// > Related: [findByLabelText]
 ///
-/// > See: https://testing-library.com/docs/queries/bylabeltext/
+/// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByLabelText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      selector: selector,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByLabelText(text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByPlaceholderText
@@ -442,15 +607,21 @@ Future<List<Element>> findAllByLabelText(
 ///
 /// > Related: [getAllByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getByPlaceholderText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getByPlaceholderText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -460,15 +631,21 @@ Element getByPlaceholderText(
 ///
 /// > Related: [getByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getAllByPlaceholderText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getAllByPlaceholderText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a single element with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -478,15 +655,21 @@ List<Element> getAllByPlaceholderText(
 ///
 /// > Related: [queryAllByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryByPlaceholderText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryByPlaceholderText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -496,15 +679,21 @@ Element queryByPlaceholderText(
 ///
 /// > Related: [queryByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryAllByPlaceholderText(text, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryAllByPlaceholderText(text, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single element value with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -516,26 +705,38 @@ List<Element> queryAllByPlaceholderText(
 ///
 /// > Related: [findAllByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByPlaceholderText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByPlaceholderText(text,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -547,26 +748,38 @@ Future<Element> findByPlaceholderText(
 ///
 /// > Related: [findByPlaceholderText]
 ///
-/// > See: https://testing-library.com/docs/queries/byplaceholdertext/
+/// > See: <https://testing-library.com/docs/queries/byplaceholdertext/>
+///
+/// ## Options
+///
+/// __[text]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByPlaceholderText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByPlaceholderText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByPlaceholderText(text,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByRole
@@ -580,10 +793,14 @@ Future<List<Element>> findAllByPlaceholderText(
 ///
 /// > Related: [getAllByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -593,31 +810,29 @@ Future<List<Element>> findAllByPlaceholderText(
 /// {@macro byRoleOptionsLevel}
 Element getByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
   bool expanded,
   bool queryFallbacks,
   int level,
-}) {
-  return within(container).getByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level);
-}
+}) =>
+    within(container).getByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level);
 
 /// Returns a list of elements with the given [role] value, defaulting to an [exact] match.
 ///
@@ -627,10 +842,14 @@ Element getByRole(
 ///
 /// > Related: [getByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -640,31 +859,29 @@ Element getByRole(
 /// {@macro byRoleOptionsLevel}
 List<Element> getAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
   bool expanded,
   bool queryFallbacks,
   int level,
-}) {
-  return within(container).getAllByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level);
-}
+}) =>
+    within(container).getAllByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level);
 
 /// Returns a single element with the given [role] value, defaulting to an [exact] match.
 ///
@@ -674,10 +891,14 @@ List<Element> getAllByRole(
 ///
 /// > Related: [queryAllByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -687,31 +908,29 @@ List<Element> getAllByRole(
 /// {@macro byRoleOptionsLevel}
 Element queryByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
   bool expanded,
   bool queryFallbacks,
   int level,
-}) {
-  return within(container).queryByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level);
-}
+}) =>
+    within(container).queryByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level);
 
 /// Returns a list of elements with the given [role] value, defaulting to an [exact] match.
 ///
@@ -722,10 +941,14 @@ Element queryByRole(
 ///
 /// > Related: [queryByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -735,31 +958,29 @@ Element queryByRole(
 /// {@macro byRoleOptionsLevel}
 List<Element> queryAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
   bool expanded,
   bool queryFallbacks,
   int level,
-}) {
-  return within(container).queryAllByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level);
-}
+}) =>
+    within(container).queryAllByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level);
 
 /// Returns a future with a single element value with the given [role] value, defaulting to an [exact] match after
 /// waiting 1000ms (or the provided [timeout] duration).
@@ -773,10 +994,14 @@ List<Element> queryAllByRole(
 ///
 /// > Related: [findAllByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -784,13 +1009,20 @@ List<Element> queryAllByRole(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
@@ -800,25 +1032,23 @@ Future<Element> findByRole(
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of elements with the given [role] value, defaulting to an [exact] match after
 /// waiting 1000ms (or the provided [timeout] duration).
@@ -832,10 +1062,14 @@ Future<Element> findByRole(
 ///
 /// > Related: [findByRole]
 ///
-/// > See: https://testing-library.com/docs/queries/byrole/
+/// > See: <https://testing-library.com/docs/queries/byrole/>
 ///
 /// ## Options
 ///
+/// __[role]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 /// {@macro byRoleOptionsHidden}
 /// {@macro byRoleOptionsSelected}
 /// {@macro byRoleOptionsChecked}
@@ -843,13 +1077,20 @@ Future<Element> findByRole(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByRole(
   Element container,
-  /*String|regex|bool Function(content, element)*/ role, {
+  /*TextMatch*/ dynamic role, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   bool hidden = false,
-  /*String|regex|bool Function(content, element)*/ dynamic name,
+  /*TextMatch*/ dynamic name,
   bool selected,
   bool checked,
   bool pressed,
@@ -859,100 +1100,126 @@ Future<List<Element>> findAllByRole(
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByRole(role,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      hidden: hidden,
-      name: name,
-      selected: selected,
-      checked: checked,
-      pressed: pressed,
-      expanded: expanded,
-      queryFallbacks: queryFallbacks,
-      level: level,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByRole(role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByTestId
 // ----------------------------------------------------
 
-/// Returns a single element with the given [testId] value, defaulting to an [exact] match.
+/// Returns a single element with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match.
 ///
 /// Throws if no element is found within the provided [container].
 /// Use [queryByTestId] if a RTE is not expected.
 ///
 /// > Related: [getAllByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getByTestId(testId, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getByTestId(testId, exact: exact, normalizer: normalizer);
 
-/// Returns a list of elements with the given [testId] value, defaulting to an [exact] match.
+/// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match.
 ///
 /// Throws if no elements are found within the provided [container].
 /// Use [queryAllByTestId] if a RTE is not expected.
 ///
 /// > Related: [getByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getAllByTestId(testId, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getAllByTestId(testId, exact: exact, normalizer: normalizer);
 
-/// Returns a single element with the given [testId] value, defaulting to an [exact] match.
+/// Returns a single element with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match.
 ///
 /// Returns `null` if no element is found within the provided [container].
 /// Use [getByTestId] if a RTE is expected.
 ///
 /// > Related: [queryAllByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryByTestId(testId, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryByTestId(testId, exact: exact, normalizer: normalizer);
 
-/// Returns a list of elements with the given [testId] value, defaulting to an [exact] match.
+/// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match.
 ///
 /// Returns an empty list if no element(s) are found within the provided [container].
 /// Use [getAllByTestId] if a RTE is expected.
 ///
 /// > Related: [queryByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryAllByTestId(testId, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryAllByTestId(testId, exact: exact, normalizer: normalizer);
 
-/// Returns a future with a single element value with the given [testId] value, defaulting to an [exact] match after
-/// waiting 1000ms (or the provided [timeout] duration).
+/// Returns a future with a single element value with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
 ///
 /// If there is a specific condition you want to wait for other than the DOM node being on the page, wrap
 /// a non-async query like [findByTestId] or [queryByTestId] in a `waitFor` function.
@@ -961,29 +1228,41 @@ List<Element> queryAllByTestId(
 ///
 /// > Related: [findAllByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByTestId(testId,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByTestId(testId,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
-/// Returns a list of elements with the given [testId] value, defaulting to an [exact] match after
-/// waiting 1000ms (or the provided [timeout] duration).
+/// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
+/// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
 ///
 /// If there is a specific condition you want to wait for other than the DOM node being on the page, wrap
 /// a non-async query like [findByTestId] or [queryByTestId] in a `waitFor` function.
@@ -992,26 +1271,38 @@ Future<Element> findByTestId(
 ///
 /// > Related: [findByTestId]
 ///
-/// > See: https://testing-library.com/docs/queries/bytestid/
+/// > See: <https://testing-library.com/docs/queries/bytestid/>
+///
+/// ## Options
+///
+/// __[testId]__
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByTestId(
   Element container,
-  /*String|regex|bool Function(content, element)*/ testId, {
+  /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByTestId(testId,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByTestId(testId,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByText
@@ -1024,18 +1315,34 @@ Future<List<Element>> findAllByTestId(
 ///
 /// > Related: [getAllByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   /*String|bool*/ ignore,
-}) {
-  return within(container)
-      .getByText(text, container: container, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
-}
+}) =>
+    within(container).getByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1044,18 +1351,34 @@ Element getByText(
 ///
 /// > Related: [getByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   /*String|bool*/ ignore,
-}) {
-  return within(container).getAllByText(text,
-      container: container, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
-}
+}) =>
+    within(container).getAllByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a single element with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1064,18 +1387,34 @@ List<Element> getAllByText(
 ///
 /// > Related: [queryAllByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   /*String|bool*/ ignore,
-}) {
-  return within(container).queryByText(text,
-      container: container, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
-}
+}) =>
+    within(container).queryByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1084,18 +1423,34 @@ Element queryByText(
 ///
 /// > Related: [queryByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
   /*String|bool*/ ignore,
-}) {
-  return within(container).queryAllByText(text,
-      container: container, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
-}
+}) =>
+    within(container).queryAllByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a future with a single element value with the given [text] content, defaulting to an [exact] match after
 /// waiting 1000ms (or the provided [timeout] duration).
@@ -1107,10 +1462,35 @@ List<Element> queryAllByText(
 ///
 /// > Related: [findAllByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
@@ -1118,19 +1498,17 @@ Future<Element> findByText(
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      selector: selector,
-      ignore: ignore,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByText(text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        ignore: ignore,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of elements with the given [text] content, defaulting to an [exact] match after
 /// waiting 1000ms (or the provided [timeout] duration).
@@ -1142,10 +1520,35 @@ Future<Element> findByText(
 ///
 /// > Related: [findByText]
 ///
-/// > See: https://testing-library.com/docs/queries/bytext/
+/// > See: <https://testing-library.com/docs/queries/bytext/>
+///
+/// ## Options
+///
+/// ### [selector]
+/// If there are multiple labels with the same text, you can use `selector`
+/// to specify the element you want to match.
+///
+/// ### [ignore]
+/// Accepts a query selector. If `node.matches` returns true for that selector, the node will be ignored.
+/// This defaults to `'script'` because generally you don't want to select script tags, but if your
+/// content is in an inline script file, then the script tag could be returned.
+///
+/// If you'd rather disable this behavior, set to `false`.
+///
+/// ### [text]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByText(
   Element container,
-  /*String|regex|bool Function(content, element)*/ text, {
+  /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
@@ -1153,19 +1556,17 @@ Future<List<Element>> findAllByText(
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByText(text,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      selector: selector,
-      ignore: ignore,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByText(text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        ignore: ignore,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 // ----------------------------------------------------
 //  ByTitle
@@ -1179,15 +1580,21 @@ Future<List<Element>> findAllByText(
 ///
 /// > Related: [getAllByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element getByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getByTitle(title, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getByTitle(title, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1197,15 +1604,21 @@ Element getByTitle(
 ///
 /// > Related: [getByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> getAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).getAllByTitle(title, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).getAllByTitle(title, exact: exact, normalizer: normalizer);
 
 /// Returns a single element with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1215,15 +1628,21 @@ List<Element> getAllByTitle(
 ///
 /// > Related: [queryAllByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 Element queryByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryByTitle(title, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryByTitle(title, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1233,15 +1652,21 @@ Element queryByTitle(
 ///
 /// > Related: [queryByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
 List<Element> queryAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
-}) {
-  return within(container).queryAllByTitle(title, container: container, exact: exact, normalizer: normalizer);
-}
+}) =>
+    within(container).queryAllByTitle(title, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single element value with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -1253,26 +1678,38 @@ List<Element> queryAllByTitle(
 ///
 /// > Related: [findAllByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<Element> findByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findByTitle(title,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findByTitle(title,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);
 
 /// Returns a list of elements with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -1284,23 +1721,35 @@ Future<Element> findByTitle(
 ///
 /// > Related: [findByTitle]
 ///
-/// > See: https://testing-library.com/docs/queries/bytitle/
+/// > See: <https://testing-library.com/docs/queries/bytitle/>
+///
+/// ## Options
+///
+/// ### [title]
+/// {@macro TextMatchArgDescription}
+/// {@macro MatcherOptionsExactArgDescription}
+/// {@macro MatcherOptionsNormalizerArgDescription}
+///
+/// ## Async Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<List<Element>> findAllByTitle(
   Element container,
-  /*String|regex|bool Function(content, element)*/ title, {
+  /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
-}) {
-  return within(container).findAllByTitle(title,
-      container: container,
-      exact: exact,
-      normalizer: normalizer,
-      timeout: timeout,
-      interval: interval,
-      onTimeout: onTimeout,
-      mutationObserverOptions: mutationObserverOptions);
-}
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) =>
+    within(container).findAllByTitle(title,
+        exact: exact,
+        normalizer: normalizer,
+        timeout: timeout,
+        interval: interval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions);

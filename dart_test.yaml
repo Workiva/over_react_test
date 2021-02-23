@@ -4,7 +4,7 @@ platforms:
   - chrome
 
 paths:
-  - test/over_react_test.dart
+#  - test/over_react_test.dart
   - test/react_testing_library_test.dart
 
 # Default concurrency of 4 for unit tests, integration preset will override

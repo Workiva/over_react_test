@@ -6,7 +6,7 @@ import 'dart:html' show DocumentFragment, Element;
 
 import 'package:js/js.dart';
 import 'package:over_react/over_react.dart' show ReactElement, UiFactory;
-import 'package:over_react_test/src/testing_library/dom/dom_queries.dart' show DomQueries;
+import 'package:over_react_test/src/testing_library/dom/scoped_queries.dart' show ScopedQueries;
 import 'package:test/test.dart' show addTearDown;
 
 import 'package:over_react_test/src/testing_library/react/render/types.dart' show JsRenderResult, RenderOptions;
@@ -26,7 +26,7 @@ import 'package:over_react_test/src/testing_library/react/render/types.dart' sho
 /// * __[wrapper]__, which will be wrapped around the [ui] - which is
 /// especially useful when testing components that need a context provider of some kind.
 ///
-/// > See: https://testing-library.com/docs/react-testing-library/api#render
+/// > See: <https://testing-library.com/docs/react-testing-library/api#render>
 RenderResult render(
   ReactElement ui, {
   Element container,
@@ -58,12 +58,12 @@ RenderResult render(
   return RenderResult._(jsResult);
 }
 
-/// The model returned from [render], which includes all the [DomQueries] scoped to the
+/// The model returned from [render], which includes all the [ScopedQueries] scoped to the
 /// container that was rendered within.
 ///
 /// TODO: Document fields / methods
 /// TODO: Document how to use the bound queries on the container
-class RenderResult extends DomQueries {
+class RenderResult extends ScopedQueries {
   RenderResult._(this._jsRenderResult) : super(() => _jsRenderResult.container);
 
   final JsRenderResult _jsRenderResult;

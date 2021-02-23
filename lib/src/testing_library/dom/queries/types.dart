@@ -22,5 +22,5 @@ typedef Query = FutureOr<Element> Function(
   Duration timeout,
   Duration interval,
   Error Function(Error error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
+  JsMutationObserverOptions mutationObserverOptions,
 );

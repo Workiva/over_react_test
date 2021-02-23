@@ -7,12 +7,9 @@ import 'package:js/js.dart';
 
 @JS()
 @anonymous
-class Config {
+class JsConfig {
   external String get testIdAttribute;
   external set testIdAttribute(String value);
-
-  // asyncWrapper(cb: (...args: any[]) => any): Promise<any>
-  // eventWrapper(cb: (...args: any[]) => any): void
 
   external int get asyncUtilTimeout;
   external set asyncUtilTimeout(int value);

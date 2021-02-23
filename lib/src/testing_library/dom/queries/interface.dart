@@ -8,7 +8,7 @@ import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 /// An interface shared by all the individual query type mixins.
 abstract class IQueries {
   @protected
-  Element Function() get getDefaultContainer;
+  Element Function() get getContainerForScope;
 
   @protected
   MatcherOptions buildMatcherOptions({
@@ -37,17 +37,18 @@ abstract class IQueries {
   }
 
   @protected
-  SharedWaitForOptions buildWaitForOptions({
+  SharedJsWaitForOptions buildWaitForOptions({
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final waitForOptions = SharedWaitForOptions();
+    final waitForOptions = SharedJsWaitForOptions();
     if (timeout != null) waitForOptions.timeout = timeout.inMilliseconds;
     if (interval != null) waitForOptions.interval = interval.inMilliseconds;
     // if (onTimeout != null) waitForOptions.onTimeout = allowInterop(onTimeout); // TODO: We would have to build dart error => js error conversion logic here
-    if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions;
+    // ignore: invalid_use_of_protected_member
+    if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions.toJs();
 
     return waitForOptions;
   }

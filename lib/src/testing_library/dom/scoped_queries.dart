@@ -15,7 +15,7 @@ import 'package:over_react_test/src/testing_library/dom/queries/interface.dart' 
 ///
 /// Only visible for the purposes of extension by specific
 /// querying objects like `RenderResult` and `_WithinQueries`.
-abstract class DomQueries
+abstract class ScopedQueries
     with
         IQueries,
         ByAltTextQueries,
@@ -26,9 +26,9 @@ abstract class DomQueries
         ByTestIdQueries,
         ByTextQueries,
         ByTitleQueries {
-  DomQueries(this.getDefaultContainer);
+  ScopedQueries(this.getContainerForScope);
 
   @protected
   @override
-  final Element Function() getDefaultContainer;
+  final Element Function() getContainerForScope;
 }

@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/config/configure.dart' show getConfig;
 
-export 'package:over_react_test/src/testing_library/dom/async/types.dart' show MutationObserverInit;
+export 'package:over_react_test/src/testing_library/dom/async/types.dart' show JsMutationObserverOptions;
 
 /// Calls the provided [expectation] on a given [interval] and/or when the [container] DOM changes,
 /// completing only if it does not throw a [TestFailure], or by throwing that [TestFailure] if
@@ -24,16 +24,19 @@ export 'package:over_react_test/src/testing_library/dom/async/types.dart' show M
 /// * If you're waiting for an element to existing in the DOM, using a `findBy*` query instead.
 /// * If you're waiting for an element to be removed from the DOM, use [waitForElementToBeRemoved] instead.
 ///
-/// * [timeout] defaults to 1000ms, or whatever value has been set globally for `Config.asyncUtilTimeout`.
-/// * [interval] defaults to 50ms.
-/// * [onTimeout] can be used to customize the [TestFailure] message.
+/// ## Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<T> waitFor<T>(
   FutureOr<T> Function() expectation, {
   Element container,
   Duration timeout,
   Duration interval = const Duration(milliseconds: 50),
   TestFailure Function(TestFailure originalError) onTimeout,
-  MutationObserverInit mutationObserverOptions,
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final config = getConfig();
   container ??= document.documentElement;
@@ -44,7 +47,6 @@ Future<T> waitFor<T>(
     // debugger();
     return error;
   };
-  mutationObserverOptions ??= defaultMutationObserverOptions;
 
   TestFailure lastError;
   MutationObserver observer;
@@ -109,19 +111,30 @@ Future<T> waitFor<T>(
     attributes: mutationObserverOptions.attributes,
     characterData: mutationObserverOptions.characterData,
     subtree: mutationObserverOptions.subtree,
+    attributeFilter: mutationObserverOptions.attributeFilter,
   );
   checkCallback(null);
 
   return doneCompleter.future;
 }
 
+/// Waits for the removal of the single element returned from the [callback] to be removed from the DOM.
+///
+/// To wait for multiple elements to be removed, use [waitForElementsToBeRemoved].
+///
+/// ## Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
 Future<void> waitForElementToBeRemoved(
   FutureOr<Element> Function() callback, {
   Element container,
   Duration timeout,
   Duration interval,
   TestFailure Function(/*JsError*/ dynamic error) onTimeout,
-  MutationObserverInit mutationObserverOptions,
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final waitForOptions = WaitForOptions();
   if (container != null) waitForOptions.container = container;
@@ -129,10 +142,38 @@ Future<void> waitForElementToBeRemoved(
   if (interval != null) waitForOptions.interval = interval.inMilliseconds;
   // TODO: We would have to build dart error => js error conversion logic here
   if (onTimeout != null) waitForOptions.onTimeout = allowInterop(onTimeout);
-  if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions;
+  // ignore: invalid_use_of_protected_member
+  if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions.toJs();
 
   // TODO: How would the allowInterop(callback) work if it was a Dart future - with the JS function expecting a Promise?
   return promiseToFuture(_waitForElementToBeRemoved(allowInterop(callback), waitForOptions));
+}
+
+/// Waits for the removal of all the elements returned from the [callback] to be removed from the DOM.
+///
+/// To wait for a single element to be removed, use [waitForElementToBeRemoved].
+///
+/// ## Options
+///
+/// {@macro sharedWaitForOptionsTimeoutDescription}
+/// {@macro sharedWaitForOptionsIntervalDescription}
+/// {@macro sharedWaitForOptionsOnTimeoutDescription}
+/// {@macro sharedWaitForOptionsMutationObserverDescription}
+Future<void> waitForElementsToBeRemoved(
+  FutureOr<List<Element>> Function() callback, {
+  Element container,
+  Duration timeout,
+  Duration interval,
+  TestFailure Function(/*JsError*/ dynamic error) onTimeout,
+  MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
+}) async {
+  final els = await callback();
+  await Future.wait(els.map((el) => waitForElementToBeRemoved(() => el,
+      container: container,
+      timeout: timeout,
+      interval: interval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions)));
 }
 
 // @JS('rtl.waitFor')
@@ -145,7 +186,7 @@ external /*Promise<void>*/ _waitForElementToBeRemoved(
 
 @JS()
 @anonymous
-class WaitForOptions extends SharedWaitForOptions {
+class WaitForOptions extends SharedJsWaitForOptions {
   external Element get container;
   external set container(Element value);
 }

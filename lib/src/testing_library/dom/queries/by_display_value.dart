@@ -7,7 +7,6 @@ import 'dart:html' show Element, InputElement, SelectElement, TextAreaElement, p
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -22,16 +21,21 @@ mixin ByDisplayValueQueries on IQueries {
   /// Throws if no element is found.
   /// Use [queryByDisplayValue] if a RTE is not expected.
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element getByDisplayValue(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetByDisplayValue(
-          container ?? getDefaultContainer(), value, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -41,15 +45,21 @@ mixin ByDisplayValueQueries on IQueries {
   ///
   /// > Related: [getByDisplayValue]
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> getAllByDisplayValue(
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsGetAllByDisplayValue(
-          container ?? getDefaultContainer(), value, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -59,15 +69,21 @@ mixin ByDisplayValueQueries on IQueries {
   ///
   /// > Related: [queryAllByDisplayValue]
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element queryByDisplayValue(
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryByDisplayValue(
-          container ?? getDefaultContainer(), value, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -77,15 +93,21 @@ mixin ByDisplayValueQueries on IQueries {
   ///
   /// > Related: [queryByDisplayValue]
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> queryAllByDisplayValue(
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByDisplayValue(
-          container ?? getDefaultContainer(), value, buildMatcherOptions(exact: exact, normalizer: normalizer));
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
 
   /// Returns a future with a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
   /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -97,23 +119,36 @@ mixin ByDisplayValueQueries on IQueries {
   ///
   /// > Related: [findAllByDisplayValue]
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByDisplayValue(
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindByDisplayValue(container ?? getDefaultContainer(), value, matcherOptions, waitForOptions));
+        _jsFindByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
@@ -126,30 +161,43 @@ mixin ByDisplayValueQueries on IQueries {
   ///
   /// > Related: [findByDisplayValue]
   ///
-  /// > See: https://testing-library.com/docs/queries/bydisplayvalue/
+  /// > See: <https://testing-library.com/docs/queries/bydisplayvalue/>
+  ///
+  /// ## Options
+  ///
+  /// ### [value]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByDisplayValue(
-    /*String|regex|bool Function(content, element)*/ value, {
-    Element container,
+    /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindAllByDisplayValue(container ?? getDefaultContainer(), value, matcherOptions, waitForOptions));
+        _jsFindAllByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByDisplayValue')
 external Element _jsGetByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
 ]);
@@ -157,7 +205,7 @@ external Element _jsGetByDisplayValue(
 @JS('rtl.getAllByDisplayValue')
 external List<Element> _jsGetAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
 ]);
@@ -165,7 +213,7 @@ external List<Element> _jsGetAllByDisplayValue(
 @JS('rtl.queryByDisplayValue')
 external Element _jsQueryByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
 ]);
@@ -173,7 +221,7 @@ external Element _jsQueryByDisplayValue(
 @JS('rtl.queryAllByDisplayValue')
 external List<Element> _jsQueryAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
 ]);
@@ -181,17 +229,17 @@ external List<Element> _jsQueryAllByDisplayValue(
 @JS('rtl.findByDisplayValue')
 external /*Promise<Element>*/ _jsFindByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByDisplayValue')
 external /*Promise<List<Element>>*/ _jsFindAllByDisplayValue(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   value, [
   MatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);

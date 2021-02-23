@@ -7,7 +7,6 @@ import 'dart:html' show Element, LabelElement, promiseToFuture;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
-import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 
@@ -24,16 +23,25 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [getAllByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element getByLabelText(
-    // TODO: How to get regex expressions working for the text argument?
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsGetByLabelText(container ?? getDefaultContainer(), text,
+      _jsGetByLabelText(getContainerForScope(), TextMatch.parse(text),
           buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
@@ -44,15 +52,25 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [getByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> getAllByLabelText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsGetAllByLabelText(container ?? getDefaultContainer(), text,
+      _jsGetAllByLabelText(getContainerForScope(), TextMatch.parse(text),
           buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
 
   /// Returns a single element that is associated with a [LabelElement] with the given [text],
@@ -63,15 +81,25 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [queryAllByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   Element queryByLabelText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsQueryByLabelText(container ?? getDefaultContainer(), text,
+      _jsQueryByLabelText(getContainerForScope(), TextMatch.parse(text),
           buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
@@ -82,15 +110,25 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [queryByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
   List<Element> queryAllByLabelText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsQueryAllByLabelText(container ?? getDefaultContainer(), text,
+      _jsQueryAllByLabelText(getContainerForScope(), TextMatch.parse(text),
           buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
 
   /// Returns a future with a single element that is associated with a [LabelElement] with the given [text],
@@ -103,24 +141,41 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [findAllByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<Element> findByLabelText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindByLabelText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+        _jsFindByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
@@ -133,31 +188,48 @@ mixin ByLabelTextQueries on IQueries {
   ///
   /// > Related: [findByLabelText]
   ///
-  /// > See: https://testing-library.com/docs/queries/bylabeltext/
+  /// > See: <https://testing-library.com/docs/queries/bylabeltext/>
+  ///
+  /// ## Options
+  ///
+  /// ### [selector]
+  /// If there are multiple labels with the same text, you can use `selector`
+  /// to specify the element you want to match.
+  ///
+  /// ### [text]
+  /// {@macro TextMatchArgDescription}
+  /// {@macro MatcherOptionsExactArgDescription}
+  /// {@macro MatcherOptionsNormalizerArgDescription}
+  ///
+  /// ## Async Options
+  ///
+  /// {@macro sharedWaitForOptionsTimeoutDescription}
+  /// {@macro sharedWaitForOptionsIntervalDescription}
+  /// {@macro sharedWaitForOptionsOnTimeoutDescription}
+  /// {@macro sharedWaitForOptionsMutationObserverDescription}
   Future<List<Element>> findAllByLabelText(
-    /*String|regex|bool Function(content, element)*/ text, {
-    Element container,
+    /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
     Duration timeout,
     Duration interval,
     Error Function(Error error) onTimeout,
-    MutationObserverInit mutationObserverOptions,
+    MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
     return promiseToFuture(
-        _jsFindAllByLabelText(container ?? getDefaultContainer(), text, matcherOptions, waitForOptions));
+        _jsFindAllByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }
 
 @JS('rtl.getByLabelText')
 external Element _jsGetByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
 ]);
@@ -165,7 +237,7 @@ external Element _jsGetByLabelText(
 @JS('rtl.getAllByLabelText')
 external List<Element> _jsGetAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
 ]);
@@ -173,7 +245,7 @@ external List<Element> _jsGetAllByLabelText(
 @JS('rtl.queryByLabelText')
 external Element _jsQueryByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
 ]);
@@ -181,7 +253,7 @@ external Element _jsQueryByLabelText(
 @JS('rtl.queryAllByLabelText')
 external List<Element> _jsQueryAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
 ]);
@@ -189,17 +261,17 @@ external List<Element> _jsQueryAllByLabelText(
 @JS('rtl.findByLabelText')
 external /*Promise<Element>*/ _jsFindByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS('rtl.findAllByLabelText')
 external /*Promise<List<Element>>*/ _jsFindAllByLabelText(
   Element container,
-  /*String|regex|bool Function(content, element)*/
+  /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
-  SharedWaitForOptions waitForOptions,
+  SharedJsWaitForOptions waitForOptions,
 ]);
