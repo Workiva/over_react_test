@@ -1,16 +1,13 @@
 @JS()
 library over_react_test.src.testing_library.dom.matches.types;
 
-import 'dart:developer';
 import 'dart:html';
 
 import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
-import 'package:over_react_test/src/testing_library/dom/config/configure.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/get_default_normalizer.dart';
-import 'package:over_react_test/src/testing_library/util/js_interop_helpers.dart';
-import 'package:test/test.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart';
 
 /// {@template TextMatchArgDescription}
 /// can be either a `String`, regex, or a function which returns `true` for a match and `false` for a mismatch.
@@ -24,15 +21,25 @@ class TextMatch {
   /// See: <https://testing-library.com/docs/queries/about#textmatch>
   static dynamic parse(dynamic value) {
     if (value is RegExp) {
+      // Display the regex as the value that could not be matched to the consumer in the test failure message
+      // instead of the string representation of the `dartValue` (interop'd function) set below.
+      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith(value));
+
+      // Set the value to a function to be called on the JS side, and do the actual
+      // regex matching using a Dart regex within that interop'd function call.
       RegExp regExp = value;
       final dartValue = (String content, Element _) => regExp.hasMatch(content);
-      _updateElementErrorMessageToPrintDartFnTextMatch(value);
       value = allowInterop(dartValue);
     } else if (value is Function) {
       // TODO: Any way to get the actual string value of the function provided instead?
       final fnStringValue = value.toString();
       final consumerConditional = fnStringValue.substring(fnStringValue.lastIndexOf('=>') + 2).trim();
-      _updateElementErrorMessageToPrintDartFnTextMatch('$functionValueErrorMessage \n\n    $consumerConditional\n\n');
+      // Display the nicest string representation of the Dart function that we can as the value that
+      // could not be matched to the consumer in the test failure message instead of the string
+      // representation of the interop `value` set below.
+      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('$functionValueErrorMessage \n\n    $consumerConditional\n\n'));
+
+      // Set the value to an interop'd function.
       value = allowInterop<Function>(value);
     } else if (value is! String) {
       throw ArgumentError('Argument must be a String, a RegExp or a function that returns a bool.');
@@ -41,15 +48,11 @@ class TextMatch {
     return value;
   }
 
-  static void _updateElementErrorMessageToPrintDartFnTextMatch(dynamic value) {
-    final existingElementErrorFn = getConfig().getElementError;
-    configure(
-        getElementError:
-            allowInterop((message, container) => getTextMatchDartFunctionElementError(message, container, value)));
-
-    addTearDown(() {
-      configure(getElementError: existingElementErrorFn);
-    });
+  static Object Function(Object originalMessage, Element container) _replaceDartInteropFunctionStringWith(Object newValue) {
+    final dartInteropFunctionValueRegex = RegExp(r'function[\s\S]+', multiLine: true);
+    return (originalMessage, container) {
+      return originalMessage.toString().replaceAll(dartInteropFunctionValueRegex, newValue.toString());
+    };
   }
 
   @visibleForTesting

@@ -1,11 +1,10 @@
 @JS()
 library over_react_test.src.testing_library.dom.config.configure;
 
-import 'dart:html';
+import 'dart:html' show Element;
 
-import 'package:js/js.dart';
-import 'package:over_react_test/src/testing_library/dom/config/types.dart';
-import 'package:test/test.dart' show TestFailure;
+import 'package:js/js.dart' show JS, allowInterop;
+import 'package:over_react_test/src/testing_library/dom/config/types.dart' show JsConfig;
 
 export 'package:over_react_test/src/testing_library/dom/config/types.dart' show JsConfig;
 
@@ -19,7 +18,7 @@ void configure({
   bool defaultHidden,
   bool showOriginalStackTrace,
   bool throwSuggestions,
-  /*TestFailure*/ Function(String message, Element container) getElementError,
+  /*TestFailure*/ Function(Object message, Element container) getElementError,
 }) {
   final existingConfig = getConfig();
   return jsConfigure(JsConfig()

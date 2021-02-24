@@ -5,23 +5,69 @@ import 'dart:html';
 import 'package:meta/meta.dart';
 import 'package:over_react/over_react.dart';
 import 'package:over_react_test/react_testing_library.dart' as rtl;
-import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:test/test.dart';
 
-import 'package:over_react_test/src/testing_library/dom/scoped_queries.dart';
+import 'package:over_react_test/src/testing_library/dom/config/configure.dart' show JsConfig, jsConfigure;
+import 'package:over_react_test/src/testing_library/dom/matches/types.dart' show TextMatch;
+import 'package:over_react_test/src/testing_library/dom/scoped_queries.dart' show ScopedQueries;
 
 import '../../util/matchers.dart';
 
 part 'shared_scoped_queries_tests.over_react.g.dart';
 
+const asyncQueryTimeout = Duration(milliseconds: 100);
+
 @isTestGroup
-void hasQueriesScopedTo(String scopeName, ScopedQueries Function(String scopeName) getQueries) {
+void hasQueriesScopedTo(String scopeName, ScopedQueries Function(String scopeName, {bool testAsyncQuery}) getQueries, {
+  // Optional because in the case of RenderResult, calling `getQueries` will render AND return the ScopedQueries object.
+  rtl.RenderResult Function({bool testAsyncQuery}) render,
+}) {
   group('$scopeName:', () {
     ScopedQueries queries;
+    JsConfig initialConfig;
+
+    setUpAll(() {
+      initialConfig = rtl.getConfig();
+    });
+
+    tearDownAll(() {
+      jsConfigure(initialConfig);
+    });
 
     setUp(() {
-      rtl.configure(throwSuggestions: false);
-      queries = getQueries(scopeName);
+      queries = null;
+      rtl.configure(
+          throwSuggestions: false,
+        asyncUtilTimeout: asyncQueryTimeout.inMilliseconds,
+      );
+      expect(document.body.children, isEmpty);
+    });
+
+    ScopedQueries initQueries({bool testAsyncQuery = false}) {
+      if (queries != null) return queries;
+
+      queries = getQueries(scopeName, testAsyncQuery: testAsyncQuery);
+      if (queries is! rtl.RenderResult) {
+        if (render == null) {
+          throw ArgumentError('When getQueries() does not return a RenderResult, the render argument must do so.');
+        }
+
+        render(testAsyncQuery: testAsyncQuery);
+      }
+
+      if (testAsyncQuery) {
+        final delayedRenderOfRootNode = querySelector('[$defaultTestIdKey="delayed-render-of-root"]');
+        expect(delayedRenderOfRootNode, isNotNull,
+            reason: 'Async queries should be tested on DOM wrapped by / controlled by the DelayedRenderOf component.');
+        expect(delayedRenderOfRootNode.children, isEmpty,
+            reason: 'Async queries should be tested with DOM that appears only after the query is called.');
+      }
+
+      return queries;
+    }
+
+    test('all queries', () {
+      queries = initQueries();
 
       expect(queries.getByAltText, isA<Function>(), reason: 'getByAltText');
       expect(queries.getAllByAltText, isA<Function>(), reason: 'getAllByAltText');
@@ -73,15 +119,58 @@ void hasQueriesScopedTo(String scopeName, ScopedQueries Function(String scopeNam
       expect(queries.findAllByTitle, isA<Function>(), reason: 'findAllByTitle');
     });
 
-    testTextMatchTypes(
-      'AltText',
-      textMatchArgName: 'text',
-      expectedText: scopeName,
-      getQueryByQuery: () => getQueries(scopeName).queryByAltText,
-      getGetByQuery: () => getQueries(scopeName).getByAltText,
-      getFindByQuery: () => getQueries(scopeName).findByAltText,
-      failureSnapshotPattern: 'alt text: $valueNotFoundPlaceholder',
-    );
+    group('', () {
+      testTextMatchTypes(
+        'AltText',
+        textMatchArgName: 'text',
+        queryShouldMatchOn: scopeName,
+        getQueryByQuery: () => initQueries().queryByAltText,
+        getGetByQuery: () => initQueries().getByAltText,
+        getFindByQuery: () => initQueries(testAsyncQuery: true).findByAltText,
+        failureSnapshotPattern: 'alt text: $valueNotFoundPlaceholder',
+      );
+
+      testTextMatchTypes(
+        'DisplayValue',
+        textMatchArgName: 'value',
+        queryShouldMatchOn: scopeName,
+        getQueryByQuery: () => initQueries().queryByDisplayValue,
+        getGetByQuery: () => initQueries().getByDisplayValue,
+        getFindByQuery: () => initQueries(testAsyncQuery: true).findByDisplayValue,
+        failureSnapshotPattern: 'display value: $valueNotFoundPlaceholder',
+      );
+
+      testTextMatchTypes(
+        'LabelText',
+        textMatchArgName: 'text',
+        queryShouldMatchOn: scopeName,
+        getQueryByQuery: () => initQueries().queryByLabelText,
+        getGetByQuery: () => initQueries().getByLabelText,
+        getFindByQuery: () => initQueries(testAsyncQuery: true).findByLabelText,
+        failureSnapshotPattern: 'label with the text of: $valueNotFoundPlaceholder',
+      );
+
+      testTextMatchTypes(
+        'PlaceholderText',
+        textMatchArgName: 'text',
+        queryShouldMatchOn: scopeName,
+        getQueryByQuery: () => initQueries().queryByPlaceholderText,
+        getGetByQuery: () => initQueries().getByPlaceholderText,
+        getFindByQuery: () => initQueries(testAsyncQuery: true).findByPlaceholderText,
+        failureSnapshotPattern: 'placeholder text of: $valueNotFoundPlaceholder',
+      );
+
+      testTextMatchTypes(
+        'Role',
+        textMatchArgName: 'role',
+        queryShouldMatchOn: 'button',
+        getQueryByQuery: () => initQueries().queryByRole,
+        getGetByQuery: () => initQueries().getByRole,
+        getFindByQuery: () => initQueries(testAsyncQuery: true).findByRole,
+        failureSnapshotPattern: 'accessible element with role="$valueNotFoundPlaceholder"',
+        fuzzyFailureSnapshotPattern: 'accessible element with the role $valueNotFoundPlaceholder',
+      );
+    });
 
     // group('queryBy / getBy', () {
     //   group('[success]', () {
@@ -230,10 +319,11 @@ void hasQueriesScopedTo(String scopeName, ScopedQueries Function(String scopeNam
     //   });
     // });
 
-    test('', () {
+    test('limiting the scope of the query as expected', () {
       final outOfScopeElement = DivElement()..text = 'out-of-scope';
       document.body.append(outOfScopeElement);
 
+      queries = initQueries();
       if (queries.getContainerForScope() != document.body) {
         expect(queries.queryByText('out-of-scope'), isNull,
             reason: 'The scoped query should not return elements that are not found within the scoped container.');
@@ -253,16 +343,19 @@ String getStringThatFuzzyMatches(String exactValue) => exactValue.substring(2);
 void testTextMatchTypes(
   String queryName, {
   @required String textMatchArgName,
-  @required String expectedText,
+  @required String queryShouldMatchOn,
   @required Function Function() getQueryByQuery,
   @required Function Function() getGetByQuery,
   @required Function Function() getFindByQuery,
   String failureSnapshotPattern,
+      String fuzzyFailureSnapshotPattern,
 }) {
-  Matcher toThrowErrorMatchingInlineSnapshotPattern(String valueExpectedButNotFound) {
+  fuzzyFailureSnapshotPattern ??= failureSnapshotPattern;
+
+  Matcher toThrowErrorMatchingInlineSnapshotPattern(String valueExpectedButNotFound, {bool fuzzyMatch = false}) {
     Matcher containsMatcher;
     if (failureSnapshotPattern != null) {
-      containsMatcher = buildContainsPatternUsing(failureSnapshotPattern, valueExpectedButNotFound);
+      containsMatcher = buildContainsPatternUsing(fuzzyMatch ? fuzzyFailureSnapshotPattern : failureSnapshotPattern, valueExpectedButNotFound);
     } else {
       containsMatcher = contains(valueExpectedButNotFound);
     }
@@ -270,9 +363,9 @@ void testTextMatchTypes(
     return toThrowErrorMatchingInlineSnapshot(containsMatcher);
   }
 
-  group('when $textMatchArgName is a', () {
+  group('when the $textMatchArgName argument is a', () {
     group('String (TextMatch.parse)', () {
-      String fuzzyText = getStringThatFuzzyMatches(expectedText);
+      String fuzzyText = getStringThatFuzzyMatches(queryShouldMatchOn);
 
       group('and exact = true (default),', () {
         group('and a failure/null return value is expected for the', () {
@@ -281,25 +374,25 @@ void testTextMatchTypes(
           });
 
           test('getBy$queryName query', () {
-            expect(() => getGetByQuery()(fuzzyText), toThrowErrorMatchingInlineSnapshotPattern(fuzzyText));
+            expect(() => getGetByQuery()(fuzzyText), toThrowErrorMatchingInlineSnapshotPattern(fuzzyText, fuzzyMatch: true));
           });
 
           test('findBy$queryName query', () async {
-            expect(() async => await getFindByQuery()(fuzzyText), toThrowErrorMatchingInlineSnapshotPattern(fuzzyText));
+            expect(() async => await getFindByQuery()(fuzzyText), toThrowErrorMatchingInlineSnapshotPattern(fuzzyText, fuzzyMatch: true));
           });
         });
 
         group('returning the matching element from the', () {
           test('queryBy$queryName query', () {
-            expect(getQueryByQuery()(expectedText), isA<Element>());
+            expect(getQueryByQuery()(queryShouldMatchOn), isA<Element>());
           });
 
           test('getBy$queryName query', () {
-            expect(getGetByQuery()(expectedText), isA<Element>());
+            expect(getGetByQuery()(queryShouldMatchOn), isA<Element>());
           });
 
           test('findBy$queryName query', () async {
-            final findByQueryReturnValue = await getFindByQuery()(expectedText);
+            final findByQueryReturnValue = await getFindByQuery()(queryShouldMatchOn);
             expect(findByQueryReturnValue, isA<Element>());
           });
         });
@@ -313,12 +406,12 @@ void testTextMatchTypes(
 
           test('getBy$queryName query', () {
             expect(() => getGetByQuery()('somethingDifferentThatDoesNotMatch', exact: false),
-                toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
+                toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch', fuzzyMatch: true));
           });
 
           test('findBy$queryName query', () {
             expect(() async => await getFindByQuery()('somethingDifferentThatDoesNotMatch', exact: false),
-                toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
+                toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch', fuzzyMatch: true));
           });
         });
 
@@ -357,6 +450,7 @@ void testTextMatchTypes(
         });
 
         test('findBy$queryName query', () async {
+          // TODO: Something is making the custom error message for async queries get duplicate "prettyDOM" appended. Seems like a race condition.
           expect(() async => await getFindByQuery()(RegExp(regExPattern)),
               toThrowErrorMatchingInlineSnapshotPattern('RegExp/$regExPattern/'));
         });
@@ -364,15 +458,15 @@ void testTextMatchTypes(
 
       group('returning the matching element from the', () {
         test('queryBy$queryName query', () {
-          expect(getQueryByQuery()(RegExp("^$expectedText\$")), isA<Element>());
+          expect(getQueryByQuery()(RegExp("^$queryShouldMatchOn\$")), isA<Element>());
         });
 
         test('getBy$queryName query', () {
-          expect(getGetByQuery()(RegExp("^$expectedText\$")), isA<Element>());
+          expect(getGetByQuery()(RegExp("^$queryShouldMatchOn\$")), isA<Element>());
         });
 
         test('findBy$queryName query', () async {
-          final findByQueryReturnValue = await getFindByQuery()(RegExp("^$expectedText\$"));
+          final findByQueryReturnValue = await getFindByQuery()(RegExp("^$queryShouldMatchOn\$"));
           expect(findByQueryReturnValue, isA<Element>());
         });
       });
@@ -381,31 +475,31 @@ void testTextMatchTypes(
     group('Function (TextMatch.parse),', () {
       group('and a failure/null return value is expected for the', () {
         test('queryBy$queryName query', () {
-          expect(getQueryByQuery()((content, el) => content != expectedText), isNull);
+          expect(getQueryByQuery()((content, el) => content != queryShouldMatchOn), isNull);
         });
 
         test('getBy$queryName query', () {
-          expect(() => getGetByQuery()((content, el) => content != expectedText),
+          expect(() => getGetByQuery()((content, el) => content != queryShouldMatchOn),
               toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
         });
 
         test('findBy$queryName query', () async {
-          expect(() async => await getFindByQuery()((content, el) => content != expectedText),
+          expect(() async => await getFindByQuery()((content, el) => content != queryShouldMatchOn),
               toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
         });
       });
 
       group('returning the matching element from the', () {
         test('queryBy$queryName query', () {
-          expect(getQueryByQuery()((content, el) => content == expectedText), isA<Element>());
+          expect(getQueryByQuery()((content, el) => content == queryShouldMatchOn), isA<Element>());
         });
 
         test('getBy$queryName query', () {
-          expect(getGetByQuery()((content, el) => content == expectedText), isA<Element>());
+          expect(getGetByQuery()((content, el) => content == queryShouldMatchOn), isA<Element>());
         });
 
         test('findBy$queryName query', () async {
-          final findByQueryReturnValue = await getFindByQuery()((content, el) => content == expectedText);
+          final findByQueryReturnValue = await getFindByQuery()((content, el) => content == queryShouldMatchOn);
           expect(findByQueryReturnValue, isA<Element>());
         });
       });
@@ -413,12 +507,13 @@ void testTextMatchTypes(
   });
 }
 
-ReactElement renderElementsForQuerying(String uniqueName) {
+ReactElement elementsForQuerying(String uniqueName) {
   return (Dom.div()
     ..addTestId(uniqueName)
     ..title = uniqueName
     ..role = Role.presentation)(
     uniqueName,
+    (Dom.button()..type = 'button')(uniqueName),
     (Dom.img()..alt = uniqueName)(),
     (Dom.label()..htmlFor = '${uniqueName}Input')(uniqueName),
     (Dom.input()
@@ -439,7 +534,6 @@ ReactElement renderElementsForQuerying(String uniqueName) {
 }
 
 mixin DelayedRenderOfProps on UiProps {
-  @requiredProp
   Duration delay;
   Function() onDidRenderAfterDelay;
 }
@@ -447,10 +541,11 @@ mixin DelayedRenderOfProps on UiProps {
 /// Used to test findBy* queries and `waitFor`.
 UiFactory<DelayedRenderOfProps> DelayedRenderOf = uiFunction(
   (props) {
-    final shouldRenderChildren = useState(false);
+    final delay = props.delay ?? asyncQueryTimeout;
+    final shouldRenderChildren = useState(delay.inMilliseconds == 0 ? true : false);
 
     useEffect(() {
-      final timer = Timer(props.delay, () {
+      final timer = Timer(delay, () {
         shouldRenderChildren.set(true);
       });
 
@@ -471,8 +566,8 @@ UiFactory<DelayedRenderOfProps> DelayedRenderOf = uiFunction(
 
     return (Dom.div()
       ..addTestId('delayed-render-of-root')
-      ..addUnconsumedDomProps(props, const []))(
-      Dom.div()('visible immediately'),
+      ..addUnconsumedDomProps(props, const [])
+    )(
       _renderChildren(),
     );
   },

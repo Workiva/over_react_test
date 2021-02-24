@@ -24,7 +24,10 @@ main() {
       });
 
       group('that contains queries scoped to', () {
-        hasQueriesScopedTo('RenderResult.container', (scopeName) => rtl.render(renderElementsForQuerying(scopeName)));
+        hasQueriesScopedTo('RenderResult.container', (scopeName, {bool testAsyncQuery = false}) {
+          final els = testAsyncQuery ? DelayedRenderOf()(elementsForQuerying(scopeName)) : elementsForQuerying(scopeName);
+          return rtl.render(els);
+        });
       });
     });
 

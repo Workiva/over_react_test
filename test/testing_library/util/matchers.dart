@@ -4,11 +4,12 @@ import 'package:over_react_test/src/over_react_test/custom_matchers.dart' show h
 
 Matcher toThrowErrorMatchingInlineSnapshot([Matcher stringSnapshotMatcher]) {
   // TODO: Would be nice to create a custom matcher class so that we could customize the error message based on which of the three matcher(s) are not present.
-  final baseMatcher = hasToStringValue(contains('TestingLibraryElementError'));
+  final errorNameMatcher = hasToStringValue(contains('TestingLibraryElementError'));
   final snapshotMatcher = stringSnapshotMatcher != null ? hasToStringValue(stringSnapshotMatcher) : null;
+  // TODO: The *byRole queries end with `</div>>`
   final prettyDomMatcher = hasToStringValue(endsWith('</div>'));
 
-  return throwsA(allOf(baseMatcher, snapshotMatcher, prettyDomMatcher));
+  return throwsA(allOf(errorNameMatcher, snapshotMatcher, prettyDomMatcher));
 }
 
 /// The value to use in the `templatePattern` argument of [buildContainsPatternUsing].
