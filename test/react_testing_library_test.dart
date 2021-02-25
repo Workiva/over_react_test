@@ -4,25 +4,16 @@ library react_testing_library_test;
 import 'dart:async';
 
 import 'package:over_react/over_react.dart';
-import 'package:over_react_test/react_testing_library.dart' as rtl;
 import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
 
 import 'testing_library/dom/configure_test.dart' as configure_test;
-import 'testing_library/dom/queries/shared_scoped_queries_tests.dart';
 import 'testing_library/react/render_test.dart' as render_test;
 
 part 'react_testing_library_test.over_react.g.dart';
 
 main() {
   enableTestMode();
-
-  // group('ByRoleFoooo', () {
-  //   test('', () async {
-  //     final renderedResult = rtl.render(DelayedRenderOf()(elementsForQuerying('foo')));
-  //     await renderedResult.findByRole('button', name: 'bar');
-  //   });
-  // });
 
   group('Testing Library', () {
     configure_test.main();

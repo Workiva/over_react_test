@@ -7,7 +7,8 @@ import 'package:over_react/over_react.dart';
 import 'package:over_react_test/react_testing_library.dart' as rtl;
 import 'package:test/test.dart';
 
-import '../dom/queries/shared_scoped_queries_tests.dart';
+import '../dom/queries/shared/scoped_queries_tests.dart';
+import '../util/rendering.dart';
 
 main() {
   group('render', () {
@@ -27,7 +28,8 @@ main() {
 
       group('that contains queries scoped to', () {
         hasQueriesScopedTo('RenderResult.container', (scopeName, {bool testAsyncQuery = false}) {
-          final els = testAsyncQuery ? DelayedRenderOf()(elementsForQuerying(scopeName)) : elementsForQuerying(scopeName);
+          final els =
+              testAsyncQuery ? DelayedRenderOf()(elementsForQuerying(scopeName)) : elementsForQuerying(scopeName);
           return rtl.render(els);
         });
       });

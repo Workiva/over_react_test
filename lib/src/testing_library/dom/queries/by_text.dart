@@ -10,7 +10,8 @@ import 'package:meta/meta.dart';
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
+    show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -222,7 +223,7 @@ mixin ByTextQueries on IQueries {
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
@@ -277,7 +278,7 @@ mixin ByTextQueries on IQueries {
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);

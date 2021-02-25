@@ -40,7 +40,7 @@ abstract class IQueries {
   SharedJsWaitForOptions buildWaitForOptions({
     Duration timeout,
     Duration interval,
-    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final waitForOptions = SharedJsWaitForOptions();

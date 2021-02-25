@@ -21,11 +21,10 @@ class TextMatch {
   ///
   /// See: <https://testing-library.com/docs/queries/about#textmatch>
   static dynamic parse(dynamic value) {
-    debugger();
     if (value is RegExp) {
       // Display the regex as the value that could not be matched to the consumer in the test failure message
       // instead of the string representation of the `dartValue` (interop'd function) set below.
-      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('"$value"'));
+      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('$value'));
 
       // Set the value to a function to be called on the JS side, and do the actual
       // regex matching using a Dart regex within that interop'd function call.
@@ -36,7 +35,8 @@ class TextMatch {
       // Display the nicest string representation of the Dart function that we can as the value that
       // could not be matched to the consumer in the test failure message instead of the string
       // representation of the interop `value` set below.
-      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('"$functionValueErrorMessage"\n\n    $value\n\n'));
+      setEphemeralElementErrorMessage(
+          _replaceDartInteropFunctionStringWith('$functionValueErrorMessage\n\n    $value\n\n'));
 
       // Set the value to an interop'd function.
       value = allowInterop<Function>(value);
@@ -47,12 +47,30 @@ class TextMatch {
     return value;
   }
 
-  static Object Function(Object originalMessage, Element container) _replaceDartInteropFunctionStringWith(Object newValue) {
-    final dartInteropFunctionValueRegex = RegExp(r'`*function[\s\S]+', multiLine: true);
+  static Object Function(Object originalMessage, Element container) _replaceDartInteropFunctionStringWith(
+      Object newValue) {
+    final dartInteropFunctionValueRegex = RegExp(r'([\"`]*)(function[\s\S]+})([\"`]*)(.*)([\s\S]+)*', multiLine: true);
+
     return (originalMessage, container) {
-      // print('originalMessage: $originalMessage');
-      var newMessage = originalMessage.toString().replaceAll(dartInteropFunctionValueRegex, newValue.toString());
-      newMessage = newMessage.replaceAll('""', '"');
+      var newMessage = originalMessage.toString().replaceAllMapped(dartInteropFunctionValueRegex, (match) {
+        final optionalOpeningQuoteOrBacktick = match.group(1);
+        final optionalClosingQuoteOrBacktick = match.group(3);
+        final restOfMessageBeforePrettyDomOrAccessibleRolesPrintout = match.group(4);
+        final newValueLines = newValue.toString().split('\n');
+        // Split out the first line of the new message so we can add
+        // the `restOfMessageBeforePrettyDomOrAccessibleRolesPrintout` after it before any optional newlines are added
+        final newValueFirstLine = newValueLines.first;
+        final newValueRestOfLines = newValueLines..removeAt(0);
+        var returnValue =
+            '$newValueFirstLine$restOfMessageBeforePrettyDomOrAccessibleRolesPrintout${newValueRestOfLines.join('\n')}';
+        if (optionalOpeningQuoteOrBacktick.isNotEmpty || optionalClosingQuoteOrBacktick.isNotEmpty) {
+          // Restore quotes around the first line of the new value if they were previously found around
+          // the `function...` portion of the original message.
+          returnValue = returnValue.replaceFirst(newValueFirstLine, '"$newValueFirstLine"');
+        }
+        return returnValue;
+      });
+
       return newMessage;
     };
   }

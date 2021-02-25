@@ -11,7 +11,8 @@ import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
+    show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -300,7 +301,7 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
@@ -322,23 +323,24 @@ mixin ByRoleQueries on IQueries {
     // return promiseToFuture(
     //     _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
-        () => getByRole(role,
-          exact: matcherOptions.exact,
-          normalizer: matcherOptions.normalizer,
-          hidden: matcherOptions.hidden,
-          name: matcherOptions.name,
-          selected: matcherOptions.selected,
-          checked: matcherOptions.checked,
-          pressed: matcherOptions.pressed,
-          expanded: matcherOptions.expanded,
-          queryFallbacks: matcherOptions.queryFallbacks,
-          level: matcherOptions.level,
-        ),
-        container: getContainerForScope(),
-        timeout: timeout,
-        interval: interval ?? defaultAsyncCallbackCheckInterval,
-        onTimeout: onTimeout,
-        mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+      () => getByRole(
+        role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
     );
   }
 
@@ -390,7 +392,7 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
@@ -412,23 +414,24 @@ mixin ByRoleQueries on IQueries {
     // return promiseToFuture(
     //     _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
-        () => getAllByRole(role,
-          exact: matcherOptions.exact,
-          normalizer: matcherOptions.normalizer,
-          hidden: matcherOptions.hidden,
-          name: matcherOptions.name,
-          selected: matcherOptions.selected,
-          checked: matcherOptions.checked,
-          pressed: matcherOptions.pressed,
-          expanded: matcherOptions.expanded,
-          queryFallbacks: matcherOptions.queryFallbacks,
-          level: matcherOptions.level,
-        ),
-        container: getContainerForScope(),
-        timeout: timeout,
-        interval: interval ?? defaultAsyncCallbackCheckInterval,
-        onTimeout: onTimeout,
-        mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+      () => getAllByRole(
+        role,
+        exact: exact,
+        normalizer: normalizer,
+        hidden: hidden,
+        name: name,
+        selected: selected,
+        checked: checked,
+        pressed: pressed,
+        expanded: expanded,
+        queryFallbacks: queryFallbacks,
+        level: level,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
     );
   }
 }

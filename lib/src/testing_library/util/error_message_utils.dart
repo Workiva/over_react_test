@@ -15,7 +15,8 @@ import 'package:over_react_test/src/testing_library/dom/config/configure.dart' s
 ///
 /// Automatically restores the `JsConfig.getElementError` value that was set before this function was called
 /// within the `tearDown` of the current test.
-void setEphemeralElementErrorMessage(Object Function(Object originalMessage, Element container) customErrorMessageBuilder) {
+void setEphemeralElementErrorMessage(
+    Object Function(Object originalMessage, Element container) customErrorMessageBuilder) {
   final existingElementErrorFn = getConfig().getElementError;
   buildDartGetElementError(Object originalMessage, Element container) {
     return buildJsGetElementError(customErrorMessageBuilder(originalMessage, container), container);

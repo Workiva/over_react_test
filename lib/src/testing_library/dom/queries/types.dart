@@ -21,6 +21,6 @@ typedef Query = FutureOr<Element> Function(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
   JsMutationObserverOptions mutationObserverOptions,
 );

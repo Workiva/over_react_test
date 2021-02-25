@@ -36,7 +36,7 @@ Future<T> waitFor<T>(
   Element container,
   Duration timeout,
   Duration interval = const Duration(milliseconds: 50),
-  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
+  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final config = getConfig();
@@ -134,7 +134,7 @@ Future<void> waitForElementToBeRemoved(
   Element container,
   Duration timeout,
   Duration interval,
-  /*Error*/dynamic Function(/*JsError*/ dynamic error) onTimeout,
+  /*Error*/ dynamic Function(/*JsError*/ dynamic error) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final waitForOptions = WaitForOptions();
