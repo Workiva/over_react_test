@@ -2,13 +2,14 @@
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_display_value;
 
-import 'dart:html' show Element, InputElement, SelectElement, TextAreaElement, promiseToFuture;
+import 'dart:html' show Element, InputElement, SelectElement, TextAreaElement;
 
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -34,8 +35,8 @@ mixin ByDisplayValueQueries on IQueries {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
-      _jsGetByDisplayValue(
-          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
+      withErrorInterop(() => _jsGetByDisplayValue(
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer)));
 
   /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -58,8 +59,8 @@ mixin ByDisplayValueQueries on IQueries {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
-      _jsGetAllByDisplayValue(
-          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
+      withErrorInterop(() => _jsGetAllByDisplayValue(
+          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer)));
 
   /// Returns a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -140,14 +141,14 @@ mixin ByDisplayValueQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
   }
 
@@ -182,14 +183,14 @@ mixin ByDisplayValueQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindAllByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
   }
 }

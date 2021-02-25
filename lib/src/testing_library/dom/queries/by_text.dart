@@ -2,7 +2,7 @@
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_text;
 
-import 'dart:html' show Element, promiseToFuture;
+import 'dart:html' show Element;
 
 import 'package:js/js.dart';
 import 'package:meta/meta.dart';
@@ -10,6 +10,7 @@ import 'package:meta/meta.dart';
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -66,8 +67,8 @@ mixin ByTextQueries on IQueries {
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsGetByText(getContainerForScope(), TextMatch.parse(text),
-          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
+      withErrorInterop(() => _jsGetByText(getContainerForScope(), TextMatch.parse(text),
+          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector)));
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
   ///
@@ -102,8 +103,8 @@ mixin ByTextQueries on IQueries {
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      _jsGetAllByText(getContainerForScope(), TextMatch.parse(text),
-          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
+      withErrorInterop(() => _jsGetAllByText(getContainerForScope(), TextMatch.parse(text),
+          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector)));
 
   /// Returns a single element with the given [text] content, defaulting to an [exact] match.
   ///
@@ -221,14 +222,14 @@ mixin ByTextQueries on IQueries {
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
@@ -276,14 +277,14 @@ mixin ByTextQueries on IQueries {
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindAllByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }

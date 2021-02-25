@@ -40,13 +40,14 @@ abstract class IQueries {
   SharedJsWaitForOptions buildWaitForOptions({
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final waitForOptions = SharedJsWaitForOptions();
     if (timeout != null) waitForOptions.timeout = timeout.inMilliseconds;
     if (interval != null) waitForOptions.interval = interval.inMilliseconds;
-    // if (onTimeout != null) waitForOptions.onTimeout = allowInterop(onTimeout); // TODO: We would have to build dart error => js error conversion logic here
+    // TODO: Wire this up / test the interop to ensure the stack trace is intact
+    // if (onTimeout != null) waitForOptions.onTimeout = allowInterop(onTimeout);
     // ignore: invalid_use_of_protected_member
     if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions.toJs();
 

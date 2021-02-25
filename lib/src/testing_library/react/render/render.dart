@@ -55,7 +55,7 @@ RenderResult render(
     }
   });
 
-  return RenderResult._(jsResult);
+  return RenderResult._(jsResult, ui);
 }
 
 /// The model returned from [render], which includes all the [ScopedQueries] scoped to the
@@ -64,9 +64,12 @@ RenderResult render(
 /// TODO: Document fields / methods
 /// TODO: Document how to use the bound queries on the container
 class RenderResult extends ScopedQueries {
-  RenderResult._(this._jsRenderResult) : super(() => _jsRenderResult.container);
+  RenderResult._(this._jsRenderResult, this._renderedElement) : super(() => _jsRenderResult.container);
 
   final JsRenderResult _jsRenderResult;
+
+  ReactElement get renderedElement => _renderedElement;
+  ReactElement _renderedElement;
 
   Element get container => _jsRenderResult.container;
 
@@ -80,7 +83,10 @@ class RenderResult extends ScopedQueries {
   ]) =>
       _jsRenderResult.debug(baseElement, maxLength, options);
 
-  void rerender(ReactElement ui) => _jsRenderResult.rerender(ui);
+  void rerender(ReactElement ui) {
+    _renderedElement = ui;
+    _jsRenderResult.rerender(ui);
+  }
 
   void unmount() => _jsRenderResult.unmount();
 

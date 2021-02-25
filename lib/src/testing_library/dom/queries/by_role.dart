@@ -2,14 +2,16 @@
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_role;
 
-import 'dart:html' show Element, promiseToFuture;
+import 'dart:html' show Element;
 
 import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -81,7 +83,7 @@ mixin ByRoleQueries on IQueries {
     bool queryFallbacks,
     int level,
   }) =>
-      _jsGetByRole(
+      withErrorInterop(() => _jsGetByRole(
           getContainerForScope(),
           TextMatch.parse(role),
           buildByRoleOptions(
@@ -94,7 +96,7 @@ mixin ByRoleQueries on IQueries {
               pressed: pressed,
               expanded: expanded,
               queryFallbacks: queryFallbacks,
-              level: level));
+              level: level)));
 
   /// Returns a list of elements with the given [role] value, defaulting to an [exact] match.
   ///
@@ -132,7 +134,7 @@ mixin ByRoleQueries on IQueries {
     bool queryFallbacks,
     int level,
   }) =>
-      _jsGetAllByRole(
+      withErrorInterop(() => _jsGetAllByRole(
           getContainerForScope(),
           TextMatch.parse(role),
           buildByRoleOptions(
@@ -145,7 +147,7 @@ mixin ByRoleQueries on IQueries {
               pressed: pressed,
               expanded: expanded,
               queryFallbacks: queryFallbacks,
-              level: level));
+              level: level)));
 
   /// Returns a single element with the given [role] value, defaulting to an [exact] match.
   ///
@@ -298,7 +300,7 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
@@ -315,8 +317,29 @@ mixin ByRoleQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
-        _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of some weirdness with
+    // the wrong error message being displayed when the role is found, but the name arg is specified and it isn't found in the DOM.
+    // return promiseToFuture(
+    //     _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
+    return waitFor(
+        () => getByRole(role,
+          exact: matcherOptions.exact,
+          normalizer: matcherOptions.normalizer,
+          hidden: matcherOptions.hidden,
+          name: matcherOptions.name,
+          selected: matcherOptions.selected,
+          checked: matcherOptions.checked,
+          pressed: matcherOptions.pressed,
+          expanded: matcherOptions.expanded,
+          queryFallbacks: matcherOptions.queryFallbacks,
+          level: matcherOptions.level,
+        ),
+        container: getContainerForScope(),
+        timeout: timeout,
+        interval: interval ?? defaultAsyncCallbackCheckInterval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements with the given [role] value, defaulting to an [exact] match after
@@ -367,7 +390,7 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildByRoleOptions(
@@ -384,8 +407,29 @@ mixin ByRoleQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
-        _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of some weirdness with
+    // the wrong error message being displayed when the role is found, but the name arg is specified and it isn't found in the DOM.
+    // return promiseToFuture(
+    //     _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
+    return waitFor(
+        () => getAllByRole(role,
+          exact: matcherOptions.exact,
+          normalizer: matcherOptions.normalizer,
+          hidden: matcherOptions.hidden,
+          name: matcherOptions.name,
+          selected: matcherOptions.selected,
+          checked: matcherOptions.checked,
+          pressed: matcherOptions.pressed,
+          expanded: matcherOptions.expanded,
+          queryFallbacks: matcherOptions.queryFallbacks,
+          level: matcherOptions.level,
+        ),
+        container: getContainerForScope(),
+        timeout: timeout,
+        interval: interval ?? defaultAsyncCallbackCheckInterval,
+        onTimeout: onTimeout,
+        mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -421,23 +465,23 @@ external List<Element> _jsQueryAllByRole(
   ByRoleOptions options,
 ]);
 
-@JS('rtl.findByRole')
-external /*Promise<Element>*/ _jsFindByRole(
-  Element container,
-  /*TextMatch*/
-  role, [
-  ByRoleOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByRole')
-external /*Promise<List<Element>>*/ _jsFindAllByRole(
-  Element container,
-  /*TextMatch*/
-  role, [
-  ByRoleOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
+// @JS('rtl.findByRole')
+// external /*Promise<Element>*/ _jsFindByRole(
+//   Element container,
+//   /*TextMatch*/
+//   role, [
+//   ByRoleOptions options,
+//   SharedJsWaitForOptions waitForOptions,
+// ]);
+//
+// @JS('rtl.findAllByRole')
+// external /*Promise<List<Element>>*/ _jsFindAllByRole(
+//   Element container,
+//   /*TextMatch*/
+//   role, [
+//   ByRoleOptions options,
+//   SharedJsWaitForOptions waitForOptions,
+// ]);
 
 @JS()
 @anonymous

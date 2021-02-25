@@ -137,7 +137,7 @@ Future<ImageElement> findByAltText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByAltText(text,
@@ -180,7 +180,7 @@ Future<List<ImageElement>> findAllByAltText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByAltText(text,
@@ -323,7 +323,7 @@ Future<Element> findByDisplayValue(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByDisplayValue(value,
@@ -366,7 +366,7 @@ Future<List<Element>> findAllByDisplayValue(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByDisplayValue(value,
@@ -534,7 +534,7 @@ Future<Element> findByLabelText(
   String selector,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByLabelText(text,
@@ -583,7 +583,7 @@ Future<List<Element>> findAllByLabelText(
   String selector,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByLabelText(text,
@@ -727,7 +727,7 @@ Future<Element> findByPlaceholderText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByPlaceholderText(text,
@@ -770,7 +770,7 @@ Future<List<Element>> findAllByPlaceholderText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByPlaceholderText(text,
@@ -1031,7 +1031,7 @@ Future<Element> findByRole(
   int level,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByRole(role,
@@ -1099,7 +1099,7 @@ Future<List<Element>> findAllByRole(
   int level,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByRole(role,
@@ -1250,7 +1250,7 @@ Future<Element> findByTestId(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByTestId(testId,
@@ -1293,7 +1293,7 @@ Future<List<Element>> findAllByTestId(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByTestId(testId,
@@ -1497,7 +1497,7 @@ Future<Element> findByText(
   /*String|bool*/ ignore,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByText(text,
@@ -1555,7 +1555,7 @@ Future<List<Element>> findAllByText(
   /*String|bool*/ ignore,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByText(text,
@@ -1700,7 +1700,7 @@ Future<Element> findByTitle(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByTitle(title,
@@ -1743,7 +1743,7 @@ Future<List<Element>> findAllByTitle(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  Error Function(Error error) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByTitle(title,

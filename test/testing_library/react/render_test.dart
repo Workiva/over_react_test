@@ -15,12 +15,14 @@ main() {
 
     group('returns a RenderResult', () {
       test('', () {
-        final renderedResult = rtl.render((Dom.div()..id = 'root')('oh hai'));
+        final elementToRender = (Dom.div()..id = 'root')('oh hai');
+        final renderedResult = rtl.render(elementToRender);
         expect(renderedResult.container, isA<Element>());
         expect(renderedResult.baseElement, isA<Element>());
         expect(renderedResult.rerender, isA<Function>());
         expect(renderedResult.unmount, isA<Function>());
         expect(renderedResult.asFragment, isA<Function>());
+        expect(renderedResult.renderedElement, same(elementToRender));
       });
 
       group('that contains queries scoped to', () {
@@ -50,9 +52,11 @@ main() {
 
       test('and then updates the DOM when rerender is called', () {
         final renderedResult = rtl.render((Dom.div()..id = 'root')('oh hai'));
-        renderedResult.rerender((Dom.div()..id = 'root')('different'));
+        final elementForRerender = (Dom.div()..id = 'root')('different');
+        renderedResult.rerender(elementForRerender);
         expect(renderedResult.container.children, hasLength(1));
         expect(renderedResult.container.children.single.text, 'different');
+        expect(renderedResult.renderedElement, same(elementForRerender));
       });
 
       group('and then unmounts / removes it by default, also calling the provided autoTearDownCallback', () {

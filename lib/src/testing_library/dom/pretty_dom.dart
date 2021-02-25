@@ -6,8 +6,8 @@ import 'dart:html' show Element;
 import 'package:js/js.dart';
 
 String prettyDOM(
-  Element dom,
-  int maxLength, {
+  Element dom, {
+  int maxLength,
   bool callToJSON,
   bool escapeRegex,
   bool escapeString,

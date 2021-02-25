@@ -3,7 +3,7 @@
 library over_react_test.src.testing_library.dom.async.wait_for;
 
 import 'dart:async';
-import 'dart:html' show Element, MutationObserver, document, promiseToFuture;
+import 'dart:html' show Element, MutationObserver, document;
 import 'dart:js' show allowInterop;
 
 import 'package:js/js.dart';
@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/config/configure.dart' show getConfig;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop;
 
 export 'package:over_react_test/src/testing_library/dom/async/types.dart' show JsMutationObserverOptions;
 
@@ -35,7 +36,7 @@ Future<T> waitFor<T>(
   Element container,
   Duration timeout,
   Duration interval = const Duration(milliseconds: 50),
-  TestFailure Function(TestFailure originalError) onTimeout,
+  /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final config = getConfig();
@@ -48,11 +49,11 @@ Future<T> waitFor<T>(
     return error;
   };
 
-  TestFailure lastError;
+  /*Error*/ dynamic lastError;
   MutationObserver observer;
   Timer intervalTimer;
   Timer overallTimeoutTimer;
-  final doneCompleter = Completer();
+  final doneCompleter = Completer<T>();
 
   void onDone(error, result) {
     overallTimeoutTimer.cancel();
@@ -67,7 +68,7 @@ Future<T> waitFor<T>(
   }
 
   void handleTimeout() {
-    TestFailure error;
+    /*Error*/ dynamic error;
     if (lastError != null) {
       error = lastError;
     } else {
@@ -133,20 +134,20 @@ Future<void> waitForElementToBeRemoved(
   Element container,
   Duration timeout,
   Duration interval,
-  TestFailure Function(/*JsError*/ dynamic error) onTimeout,
+  /*Error*/dynamic Function(/*JsError*/ dynamic error) onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) {
   final waitForOptions = WaitForOptions();
   if (container != null) waitForOptions.container = container;
   if (timeout != null) waitForOptions.timeout = timeout.inMilliseconds;
   if (interval != null) waitForOptions.interval = interval.inMilliseconds;
-  // TODO: We would have to build dart error => js error conversion logic here
+  // TODO: Test this interop to ensure the stack trace is intact
   if (onTimeout != null) waitForOptions.onTimeout = allowInterop(onTimeout);
   // ignore: invalid_use_of_protected_member
   if (mutationObserverOptions != null) waitForOptions.mutationObserverOptions = mutationObserverOptions.toJs();
 
   // TODO: How would the allowInterop(callback) work if it was a Dart future - with the JS function expecting a Promise?
-  return promiseToFuture(_waitForElementToBeRemoved(allowInterop(callback), waitForOptions));
+  return promiseToFutureWithErrorInterop(_waitForElementToBeRemoved(allowInterop(callback), waitForOptions));
 }
 
 /// Waits for the removal of all the elements returned from the [callback] to be removed from the DOM.

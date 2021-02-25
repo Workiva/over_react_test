@@ -95,3 +95,4 @@ class MutationObserverOptions {
 }
 
 const defaultMutationObserverOptions = MutationObserverOptions();
+const defaultAsyncCallbackCheckInterval = Duration(milliseconds: 50);

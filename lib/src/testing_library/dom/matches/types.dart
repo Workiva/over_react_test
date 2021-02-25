@@ -1,6 +1,7 @@
 @JS()
 library over_react_test.src.testing_library.dom.matches.types;
 
+import 'dart:developer';
 import 'dart:html';
 
 import 'package:js/js.dart';
@@ -20,10 +21,11 @@ class TextMatch {
   ///
   /// See: <https://testing-library.com/docs/queries/about#textmatch>
   static dynamic parse(dynamic value) {
+    debugger();
     if (value is RegExp) {
       // Display the regex as the value that could not be matched to the consumer in the test failure message
       // instead of the string representation of the `dartValue` (interop'd function) set below.
-      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith(value));
+      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('"$value"'));
 
       // Set the value to a function to be called on the JS side, and do the actual
       // regex matching using a Dart regex within that interop'd function call.
@@ -31,13 +33,10 @@ class TextMatch {
       final dartValue = (String content, Element _) => regExp.hasMatch(content);
       value = allowInterop(dartValue);
     } else if (value is Function) {
-      // TODO: Any way to get the actual string value of the function provided instead?
-      final fnStringValue = value.toString();
-      final consumerConditional = fnStringValue.substring(fnStringValue.lastIndexOf('=>') + 2).trim();
       // Display the nicest string representation of the Dart function that we can as the value that
       // could not be matched to the consumer in the test failure message instead of the string
       // representation of the interop `value` set below.
-      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('$functionValueErrorMessage \n\n    $consumerConditional\n\n'));
+      setEphemeralElementErrorMessage(_replaceDartInteropFunctionStringWith('"$functionValueErrorMessage"\n\n    $value\n\n'));
 
       // Set the value to an interop'd function.
       value = allowInterop<Function>(value);
@@ -49,9 +48,12 @@ class TextMatch {
   }
 
   static Object Function(Object originalMessage, Element container) _replaceDartInteropFunctionStringWith(Object newValue) {
-    final dartInteropFunctionValueRegex = RegExp(r'function[\s\S]+', multiLine: true);
+    final dartInteropFunctionValueRegex = RegExp(r'`*function[\s\S]+', multiLine: true);
     return (originalMessage, container) {
-      return originalMessage.toString().replaceAll(dartInteropFunctionValueRegex, newValue.toString());
+      // print('originalMessage: $originalMessage');
+      var newMessage = originalMessage.toString().replaceAll(dartInteropFunctionValueRegex, newValue.toString());
+      newMessage = newMessage.replaceAll('""', '"');
+      return newMessage;
     };
   }
 

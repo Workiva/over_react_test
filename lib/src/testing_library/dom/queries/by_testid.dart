@@ -2,13 +2,14 @@
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_testid;
 
-import 'dart:html' show Element, promiseToFuture;
+import 'dart:html' show Element;
 
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -36,8 +37,8 @@ mixin ByTestIdQueries on IQueries {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
-      _jsGetByTestId(
-          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer));
+      withErrorInterop(() => _jsGetByTestId(
+          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer)));
 
   /// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
   /// defaulting to an [exact] match.
@@ -60,8 +61,8 @@ mixin ByTestIdQueries on IQueries {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
-      _jsGetAllByTestId(
-          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer));
+      withErrorInterop(() => _jsGetAllByTestId(
+          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer)));
 
   /// Returns a single element with the given [testId] value for the `data-test-id` attribute,
   /// defaulting to an [exact] match.
@@ -142,14 +143,14 @@ mixin ByTestIdQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindByTestId(getContainerForScope(), TextMatch.parse(testId), matcherOptions, waitForOptions));
   }
 
@@ -184,14 +185,14 @@ mixin ByTestIdQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindAllByTestId(getContainerForScope(), TextMatch.parse(testId), matcherOptions, waitForOptions));
   }
 }

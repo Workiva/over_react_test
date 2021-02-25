@@ -2,13 +2,14 @@
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_label_text;
 
-import 'dart:html' show Element, LabelElement, promiseToFuture;
+import 'dart:html' show Element, LabelElement;
 
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show promiseToFutureWithErrorInterop, withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -41,8 +42,8 @@ mixin ByLabelTextQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsGetByLabelText(getContainerForScope(), TextMatch.parse(text),
-          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
+      withErrorInterop(() => _jsGetByLabelText(getContainerForScope(), TextMatch.parse(text),
+          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector)));
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
   /// defaulting to an [exact] match.
@@ -70,8 +71,8 @@ mixin ByLabelTextQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
-      _jsGetAllByLabelText(getContainerForScope(), TextMatch.parse(text),
-          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
+      withErrorInterop(() => _jsGetAllByLabelText(getContainerForScope(), TextMatch.parse(text),
+          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector)));
 
   /// Returns a single element that is associated with a [LabelElement] with the given [text],
   /// defaulting to an [exact] match.
@@ -167,14 +168,14 @@ mixin ByLabelTextQueries on IQueries {
     String selector,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 
@@ -214,14 +215,14 @@ mixin ByLabelTextQueries on IQueries {
     String selector,
     Duration timeout,
     Duration interval,
-    Error Function(Error error) onTimeout,
+    /*Error*/dynamic Function(/*Error*/dynamic originalError) onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
     final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFuture(
+    return promiseToFutureWithErrorInterop(
         _jsFindAllByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
   }
 }
