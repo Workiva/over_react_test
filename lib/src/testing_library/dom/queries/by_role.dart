@@ -71,7 +71,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
-  Element getByRole(
+  E getByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -122,7 +122,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
-  List<Element> getAllByRole(
+  List<E> getAllByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -136,19 +136,21 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       withErrorInterop(() => _jsGetAllByRole(
-          getContainerForScope(),
-          TextMatch.parse(role),
-          buildByRoleOptions(
-              exact: exact,
-              normalizer: normalizer,
-              hidden: hidden,
-              name: name,
-              selected: selected,
-              checked: checked,
-              pressed: pressed,
-              expanded: expanded,
-              queryFallbacks: queryFallbacks,
-              level: level)));
+              getContainerForScope(),
+              TextMatch.parse(role),
+              buildByRoleOptions(
+                  exact: exact,
+                  normalizer: normalizer,
+                  hidden: hidden,
+                  name: name,
+                  selected: selected,
+                  checked: checked,
+                  pressed: pressed,
+                  expanded: expanded,
+                  queryFallbacks: queryFallbacks,
+                  level: level))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>());
 
   /// Returns a single element with the given [role] value, defaulting to an [exact] match.
   ///
@@ -173,7 +175,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
-  Element queryByRole(
+  E queryByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -225,7 +227,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro byRoleOptionsExpanded}
   /// {@macro byRoleOptionsQueryFallbacks}
   /// {@macro byRoleOptionsLevel}
-  List<Element> queryAllByRole(
+  List<E> queryAllByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -239,19 +241,21 @@ mixin ByRoleQueries on IQueries {
     int level,
   }) =>
       _jsQueryAllByRole(
-          getContainerForScope(),
-          TextMatch.parse(role),
-          buildByRoleOptions(
-              exact: exact,
-              normalizer: normalizer,
-              hidden: hidden,
-              name: name,
-              selected: selected,
-              checked: checked,
-              pressed: pressed,
-              expanded: expanded,
-              queryFallbacks: queryFallbacks,
-              level: level));
+              getContainerForScope(),
+              TextMatch.parse(role),
+              buildByRoleOptions(
+                  exact: exact,
+                  normalizer: normalizer,
+                  hidden: hidden,
+                  name: name,
+                  selected: selected,
+                  checked: checked,
+                  pressed: pressed,
+                  expanded: expanded,
+                  queryFallbacks: queryFallbacks,
+                  level: level))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element value with the given [role] value, defaulting to an [exact] match after
   /// waiting 1000ms (or the provided [timeout] duration).
@@ -287,7 +291,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByRole(
+  Future<E> findByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -323,7 +327,7 @@ mixin ByRoleQueries on IQueries {
     // return promiseToFuture(
     //     _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
-      () => getByRole(
+      () => getByRole<E>(
         role,
         exact: exact,
         normalizer: normalizer,
@@ -378,7 +382,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByRole(
+  Future<List<E>> findAllByRole<E extends Element>(
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -409,12 +413,14 @@ mixin ByRoleQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of some weirdness with
-    // the wrong error message being displayed when the role is found, but the name arg is specified and it isn't found in the DOM.
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5),
+    // and some weirdness with the wrong error message being displayed when the role is found, but the name arg is
+    // specified and it isn't found in the DOM.
     // return promiseToFuture(
     //     _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
-      () => getAllByRole(
+      () => getAllByRole<E>(
         role,
         exact: exact,
         normalizer: normalizer,

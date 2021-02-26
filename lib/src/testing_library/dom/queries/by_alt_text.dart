@@ -7,6 +7,7 @@ import 'dart:html' show Element, ImageElement;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
 import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
@@ -63,7 +64,9 @@ mixin ByAltTextQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       withErrorInterop(() => _jsGetAllByAltText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<ImageElement>());
 
   /// Returns a single [ImageElement] with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -111,7 +114,9 @@ mixin ByAltTextQueries on IQueries {
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByAltText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
+              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<ImageElement>();
 
   /// Returns a future with a single [ImageElement] value with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -151,8 +156,23 @@ mixin ByAltTextQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFutureWithErrorInterop(
-        _jsFindByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByAltText for consistency with our
+    // need to us it on the analogous `findAllByAltText` query.
+    // return promiseToFutureWithErrorInterop(
+    // return promiseToFutureWithErrorInterop(
+    //     _jsFindByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    return waitFor(
+      () => getByAltText(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
@@ -193,8 +213,23 @@ mixin ByAltTextQueries on IQueries {
     final waitForOptions = buildWaitForOptions(
         timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
 
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByAltText because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByAltText` return value.
+    // return promiseToFutureWithErrorInterop(
+    //     _jsFindAllByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    return waitFor(
+      () => getAllByAltText(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
