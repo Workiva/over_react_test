@@ -1,5 +1,4 @@
 // ignore_for_file: invalid_use_of_protected_member, await_only_futures
-import 'dart:async';
 import 'dart:html';
 
 import 'package:meta/meta.dart';
@@ -138,13 +137,22 @@ void hasQueriesScopedTo(
     });
 
     group('', () {
-      testTextMatchTypes(
+      testTextMatchTypes<ImageElement>(
         'AltText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByAltText,
-        getGetByQuery: () => renderAndGetQueries().getByAltText,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByAltText,
+        queryQueriesByName: {
+          'queryByAltText': () => renderAndGetQueries().queryByAltText,
+          'queryAllByAltText': () => renderAndGetQueries().queryAllByAltText,
+        },
+        getQueriesByName: {
+          'getByAltText': () => renderAndGetQueries().getByAltText,
+          'getAllByAltText': () => renderAndGetQueries().getAllByAltText,
+        },
+        findQueriesByName: {
+          'findByAltText': () => renderAndGetQueries(testAsyncQuery: true).findByAltText,
+          'findAllByAltText': () => renderAndGetQueries(testAsyncQuery: true).findAllByAltText,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'alt text: $valueNotFoundPlaceholder',
       );
@@ -153,9 +161,18 @@ void hasQueriesScopedTo(
         'DisplayValue',
         textMatchArgName: 'value',
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByDisplayValue,
-        getGetByQuery: () => renderAndGetQueries().getByDisplayValue,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByDisplayValue,
+        queryQueriesByName: {
+          'queryByDisplayValue': () => renderAndGetQueries().queryByDisplayValue,
+          'queryAllByDisplayValue': () => renderAndGetQueries().queryAllByDisplayValue,
+        },
+        getQueriesByName: {
+          'getByDisplayValue': () => renderAndGetQueries().getByDisplayValue,
+          'getAllByDisplayValue': () => renderAndGetQueries().getAllByDisplayValue,
+        },
+        findQueriesByName: {
+          'findByDisplayValue': () => renderAndGetQueries(testAsyncQuery: true).findByDisplayValue,
+          'findAllByDisplayValue': () => renderAndGetQueries(testAsyncQuery: true).findAllByDisplayValue,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'display value: $valueNotFoundPlaceholder',
       );
@@ -164,9 +181,18 @@ void hasQueriesScopedTo(
         'LabelText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByLabelText,
-        getGetByQuery: () => renderAndGetQueries().getByLabelText,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByLabelText,
+        queryQueriesByName: {
+          'queryByLabelText': () => renderAndGetQueries().queryByLabelText,
+          'queryAllByLabelText': () => renderAndGetQueries().queryAllByLabelText,
+        },
+        getQueriesByName: {
+          'getByLabelText': () => renderAndGetQueries().getByLabelText,
+          'getAllByLabelText': () => renderAndGetQueries().getAllByLabelText,
+        },
+        findQueriesByName: {
+          'findByLabelText': () => renderAndGetQueries(testAsyncQuery: true).findByLabelText,
+          'findAllByLabelText': () => renderAndGetQueries(testAsyncQuery: true).findAllByLabelText,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'label with the text of: $valueNotFoundPlaceholder',
       );
@@ -175,9 +201,18 @@ void hasQueriesScopedTo(
         'PlaceholderText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByPlaceholderText,
-        getGetByQuery: () => renderAndGetQueries().getByPlaceholderText,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByPlaceholderText,
+        queryQueriesByName: {
+          'queryByPlaceholderText': () => renderAndGetQueries().queryByPlaceholderText,
+          'queryAllByPlaceholderText': () => renderAndGetQueries().queryAllByPlaceholderText,
+        },
+        getQueriesByName: {
+          'getByPlaceholderText': () => renderAndGetQueries().getByPlaceholderText,
+          'getAllByPlaceholderText': () => renderAndGetQueries().getAllByPlaceholderText,
+        },
+        findQueriesByName: {
+          'findByPlaceholderText': () => renderAndGetQueries(testAsyncQuery: true).findByPlaceholderText,
+          'findAllByPlaceholderText': () => renderAndGetQueries(testAsyncQuery: true).findAllByPlaceholderText,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'placeholder text of: $valueNotFoundPlaceholder',
       );
@@ -187,9 +222,18 @@ void hasQueriesScopedTo(
         textMatchArgName: 'role',
         textMatchArgSupportsFuzzyMatching: false, // exact = false is not supported by role queries
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByRole,
-        getGetByQuery: () => renderAndGetQueries().getByRole,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByRole,
+        queryQueriesByName: {
+          'queryByRole': () => renderAndGetQueries().queryByRole,
+          'queryAllByRole': () => renderAndGetQueries().queryAllByRole,
+        },
+        getQueriesByName: {
+          'getByRole': () => renderAndGetQueries().getByRole,
+          'getAllByRole': () => renderAndGetQueries().getAllByRole,
+        },
+        findQueriesByName: {
+          'findByRole': () => renderAndGetQueries(testAsyncQuery: true).findByRole,
+          'findAllByRole': () => renderAndGetQueries(testAsyncQuery: true).findAllByRole,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'with the role "$valueNotFoundPlaceholder"',
       );
@@ -199,9 +243,18 @@ void hasQueriesScopedTo(
         textMatchArgName: 'name',
         textMatchArgSupportsFuzzyMatching: false, // exact = false is not supported by role queries
         queryShouldMatchOn: scopeName,
-        getQueryByQuery: () => renderAndGetQueries().queryByRole,
-        getGetByQuery: () => renderAndGetQueries().getByRole,
-        getFindByQuery: () => renderAndGetQueries(testAsyncQuery: true).findByRole,
+        queryQueriesByName: {
+          'queryByRole': () => renderAndGetQueries().queryByRole,
+          'queryAllByRole': () => renderAndGetQueries().queryAllByRole,
+        },
+        getQueriesByName: {
+          'getByRole': () => renderAndGetQueries().getByRole,
+          'getAllByRole': () => renderAndGetQueries().getAllByRole,
+        },
+        findQueriesByName: {
+          'findByRole': () => renderAndGetQueries(testAsyncQuery: true).findByRole,
+          'findAllByRole': () => renderAndGetQueries(testAsyncQuery: true).findAllByRole,
+        },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'with the role "$validRoleInDom" and name "$valueNotFoundPlaceholder"',
       );

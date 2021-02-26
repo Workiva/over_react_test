@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 
 import 'package:meta/meta.dart';
@@ -13,10 +14,10 @@ String getStringThatFuzzyMatches(String exactValue) => exactValue.substring(2);
 
 /// Tests both success and failure scenarios for queries with [textMatchArgName] that utilize
 /// [TextMatch.parse] to allow `String`, `RegExp` and `Function`s as values to find one or more
-/// matches of [MatchType] for [queryShouldMatchOn].
+/// matches of type [E] for [queryShouldMatchOn].
 ///
 /// Exercises the 3 types of queries (queryBy, getBy and findBy) - which should be returned from
-/// [getQueryByQuery], [getGetByQuery] and [getFindByQuery], respectively.
+/// the value of each key in [queryQueriesByName], [getQueriesByName] and [findQueriesByName], respectively.
 ///
 /// [getExpectedPrettyDom] should return the return value of calling `prettyDOM` with
 /// the `container` of a `RenderResult` like so:
@@ -33,13 +34,13 @@ String getStringThatFuzzyMatches(String exactValue) => exactValue.substring(2);
 ///
 /// If the query does not support `MatcherOptions.exact`, set [textMatchArgSupportsFuzzyMatching] to `false`.
 @isTestGroup
-void testTextMatchTypes(
+void testTextMatchTypes<E extends Element>(
   String queryTypeName, {
   @required String textMatchArgName,
   @required String queryShouldMatchOn,
-  @required Function Function() getQueryByQuery,
-  @required Function Function() getGetByQuery,
-  @required Function Function() getFindByQuery,
+  @required Map<String, Function Function()> queryQueriesByName,
+  @required Map<String, Function Function()> getQueriesByName,
+  @required Map<String, Function Function()> findQueriesByName,
   @required String Function() getExpectedPrettyDom,
   bool textMatchArgSupportsFuzzyMatching = true,
   String failureSnapshotPattern,
@@ -59,117 +60,151 @@ void testTextMatchTypes(
     return toThrowErrorMatchingInlineSnapshot(containsMatcher, stringPrettyDomMatcher);
   }
 
+  Matcher getExpectedMatcherForFailedQuery(String queryName) {
+    return queryName.contains('All') ? isEmpty : isNull;
+  }
+
+  Matcher getExpectedMatcherForSuccessfulQuery(String queryName) {
+    return queryName.contains('All') ? isA<List<E>>() : isA<E>();
+  }
+
   group('when the $textMatchArgName argument is a', () {
     group('String (TextMatch.parse),', () {
       String fuzzyValue = getStringThatFuzzyMatches(queryShouldMatchOn);
 
       group('and exact = true (default),', () {
         group('and a failure/null or empty return value is expected for the', () {
-          test('queryBy$queryTypeName query', () {
-            if (queryTypeName == 'Role') {
-              if (textMatchArgName == 'role') {
-                expect(getQueryByQuery()(validRoleNotInDom), isNull);
-              } else if (textMatchArgName == 'name') {
-                expect(getQueryByQuery()(validRoleInDom, name: fuzzyValue), isNull);
+          queryQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () {
+              if (queryTypeName == 'Role') {
+                if (textMatchArgName == 'role') {
+                  expect(queryGetter()(validRoleNotInDom), getExpectedMatcherForFailedQuery(queryName));
+                } else if (textMatchArgName == 'name') {
+                  expect(queryGetter()(validRoleInDom, name: fuzzyValue), getExpectedMatcherForFailedQuery(queryName));
+                }
+              } else {
+                expect(queryGetter()(fuzzyValue), getExpectedMatcherForFailedQuery(queryName));
               }
-            } else {
-              expect(getQueryByQuery()(fuzzyValue), isNull);
-            }
+            });
           });
 
-          test('getBy$queryTypeName query', () {
-            if (queryTypeName == 'Role') {
-              if (textMatchArgName == 'role') {
-                expect(() => getGetByQuery()(validRoleNotInDom),
-                    toThrowErrorMatchingInlineSnapshotPattern(validRoleNotInDom));
-              } else if (textMatchArgName == 'name') {
-                expect(() => getGetByQuery()(validRoleInDom, name: fuzzyValue),
-                    toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
+          getQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () {
+              if (queryTypeName == 'Role') {
+                if (textMatchArgName == 'role') {
+                  expect(() => queryGetter()(validRoleNotInDom),
+                      toThrowErrorMatchingInlineSnapshotPattern(validRoleNotInDom));
+                } else if (textMatchArgName == 'name') {
+                  expect(() => queryGetter()(validRoleInDom, name: fuzzyValue),
+                      toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
+                }
+              } else {
+                expect(() => queryGetter()(fuzzyValue), toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
               }
-            } else {
-              expect(() => getGetByQuery()(fuzzyValue), toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
-            }
+            });
           });
 
-          test('findBy$queryTypeName query', () async {
-            final query = getFindByQuery();
-            if (queryTypeName == 'Role') {
-              if (textMatchArgName == 'role') {
-                expect(() async => await query(validRoleNotInDom),
-                    toThrowErrorMatchingInlineSnapshotPattern(validRoleNotInDom));
-              } else if (textMatchArgName == 'name') {
-                expect(() async => await query(validRoleInDom, name: fuzzyValue),
-                    toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
+          findQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () async {
+              final query = queryGetter();
+              if (queryTypeName == 'Role') {
+                if (textMatchArgName == 'role') {
+                  // TODO: Can this be switched to `query(fuzzyValue)` now that the async error message race conditions are resolved? If so, use a var to declare `toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue)` as `throwsWithExpectedFailureMessage`
+                  expect(() async => await query(validRoleNotInDom),
+                      toThrowErrorMatchingInlineSnapshotPattern(validRoleNotInDom));
+                } else if (textMatchArgName == 'name') {
+                  expect(() async => await query(validRoleInDom, name: fuzzyValue),
+                      toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
+                }
+              } else {
+                expect(() async => await query(fuzzyValue), toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
               }
-            } else {
-              expect(() async => await query(fuzzyValue), toThrowErrorMatchingInlineSnapshotPattern(fuzzyValue));
-            }
-          }, timeout: asyncQueryTestTimeout);
+            }, timeout: asyncQueryTestTimeout);
+          });
         });
 
         group('returning the matching element from the', () {
-          test('queryBy$queryTypeName query', () {
-            if (queryTypeName == 'Role') {
-              expect(getQueryByQuery()(validRoleInDom, name: queryShouldMatchOn), isA<Element>());
-            } else {
-              expect(getQueryByQuery()(queryShouldMatchOn), isA<Element>());
-            }
+          queryQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () {
+              if (queryTypeName == 'Role') {
+                expect(queryGetter()(validRoleInDom, name: queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else {
+                expect(queryGetter()(queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            });
           });
 
-          test('getBy$queryTypeName query', () {
-            if (queryTypeName == 'Role') {
-              expect(getGetByQuery()(validRoleInDom, name: queryShouldMatchOn), isA<Element>());
-            } else {
-              expect(getGetByQuery()(queryShouldMatchOn), isA<Element>());
-            }
+          getQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () {
+              if (queryTypeName == 'Role') {
+                expect(queryGetter()(validRoleInDom, name: queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else {
+                expect(queryGetter()(queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            });
           });
 
-          test('findBy$queryTypeName query', () async {
-            Element findByQueryReturnValue;
+          findQueriesByName.forEach((queryName, queryGetter) {
+            test('$queryName query', () async {
+              dynamic findByQueryReturnValue;
 
-            if (queryTypeName == 'Role') {
-              findByQueryReturnValue = await getFindByQuery()(validRoleInDom, name: queryShouldMatchOn);
-            } else {
-              findByQueryReturnValue = await getFindByQuery()(queryShouldMatchOn);
-            }
+              if (queryTypeName == 'Role') {
+                findByQueryReturnValue = await queryGetter()(validRoleInDom, name: queryShouldMatchOn);
+              } else {
+                findByQueryReturnValue = await queryGetter()(queryShouldMatchOn);
+              }
 
-            expect(findByQueryReturnValue, isA<Element>());
-          }, timeout: asyncQueryTestTimeout);
+              expect(findByQueryReturnValue, getExpectedMatcherForSuccessfulQuery(queryName));
+            }, timeout: asyncQueryTestTimeout);
+          });
         });
       });
 
       if (textMatchArgSupportsFuzzyMatching) {
         group('and exact = false,', () {
           group('and a failure/null return value is expected when calling the', () {
-            test('queryBy$queryTypeName query', () {
-              expect(getQueryByQuery()('somethingDifferentThatDoesNotMatch', exact: false), isNull);
+            queryQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () {
+                expect(queryGetter()('somethingDifferentThatDoesNotMatch', exact: false), getExpectedMatcherForFailedQuery(queryName));
+              });
             });
 
-            test('getBy$queryTypeName query', () {
-              expect(() => getGetByQuery()('somethingDifferentThatDoesNotMatch', exact: false),
-                  toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
+            getQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () {
+                expect(() => queryGetter()('somethingDifferentThatDoesNotMatch', exact: false),
+                    toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
+              });
             });
 
-            test('findBy$queryTypeName query', () {
-              final query = getFindByQuery();
-              expect(() async => await query('somethingDifferentThatDoesNotMatch', exact: false),
-                  toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
-            }, timeout: asyncQueryTestTimeout);
+            findQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () async {
+                final query = queryGetter();
+                expect(() async => await query('somethingDifferentThatDoesNotMatch', exact: false),
+                    toThrowErrorMatchingInlineSnapshotPattern('somethingDifferentThatDoesNotMatch'));
+              }, timeout: asyncQueryTestTimeout);
+            });
           });
 
           group('and a match is found when calling the', () {
-            test('queryBy$queryTypeName query', () {
-              expect(getQueryByQuery()(fuzzyValue, exact: false), isA<Element>());
+            queryQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () {
+                expect(queryGetter()(fuzzyValue, exact: false), getExpectedMatcherForSuccessfulQuery(queryName));
+              });
             });
 
-            test('getBy$queryTypeName query', () {
-              expect(getGetByQuery()(fuzzyValue, exact: false), isA<Element>());
+            getQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () {
+                expect(queryGetter()(fuzzyValue, exact: false), getExpectedMatcherForSuccessfulQuery(queryName));
+              });
             });
 
-            test('findBy$queryTypeName query', () async {
-              final findByQueryReturnValue = await getFindByQuery()(fuzzyValue, exact: false);
-              expect(findByQueryReturnValue, isA<Element>());
-            }, timeout: asyncQueryTestTimeout);
+            findQueriesByName.forEach((queryName, queryGetter) {
+              test('$queryName query', () async {
+                final query = queryGetter();
+                final findByQueryReturnValue = await query(fuzzyValue, exact: false);
+                expect(findByQueryReturnValue, getExpectedMatcherForSuccessfulQuery(queryName));
+              }, timeout: asyncQueryTestTimeout);
+            });
           });
         });
       }
@@ -181,184 +216,200 @@ void testTextMatchTypes(
 
     group('RegExp (TextMatch.parse),', () {
       group('and a failure/null return value is expected for the', () {
-        const badRegExPattern = "^somethingDifferentThatDoesNotMatch\$";
+        const badRegExPattern = '^somethingDifferentThatDoesNotMatch\$';
+        final throwsWithExpectedFailureMessage = toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/');
 
-        test('queryBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getQueryByQuery()(RegExp(badRegExPattern)), isNull);
-            } else if (textMatchArgName == 'name') {
-              expect(getQueryByQuery()(validRoleInDom, name: RegExp(badRegExPattern)), isNull);
+        queryQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()(RegExp(badRegExPattern)), getExpectedMatcherForFailedQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: RegExp(badRegExPattern)), getExpectedMatcherForFailedQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()(RegExp(badRegExPattern)), getExpectedMatcherForFailedQuery(queryName));
             }
-          } else {
-            expect(getQueryByQuery()(RegExp(badRegExPattern)), isNull);
-          }
+          });
         });
 
-        test('getBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(() => getGetByQuery()(RegExp(badRegExPattern)),
-                  toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
-            } else if (textMatchArgName == 'name') {
-              expect(() => getGetByQuery()(validRoleInDom, name: RegExp(badRegExPattern)),
-                  toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
+        getQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() => queryGetter()(RegExp(badRegExPattern)), throwsWithExpectedFailureMessage);
+              } else if (textMatchArgName == 'name') {
+                expect(() => queryGetter()(validRoleInDom, name: RegExp(badRegExPattern)), throwsWithExpectedFailureMessage);
+              }
+            } else {
+              expect(() => queryGetter()(RegExp(badRegExPattern)), throwsWithExpectedFailureMessage);
             }
-          } else {
-            expect(() => getGetByQuery()(RegExp(badRegExPattern)),
-                toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
-          }
+          });
         });
 
-        test('findBy$queryTypeName query', () async {
-          final query = getFindByQuery();
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(() async => await query(RegExp(badRegExPattern)),
-                  toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
-            } else if (textMatchArgName == 'name') {
-              expect(() async => await query(validRoleInDom, name: RegExp(badRegExPattern)),
-                  toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
+        findQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () async {
+            final query = queryGetter();
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() async => await query(RegExp(badRegExPattern)), throwsWithExpectedFailureMessage);
+              } else if (textMatchArgName == 'name') {
+                expect(() async => await query(validRoleInDom, name: RegExp(badRegExPattern)),
+                    throwsWithExpectedFailureMessage);
+              }
+            } else {
+              expect(() async => await query(RegExp(badRegExPattern)), throwsWithExpectedFailureMessage);
             }
-          } else {
-            expect(() async => await query(RegExp(badRegExPattern)),
-                toThrowErrorMatchingInlineSnapshotPattern('RegExp/$badRegExPattern/'));
-          }
-        }, timeout: asyncQueryTestTimeout);
+          }, timeout: asyncQueryTestTimeout);
+        });
       });
 
       group('returning the matching element from the', () {
-        test('queryBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getQueryByQuery()(RegExp("^$validRoleInDom\$")), isA<Element>());
-            } else if (textMatchArgName == 'name') {
-              expect(getQueryByQuery()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$")), isA<Element>());
+        queryQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()(RegExp("^$validRoleInDom\$")), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$")), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()(RegExp("^$queryShouldMatchOn\$")), getExpectedMatcherForSuccessfulQuery(queryName));
             }
-          } else {
-            expect(getQueryByQuery()(RegExp("^$queryShouldMatchOn\$")), isA<Element>());
-          }
+          });
         });
 
-        test('getBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getGetByQuery()(RegExp("^$validRoleInDom\$")), isA<Element>());
-            } else if (textMatchArgName == 'name') {
-              expect(getGetByQuery()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$")), isA<Element>());
+        getQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()(RegExp("^$validRoleInDom\$")), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$")), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()(RegExp("^$queryShouldMatchOn\$")), getExpectedMatcherForSuccessfulQuery(queryName));
             }
-          } else {
-            expect(getGetByQuery()(RegExp("^$queryShouldMatchOn\$")), isA<Element>());
-          }
+          });
         });
 
-        test('findBy$queryTypeName query', () async {
-          Element findByQueryReturnValue;
+        findQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () async {
+            dynamic findByQueryReturnValue;
 
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              findByQueryReturnValue = await getFindByQuery()(RegExp("^$validRoleInDom\$"));
-            } else if (textMatchArgName == 'name') {
-              findByQueryReturnValue = await getFindByQuery()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$"));
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                findByQueryReturnValue = await queryGetter()(RegExp("^$validRoleInDom\$"));
+              } else if (textMatchArgName == 'name') {
+                findByQueryReturnValue = await queryGetter()(validRoleInDom, name: RegExp("^$queryShouldMatchOn\$"));
+              }
+            } else {
+              findByQueryReturnValue = await queryGetter()(RegExp("^$queryShouldMatchOn\$"));
             }
-          } else {
-            findByQueryReturnValue = await getFindByQuery()(RegExp("^$queryShouldMatchOn\$"));
-          }
 
-          expect(findByQueryReturnValue, isA<Element>());
-        }, timeout: asyncQueryTestTimeout);
+            expect(findByQueryReturnValue, getExpectedMatcherForSuccessfulQuery(queryName));
+          }, timeout: asyncQueryTestTimeout);
+        });
       });
     });
 
     group('Function (TextMatch.parse),', () {
       group('and a failure/null return value is expected for the', () {
-        test('queryBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getQueryByQuery()((content, el) => content == validRoleNotInDom), isNull);
-            } else if (textMatchArgName == 'name') {
-              expect(getQueryByQuery()(validRoleInDom, name: (content, el) => content != queryShouldMatchOn), isNull);
+        final throwsWithExpectedFailureMessage = toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage);
+
+        queryQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()((content, el) => content == validRoleNotInDom), getExpectedMatcherForFailedQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: (content, el) => content != queryShouldMatchOn), getExpectedMatcherForFailedQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()((content, el) => content != queryShouldMatchOn), getExpectedMatcherForFailedQuery(queryName));
             }
-          } else {
-            expect(getQueryByQuery()((content, el) => content != queryShouldMatchOn), isNull);
-          }
+          });
         });
 
-        test('getBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(() => getGetByQuery()((content, el) => content == validRoleNotInDom),
-                  toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
-            } else if (textMatchArgName == 'name') {
-              expect(() => getGetByQuery()(validRoleInDom, name: (content, el) => content != queryShouldMatchOn),
-                  toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
+        getQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() => queryGetter()((content, el) => content == validRoleNotInDom),
+                    throwsWithExpectedFailureMessage);
+              } else if (textMatchArgName == 'name') {
+                expect(() => queryGetter()(validRoleInDom, name: (content, el) => content != queryShouldMatchOn),
+                    throwsWithExpectedFailureMessage);
+              }
+            } else {
+              expect(() => queryGetter()((content, el) => content != queryShouldMatchOn), throwsWithExpectedFailureMessage);
             }
-          } else {
-            expect(() => getGetByQuery()((content, el) => content != queryShouldMatchOn),
-                toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
-          }
+          });
         });
 
-        test('findBy$queryTypeName query', () async {
-          final query = getFindByQuery();
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(() async => await query((content, el) => content == validRoleNotInDom),
-                  toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
-            } else if (textMatchArgName == 'name') {
-              expect(() async => await query(validRoleInDom, name: (content, el) => content != queryShouldMatchOn),
-                  toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
+        findQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () async {
+            final query = queryGetter();
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() async => await query((content, el) => content == validRoleNotInDom), throwsWithExpectedFailureMessage);
+              } else if (textMatchArgName == 'name') {
+                expect(() async => await query(validRoleInDom, name: (content, el) => content == validRoleNotInDom),
+                    throwsWithExpectedFailureMessage);
+              }
+            } else {
+              expect(() async => await query((content, el) => content == validRoleNotInDom), throwsWithExpectedFailureMessage);
             }
-          } else {
-            expect(() async => await query((content, el) => content != queryShouldMatchOn),
-                toThrowErrorMatchingInlineSnapshotPattern(TextMatch.functionValueErrorMessage));
-          }
-        }, timeout: asyncQueryTestTimeout);
+          }, timeout: asyncQueryTestTimeout);
+        });
       });
 
       group('returning the matching element from the', () {
-        test('queryBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getQueryByQuery()((content, el) => content == validRoleInDom), isA<Element>());
-            } else if (textMatchArgName == 'name') {
-              expect(getQueryByQuery()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn),
-                  isA<Element>());
+        queryQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()((content, el) => content == validRoleInDom), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()((content, el) => content == queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
             }
-          } else {
-            expect(getQueryByQuery()((content, el) => content == queryShouldMatchOn), isA<Element>());
-          }
+          });
         });
 
-        test('getBy$queryTypeName query', () {
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              expect(getGetByQuery()((content, el) => content == validRoleInDom), isA<Element>());
-            } else if (textMatchArgName == 'name') {
-              expect(getGetByQuery()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn),
-                  isA<Element>());
+        getQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(queryGetter()((content, el) => content == validRoleInDom), getExpectedMatcherForSuccessfulQuery(queryName));
+              } else if (textMatchArgName == 'name') {
+                expect(queryGetter()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
+              }
+            } else {
+              expect(queryGetter()((content, el) => content == queryShouldMatchOn), getExpectedMatcherForSuccessfulQuery(queryName));
             }
-          } else {
-            expect(getGetByQuery()((content, el) => content == queryShouldMatchOn), isA<Element>());
-          }
+          });
         });
 
-        test('findBy$queryTypeName query', () async {
-          Element findByQueryReturnValue;
+        findQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () async {
+            dynamic findByQueryReturnValue;
 
-          if (queryTypeName == 'Role') {
-            if (textMatchArgName == 'role') {
-              findByQueryReturnValue = await getFindByQuery()((content, el) => content == validRoleInDom);
-            } else if (textMatchArgName == 'name') {
-              findByQueryReturnValue =
-                  await getFindByQuery()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn);
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                findByQueryReturnValue = await queryGetter()((content, el) => content == validRoleInDom);
+              } else if (textMatchArgName == 'name') {
+                findByQueryReturnValue = await queryGetter()(validRoleInDom, name: (content, el) => content == queryShouldMatchOn);
+              }
+            } else {
+              findByQueryReturnValue = await queryGetter()((content, el) => content == queryShouldMatchOn);
             }
-          } else {
-            findByQueryReturnValue = await getFindByQuery()((content, el) => content == queryShouldMatchOn);
-          }
 
-          expect(findByQueryReturnValue, isA<Element>());
-        }, timeout: asyncQueryTestTimeout);
+            expect(findByQueryReturnValue, getExpectedMatcherForSuccessfulQuery(queryName));
+          }, timeout: asyncQueryTestTimeout);
+        });
       });
     });
   });
