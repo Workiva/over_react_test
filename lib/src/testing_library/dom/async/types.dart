@@ -4,6 +4,8 @@ library over_react_test.src.testing_library.dom.async.types;
 import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
+typedef QueryTimeoutFn = /*Error || TestFailure*/ Object Function(/*Error*/ Object originalError);
+
 @JS()
 @anonymous
 class SharedJsWaitForOptions {

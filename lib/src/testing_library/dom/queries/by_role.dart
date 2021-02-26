@@ -11,8 +11,7 @@ import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -64,6 +63,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -75,6 +75,7 @@ mixin ByRoleQueries on IQueries {
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     bool hidden = false,
     /*TextMatch*/ dynamic name,
     bool selected,
@@ -84,20 +85,22 @@ mixin ByRoleQueries on IQueries {
     bool queryFallbacks,
     int level,
   }) =>
-      withErrorInterop(() => _jsGetByRole(
-          getContainerForScope(),
-          TextMatch.parse(role),
-          buildByRoleOptions(
-              exact: exact,
-              normalizer: normalizer,
-              hidden: hidden,
-              name: name,
-              selected: selected,
-              checked: checked,
-              pressed: pressed,
-              expanded: expanded,
-              queryFallbacks: queryFallbacks,
-              level: level)));
+      withErrorInterop(
+          () => _jsGetByRole(
+              getContainerForScope(),
+              TextMatch.parse(role),
+              buildByRoleOptions(
+                  exact: exact,
+                  normalizer: normalizer,
+                  hidden: hidden,
+                  name: name,
+                  selected: selected,
+                  checked: checked,
+                  pressed: pressed,
+                  expanded: expanded,
+                  queryFallbacks: queryFallbacks,
+                  level: level)),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements with the given [role] value, defaulting to an [exact] match.
   ///
@@ -115,6 +118,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -126,6 +130,7 @@ mixin ByRoleQueries on IQueries {
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     bool hidden = false,
     /*TextMatch*/ dynamic name,
     bool selected,
@@ -135,22 +140,24 @@ mixin ByRoleQueries on IQueries {
     bool queryFallbacks,
     int level,
   }) =>
-      withErrorInterop(() => _jsGetAllByRole(
-              getContainerForScope(),
-              TextMatch.parse(role),
-              buildByRoleOptions(
-                  exact: exact,
-                  normalizer: normalizer,
-                  hidden: hidden,
-                  name: name,
-                  selected: selected,
-                  checked: checked,
-                  pressed: pressed,
-                  expanded: expanded,
-                  queryFallbacks: queryFallbacks,
-                  level: level))
-          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
-          .cast<E>());
+      withErrorInterop(
+          () => _jsGetAllByRole(
+                  getContainerForScope(),
+                  TextMatch.parse(role),
+                  buildByRoleOptions(
+                      exact: exact,
+                      normalizer: normalizer,
+                      hidden: hidden,
+                      name: name,
+                      selected: selected,
+                      checked: checked,
+                      pressed: pressed,
+                      expanded: expanded,
+                      queryFallbacks: queryFallbacks,
+                      level: level))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element with the given [role] value, defaulting to an [exact] match.
   ///
@@ -277,6 +284,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -295,6 +303,7 @@ mixin ByRoleQueries on IQueries {
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     bool hidden = false,
     /*TextMatch*/ dynamic name,
     bool selected,
@@ -305,32 +314,17 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildByRoleOptions(
-        exact: exact,
-        normalizer: normalizer,
-        hidden: hidden,
-        name: name,
-        selected: selected,
-        checked: checked,
-        pressed: pressed,
-        expanded: expanded,
-        queryFallbacks: queryFallbacks,
-        level: level);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
     // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of some weirdness with
     // the wrong error message being displayed when the role is found, but the name arg is specified and it isn't found in the DOM.
-    // return promiseToFuture(
-    //     _jsFindByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
       () => getByRole<E>(
         role,
         exact: exact,
         normalizer: normalizer,
+        errorMessage: errorMessage,
         hidden: hidden,
         name: name,
         selected: selected,
@@ -368,6 +362,7 @@ mixin ByRoleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   /// {@macro byRoleOptionsHidden}
   /// {@macro byRoleOptionsSelected}
   /// {@macro byRoleOptionsChecked}
@@ -386,6 +381,7 @@ mixin ByRoleQueries on IQueries {
     /*TextMatch*/ dynamic role, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     bool hidden = false,
     /*TextMatch*/ dynamic name,
     bool selected,
@@ -396,34 +392,19 @@ mixin ByRoleQueries on IQueries {
     int level,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildByRoleOptions(
-        exact: exact,
-        normalizer: normalizer,
-        hidden: hidden,
-        name: name,
-        selected: selected,
-        checked: checked,
-        pressed: pressed,
-        expanded: expanded,
-        queryFallbacks: queryFallbacks,
-        level: level);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
     // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByRole because of the inability
     // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5),
     // and some weirdness with the wrong error message being displayed when the role is found, but the name arg is
     // specified and it isn't found in the DOM.
-    // return promiseToFuture(
-    //     _jsFindAllByRole(getContainerForScope(), TextMatch.parse(role), matcherOptions, waitForOptions));
     return waitFor(
       () => getAllByRole<E>(
         role,
         exact: exact,
         normalizer: normalizer,
+        errorMessage: errorMessage,
         hidden: hidden,
         name: name,
         selected: selected,
@@ -473,24 +454,6 @@ external List<Element> _jsQueryAllByRole(
   role, [
   ByRoleOptions options,
 ]);
-
-// @JS('rtl.findByRole')
-// external /*Promise<Element>*/ _jsFindByRole(
-//   Element container,
-//   /*TextMatch*/
-//   role, [
-//   ByRoleOptions options,
-//   SharedJsWaitForOptions waitForOptions,
-// ]);
-//
-// @JS('rtl.findAllByRole')
-// external /*Promise<List<Element>>*/ _jsFindAllByRole(
-//   Element container,
-//   /*TextMatch*/
-//   role, [
-//   ByRoleOptions options,
-//   SharedJsWaitForOptions waitForOptions,
-// ]);
 
 @JS()
 @anonymous

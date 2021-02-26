@@ -7,10 +7,10 @@ import 'dart:html' show Element;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -33,13 +33,17 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByPlaceholderText(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByPlaceholderText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetByPlaceholderText(
+              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match.
@@ -57,13 +61,19 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByPlaceholderText(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByPlaceholderText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetAllByPlaceholderText(getContainerForScope(), TextMatch.parse(text),
+                  buildMatcherOptions(exact: exact, normalizer: normalizer))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match.
@@ -81,7 +91,7 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByPlaceholderText(
+  E queryByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -105,13 +115,15 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByPlaceholderText(
+  List<E> queryAllByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByPlaceholderText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer));
+              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element value with the given [text] as the value of the `placeholder` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -131,6 +143,7 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -138,21 +151,31 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByPlaceholderText(
+  Future<E> findByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByPlaceholderText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByPlaceholderText for consistency with our
+    // need to use it on the analogous `findAllByPlaceholderText` query.
+    return waitFor(
+      () => getByPlaceholderText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
@@ -173,6 +196,7 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -180,21 +204,32 @@ mixin ByPlaceholderTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByPlaceholderText(
+  Future<List<E>> findAllByPlaceholderText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByPlaceholderText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByPlaceholderText because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByPlaceholderText` return value.
+    return waitFor(
+      () => getAllByPlaceholderText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -228,22 +263,4 @@ external List<Element> _jsQueryAllByPlaceholderText(
   /*TextMatch*/
   text, [
   MatcherOptions options,
-]);
-
-@JS('rtl.findByPlaceholderText')
-external /*Promise<Element>*/ _jsFindByPlaceholderText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByPlaceholderText')
-external /*Promise<List<Element>>*/ _jsFindAllByPlaceholderText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

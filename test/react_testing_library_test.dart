@@ -8,6 +8,7 @@ import 'package:react/react_client/react_interop.dart';
 import 'package:test/test.dart';
 
 import 'testing_library/dom/configure_test.dart' as configure_test;
+import 'testing_library/dom/wait_for_test.dart' as wait_for_test;
 import 'testing_library/react/render_test.dart' as render_test;
 
 part 'react_testing_library_test.over_react.g.dart';
@@ -17,6 +18,7 @@ main() {
 
   group('Testing Library', () {
     configure_test.main();
+    wait_for_test.main();
     render_test.main();
   });
 
@@ -477,78 +479,7 @@ main() {
   //       });
   //     });
   //
-  //     group('waitFor', () {
-  //       test('[success]', () async {
-  //         bool hiddenNodeIsVisible = false;
-  //         final testDelay = const Duration(milliseconds: 2000);
-  //         final result = rtl.render((DelayedDomNodeAppearance()
-  //           ..delayHiddenNodeRenderFor = testDelay
-  //           ..onHiddenNodeIsVisible = () {
-  //             debugger();
-  //             hiddenNodeIsVisible = true;
-  //           })());
-  //         expect(result.queryByText('visible'), isNotNull);
-  //         expect(result.queryByText('hidden'), isNull, reason: 'test setup sanity check');
-  //         await rtl.waitFor(() => expect(hiddenNodeIsVisible, isTrue),
-  //             timeout: Duration(milliseconds: testDelay.inMilliseconds + 100));
-  //         expect(result.queryByText('hidden'), isNotNull);
-  //       });
-  //
-  //       test('[failure]', () async {
-  //         bool hiddenNodeIsVisible = false;
-  //         final testDelay = const Duration(milliseconds: 1000);
-  //         // Intentionally omit the callback that would otherwise set hiddenNodeIsVisible to true
-  //         final result = rtl.render((DelayedDomNodeAppearance()..delayHiddenNodeRenderFor = testDelay)());
-  //         expect(result.queryByText('visible'), isNotNull);
-  //         expect(result.queryByText('hidden'), isNull, reason: 'test setup sanity check');
-  //
-  //         expect(
-  //             () async => await rtl.waitFor(() => expect(hiddenNodeIsVisible, isTrue),
-  //                 timeout: Duration(milliseconds: testDelay.inMilliseconds + 100)),
-  //             throwsA(isA<TestFailure>()));
-  //         expect(result.queryByText('hidden'), isNull);
-  //       });
-  //     });
-  //
-  //     group('waitForElementToBeRemoved', () {
-  //       test('[success]', () async {
-  //         final testDelay = const Duration(milliseconds: 2000);
-  //         final result = rtl.render((ControlledDomNodeAppearance()
-  //           ..delayHiddenNodeRenderFor = testDelay
-  //           ..shouldRenderHiddenNode = true)());
-  //         expect(result.queryByText('visible'), isNotNull, reason: 'test setup sanity check');
-  //         expect(result.queryByText('willBeRemoved'), isNotNull, reason: 'test setup sanity check');
-  //
-  //         result.rerender((ControlledDomNodeAppearance()
-  //           ..delayHiddenNodeRenderFor = testDelay
-  //           ..shouldRenderHiddenNode = false)());
-  //         await rtl.waitForElementToBeRemoved(() => result.queryByText('willBeRemoved'),
-  //             timeout: Duration(milliseconds: testDelay.inMilliseconds + 100), onTimeout: (error) {
-  //           return TestFailure(
-  //               'The element with text "willBeRemoved" is still present in the DOM after ${testDelay.inMilliseconds + 100}ms.');
-  //         });
-  //         expect(result.queryByText('willBeRemoved'), isNull);
-  //       });
-  //
-  //       test('[failure]', () async {
-  //         final testDelay = const Duration(milliseconds: 2000);
-  //         final result = rtl.render((ControlledDomNodeAppearance()
-  //           ..delayHiddenNodeRenderFor = testDelay
-  //           ..shouldRenderHiddenNode = true)());
-  //         expect(result.queryByText('visible'), isNotNull, reason: 'test setup sanity check');
-  //         expect(result.queryByText('willBeRemoved'), isNotNull, reason: 'test setup sanity check');
-  //
-  //         expect(
-  //             () async => await rtl.waitForElementToBeRemoved(() => result.queryByText('willBeRemoved'),
-  //                     timeout: Duration(milliseconds: testDelay.inMilliseconds + 100), onTimeout: (error) {
-  //                   return TestFailure(
-  //                       'The element with text "willBeRemoved" is still present in the DOM after ${testDelay.inMilliseconds + 100}ms.');
-  //                 }),
-  //             throwsA(isA<TestFailure>()));
-  //         expect(result.queryByText('willBeRemoved'), isNotNull);
-  //       });
-  //     });
-  //   });
+    // });
   // });
 }
 

@@ -7,10 +7,10 @@ import 'dart:html' show Element, LabelElement;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -37,14 +37,18 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByLabelText(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByLabelText(getContainerForScope(), TextMatch.parse(text),
-          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector)));
+      withErrorInterop(
+          () => _jsGetByLabelText(getContainerForScope(), TextMatch.parse(text),
+              buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector)),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
   /// defaulting to an [exact] match.
@@ -66,14 +70,20 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByLabelText(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByLabelText(getContainerForScope(), TextMatch.parse(text),
-          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector)));
+      withErrorInterop(
+          () => _jsGetAllByLabelText(getContainerForScope(), TextMatch.parse(text),
+                  buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element that is associated with a [LabelElement] with the given [text],
   /// defaulting to an [exact] match.
@@ -95,7 +105,7 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByLabelText(
+  E queryByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -124,14 +134,16 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByLabelText(
+  List<E> queryAllByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
   }) =>
       _jsQueryAllByLabelText(getContainerForScope(), TextMatch.parse(text),
-          buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector));
+              buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element that is associated with a [LabelElement] with the given [text],
   /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -155,6 +167,7 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -162,22 +175,33 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByLabelText(
+  Future<E> findByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByLabelText for consistency with our
+    // need to use it on the analogous `findAllByLabelText` query.
+    return waitFor(
+      () => getByLabelText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
@@ -202,6 +226,7 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -209,22 +234,34 @@ mixin ByLabelTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByLabelText(
+  Future<List<E>> findAllByLabelText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
     String selector,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildSelectorMatcherOptions(exact: exact, normalizer: normalizer, selector: selector);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByLabelText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByLabelText because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByLabelText` return value.
+    return waitFor(
+      () => getAllByLabelText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -258,22 +295,4 @@ external List<Element> _jsQueryAllByLabelText(
   /*TextMatch*/
   text, [
   SelectorMatcherOptions options,
-]);
-
-@JS('rtl.findByLabelText')
-external /*Promise<Element>*/ _jsFindByLabelText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  SelectorMatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByLabelText')
-external /*Promise<List<Element>>*/ _jsFindAllByLabelText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  SelectorMatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

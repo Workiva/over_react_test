@@ -29,41 +29,43 @@ void setEphemeralElementErrorMessage(
   });
 }
 
-/// Converts a JavaScript Promise to a Dart [Future], preserving the stack trace of the error thrown
-/// from JS in the event that the [jsPromise] is rejected by throwing a  [TestingLibraryElementError].
-///
-/// > Related: [withErrorInterop]
-Future<T> promiseToFutureWithErrorInterop<T>(/*Promise<T>*/ jsPromise) async {
-  return promiseToFuture<T>(jsPromise).catchError((e) {
-    throw TestingLibraryElementError.fromJs(e);
-  });
-}
-
 /// Catches any potential `JsError`s thrown by JS query function by calling [getJsQueryResult],
 /// preserving the stack trace of the error thrown from JS by throwing a [TestingLibraryElementError].
 ///
-/// > Related: [promiseToFutureWithErrorInterop]
-T withErrorInterop<T>(T Function() getJsQueryResult) {
+/// Optionally, a [errorMessage] can be provided to customize the error message.
+T withErrorInterop<T>(T Function() getJsQueryResult, {String errorMessage}) {
   T returnValue;
 
   try {
     returnValue = getJsQueryResult();
   } catch (e) {
-    throw TestingLibraryElementError.fromJs(e);
+    throw TestingLibraryElementError.fromJs(e, errorMessage: errorMessage);
   }
 
   return returnValue;
 }
 
+// TODO: Do we need to export this for consumers?
 class TestingLibraryElementError extends Error {
-  TestingLibraryElementError._(this.message, this.jsStackTrace) : super();
+  TestingLibraryElementError(this.message, [this.jsStackTrace]) : super();
 
-  factory TestingLibraryElementError.fromJs(JsError jsError) {
-    return TestingLibraryElementError._(jsError.toString(), StackTrace.fromString(jsError.stack));
+  factory TestingLibraryElementError.fromJs(JsError jsError, {String errorMessage}) {
+    final message = errorMessage == null ? jsError.toString() : '$jsError\n\n$errorMessage';
+    return TestingLibraryElementError(message, StackTrace.fromString(jsError.stack));
   }
 
   final String message;
   final StackTrace jsStackTrace;
+
+  @override
+  String toString() => message;
+}
+
+// TODO: Do we need to export this for consumers?
+class TestingLibraryAsyncTimeout extends Error {
+  TestingLibraryAsyncTimeout(this.message) : super();
+
+  final String message;
 
   @override
   String toString() => message;

@@ -1,7 +1,7 @@
 import 'dart:html' show Element, ImageElement, InputElement, LabelElement, SelectElement, TextAreaElement;
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart'
-    show MutationObserverOptions, defaultMutationObserverOptions;
+    show MutationObserverOptions, QueryTimeoutFn, defaultMutationObserverOptions;
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart' show NormalizerFn, NormalizerOptions;
 import 'package:over_react_test/src/testing_library/dom/within.dart' show within;
 
@@ -25,7 +25,7 @@ import 'package:over_react_test/src/testing_library/dom/within.dart' show within
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-ImageElement getByAltText(
+ImageElement getByAltText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -137,7 +137,7 @@ Future<ImageElement> findByAltText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findByAltText(text,
@@ -180,7 +180,7 @@ Future<List<ImageElement>> findAllByAltText(
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
     within(container).findAllByAltText(text,
@@ -211,13 +211,13 @@ Future<List<ImageElement>> findAllByAltText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByDisplayValue(
+E getByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getByDisplayValue(value, exact: exact, normalizer: normalizer);
+    within(container).getByDisplayValue<E>(value, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -235,13 +235,13 @@ Element getByDisplayValue(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByDisplayValue(
+List<E> getAllByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getAllByDisplayValue(value, exact: exact, normalizer: normalizer);
+    within(container).getAllByDisplayValue<E>(value, exact: exact, normalizer: normalizer);
 
 /// Returns a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -259,13 +259,13 @@ List<Element> getAllByDisplayValue(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByDisplayValue(
+E queryByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryByDisplayValue(value, exact: exact, normalizer: normalizer);
+    within(container).queryByDisplayValue<E>(value, exact: exact, normalizer: normalizer);
 
 /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
 /// defaulting to an [exact] match.
@@ -283,13 +283,13 @@ Element queryByDisplayValue(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByDisplayValue(
+List<E> queryAllByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryAllByDisplayValue(value, exact: exact, normalizer: normalizer);
+    within(container).queryAllByDisplayValue<E>(value, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -316,17 +316,17 @@ List<Element> queryAllByDisplayValue(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByDisplayValue(
+Future<E> findByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByDisplayValue(value,
+    within(container).findByDisplayValue<E>(value,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -359,17 +359,17 @@ Future<Element> findByDisplayValue(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByDisplayValue(
+Future<List<E>> findAllByDisplayValue<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic value, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByDisplayValue(value,
+    within(container).findAllByDisplayValue<E>(value,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -401,14 +401,14 @@ Future<List<Element>> findAllByDisplayValue(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByLabelText(
+E getByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
 }) =>
-    within(container).getByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
+    within(container).getByLabelText<E>(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -430,14 +430,14 @@ Element getByLabelText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByLabelText(
+List<E> getAllByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
 }) =>
-    within(container).getAllByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
+    within(container).getAllByLabelText<E>(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a single element that is associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -459,14 +459,14 @@ List<Element> getAllByLabelText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByLabelText(
+E queryByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
 }) =>
-    within(container).queryByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
+    within(container).queryByLabelText<E>(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a list of elements that are associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match.
@@ -488,14 +488,14 @@ Element queryByLabelText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByLabelText(
+List<E> queryAllByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   String selector,
 }) =>
-    within(container).queryAllByLabelText(text, exact: exact, normalizer: normalizer, selector: selector);
+    within(container).queryAllByLabelText<E>(text, exact: exact, normalizer: normalizer, selector: selector);
 
 /// Returns a future with a single element that is associated with a [LabelElement] with the given [text],
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -526,7 +526,7 @@ List<Element> queryAllByLabelText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByLabelText(
+Future<E> findByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -534,10 +534,10 @@ Future<Element> findByLabelText(
   String selector,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByLabelText(text,
+    within(container).findByLabelText<E>(text,
         exact: exact,
         normalizer: normalizer,
         selector: selector,
@@ -575,7 +575,7 @@ Future<Element> findByLabelText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByLabelText(
+Future<List<E>> findAllByLabelText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -583,10 +583,10 @@ Future<List<Element>> findAllByLabelText(
   String selector,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByLabelText(text,
+    within(container).findAllByLabelText<E>(text,
         exact: exact,
         normalizer: normalizer,
         selector: selector,
@@ -615,13 +615,13 @@ Future<List<Element>> findAllByLabelText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByPlaceholderText(
+E getByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getByPlaceholderText(text, exact: exact, normalizer: normalizer);
+    within(container).getByPlaceholderText<E>(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -639,13 +639,13 @@ Element getByPlaceholderText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByPlaceholderText(
+List<E> getAllByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getAllByPlaceholderText(text, exact: exact, normalizer: normalizer);
+    within(container).getAllByPlaceholderText<E>(text, exact: exact, normalizer: normalizer);
 
 /// Returns a single element with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -663,13 +663,13 @@ List<Element> getAllByPlaceholderText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByPlaceholderText(
+E queryByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryByPlaceholderText(text, exact: exact, normalizer: normalizer);
+    within(container).queryByPlaceholderText<E>(text, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match.
@@ -687,13 +687,13 @@ Element queryByPlaceholderText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByPlaceholderText(
+List<E> queryAllByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryAllByPlaceholderText(text, exact: exact, normalizer: normalizer);
+    within(container).queryAllByPlaceholderText<E>(text, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single element value with the given [text] as the value of the `placeholder` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -720,17 +720,17 @@ List<Element> queryAllByPlaceholderText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByPlaceholderText(
+Future<E> findByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByPlaceholderText(text,
+    within(container).findByPlaceholderText<E>(text,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -763,17 +763,17 @@ Future<Element> findByPlaceholderText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByPlaceholderText(
+Future<List<E>> findAllByPlaceholderText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByPlaceholderText(text,
+    within(container).findAllByPlaceholderText<E>(text,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -808,7 +808,7 @@ Future<List<Element>> findAllByPlaceholderText(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
-Element getByRole(
+E getByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -822,7 +822,7 @@ Element getByRole(
   bool queryFallbacks,
   int level,
 }) =>
-    within(container).getByRole(role,
+    within(container).getByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -857,7 +857,7 @@ Element getByRole(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
-List<Element> getAllByRole(
+List<E> getAllByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -871,7 +871,7 @@ List<Element> getAllByRole(
   bool queryFallbacks,
   int level,
 }) =>
-    within(container).getAllByRole(role,
+    within(container).getAllByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -906,7 +906,7 @@ List<Element> getAllByRole(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
-Element queryByRole(
+E queryByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -920,7 +920,7 @@ Element queryByRole(
   bool queryFallbacks,
   int level,
 }) =>
-    within(container).queryByRole(role,
+    within(container).queryByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -956,7 +956,7 @@ Element queryByRole(
 /// {@macro byRoleOptionsExpanded}
 /// {@macro byRoleOptionsQueryFallbacks}
 /// {@macro byRoleOptionsLevel}
-List<Element> queryAllByRole(
+List<E> queryAllByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -970,7 +970,7 @@ List<Element> queryAllByRole(
   bool queryFallbacks,
   int level,
 }) =>
-    within(container).queryAllByRole(role,
+    within(container).queryAllByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -1016,7 +1016,7 @@ List<Element> queryAllByRole(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByRole(
+Future<E> findByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -1031,10 +1031,10 @@ Future<Element> findByRole(
   int level,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByRole(role,
+    within(container).findByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -1084,7 +1084,7 @@ Future<Element> findByRole(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByRole(
+Future<List<E>> findAllByRole<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic role, {
   bool exact = true,
@@ -1099,10 +1099,10 @@ Future<List<Element>> findAllByRole(
   int level,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByRole(role,
+    within(container).findAllByRole<E>(role,
         exact: exact,
         normalizer: normalizer,
         hidden: hidden,
@@ -1138,13 +1138,13 @@ Future<List<Element>> findAllByRole(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByTestId(
+E getByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getByTestId(testId, exact: exact, normalizer: normalizer);
+    within(container).getByTestId<E>(testId, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
 /// defaulting to an [exact] match.
@@ -1162,13 +1162,13 @@ Element getByTestId(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByTestId(
+List<E> getAllByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getAllByTestId(testId, exact: exact, normalizer: normalizer);
+    within(container).getAllByTestId<E>(testId, exact: exact, normalizer: normalizer);
 
 /// Returns a single element with the given [testId] value for the `data-test-id` attribute,
 /// defaulting to an [exact] match.
@@ -1186,13 +1186,13 @@ List<Element> getAllByTestId(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByTestId(
+E queryByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryByTestId(testId, exact: exact, normalizer: normalizer);
+    within(container).queryByTestId<E>(testId, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
 /// defaulting to an [exact] match.
@@ -1210,13 +1210,13 @@ Element queryByTestId(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByTestId(
+List<E> queryAllByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryAllByTestId(testId, exact: exact, normalizer: normalizer);
+    within(container).queryAllByTestId<E>(testId, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single element value with the given [testId] value for the `data-test-id` attribute,
 /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -1243,17 +1243,17 @@ List<Element> queryAllByTestId(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByTestId(
+Future<E> findByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByTestId(testId,
+    within(container).findByTestId<E>(testId,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -1286,17 +1286,17 @@ Future<Element> findByTestId(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByTestId(
+Future<List<E>> findAllByTestId<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic testId, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByTestId(testId,
+    within(container).findAllByTestId<E>(testId,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -1334,7 +1334,7 @@ Future<List<Element>> findAllByTestId(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByText(
+E getByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1342,7 +1342,7 @@ Element getByText(
   String selector,
   /*String|bool*/ ignore,
 }) =>
-    within(container).getByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
+    within(container).getByText<E>(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1370,7 +1370,7 @@ Element getByText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByText(
+List<E> getAllByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1378,7 +1378,7 @@ List<Element> getAllByText(
   String selector,
   /*String|bool*/ ignore,
 }) =>
-    within(container).getAllByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
+    within(container).getAllByText<E>(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a single element with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1406,7 +1406,7 @@ List<Element> getAllByText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByText(
+E queryByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1414,7 +1414,7 @@ Element queryByText(
   String selector,
   /*String|bool*/ ignore,
 }) =>
-    within(container).queryByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
+    within(container).queryByText<E>(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
 ///
@@ -1442,7 +1442,7 @@ Element queryByText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByText(
+List<E> queryAllByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1450,7 +1450,7 @@ List<Element> queryAllByText(
   String selector,
   /*String|bool*/ ignore,
 }) =>
-    within(container).queryAllByText(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
+    within(container).queryAllByText<E>(text, exact: exact, normalizer: normalizer, selector: selector, ignore: ignore);
 
 /// Returns a future with a single element value with the given [text] content, defaulting to an [exact] match after
 /// waiting 1000ms (or the provided [timeout] duration).
@@ -1488,7 +1488,7 @@ List<Element> queryAllByText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByText(
+Future<E> findByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1497,10 +1497,10 @@ Future<Element> findByText(
   /*String|bool*/ ignore,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByText(text,
+    within(container).findByText<E>(text,
         exact: exact,
         normalizer: normalizer,
         selector: selector,
@@ -1546,7 +1546,7 @@ Future<Element> findByText(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByText(
+Future<List<E>> findAllByText<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic text, {
   bool exact = true,
@@ -1555,10 +1555,10 @@ Future<List<Element>> findAllByText(
   /*String|bool*/ ignore,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByText(text,
+    within(container).findAllByText<E>(text,
         exact: exact,
         normalizer: normalizer,
         selector: selector,
@@ -1588,13 +1588,13 @@ Future<List<Element>> findAllByText(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element getByTitle(
+E getByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getByTitle(title, exact: exact, normalizer: normalizer);
+    within(container).getByTitle<E>(title, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1612,13 +1612,13 @@ Element getByTitle(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> getAllByTitle(
+List<E> getAllByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).getAllByTitle(title, exact: exact, normalizer: normalizer);
+    within(container).getAllByTitle<E>(title, exact: exact, normalizer: normalizer);
 
 /// Returns a single element with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1636,13 +1636,13 @@ List<Element> getAllByTitle(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-Element queryByTitle(
+E queryByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryByTitle(title, exact: exact, normalizer: normalizer);
+    within(container).queryByTitle<E>(title, exact: exact, normalizer: normalizer);
 
 /// Returns a list of elements with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match.
@@ -1660,13 +1660,13 @@ Element queryByTitle(
 /// {@macro TextMatchArgDescription}
 /// {@macro MatcherOptionsExactArgDescription}
 /// {@macro MatcherOptionsNormalizerArgDescription}
-List<Element> queryAllByTitle(
+List<E> queryAllByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
 }) =>
-    within(container).queryAllByTitle(title, exact: exact, normalizer: normalizer);
+    within(container).queryAllByTitle<E>(title, exact: exact, normalizer: normalizer);
 
 /// Returns a future with a single element value with the given [title] as the value of the `title` attribute,
 /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -1693,17 +1693,17 @@ List<Element> queryAllByTitle(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<Element> findByTitle(
+Future<E> findByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findByTitle(title,
+    within(container).findByTitle<E>(title,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,
@@ -1736,17 +1736,17 @@ Future<Element> findByTitle(
 /// {@macro sharedWaitForOptionsIntervalDescription}
 /// {@macro sharedWaitForOptionsOnTimeoutDescription}
 /// {@macro sharedWaitForOptionsMutationObserverDescription}
-Future<List<Element>> findAllByTitle(
+Future<List<E>> findAllByTitle<E extends Element>(
   Element container,
   /*TextMatch*/ dynamic title, {
   bool exact = true,
   NormalizerFn Function(NormalizerOptions) normalizer,
   Duration timeout,
   Duration interval,
-  /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+  QueryTimeoutFn onTimeout,
   MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
 }) =>
-    within(container).findAllByTitle(title,
+    within(container).findAllByTitle<E>(title,
         exact: exact,
         normalizer: normalizer,
         timeout: timeout,

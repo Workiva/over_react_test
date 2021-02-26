@@ -1,6 +1,8 @@
 import 'dart:html';
 
 import 'package:meta/meta.dart';
+import 'package:over_react_test/src/over_react_test/custom_matchers.dart';
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart';
 import 'package:test/test.dart';
 
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart' show TextMatch;
@@ -214,6 +216,61 @@ void testTextMatchTypes<E extends Element>(
 
       group('and normalizer is customized', () {
         // TODO
+      });
+
+      group('and errorMessage is customized when a failure is expected for the', () {
+        getQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () {
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() => queryGetter()(validRoleNotInDom, errorMessage: 'This is custom'),
+                    throwsA(allOf(
+                        isA<TestingLibraryElementError>(),
+                        hasToStringValue(contains('</div>')),
+                        hasToStringValue(contains('This is custom')))));
+              } else if (textMatchArgName == 'name') {
+                expect(() => queryGetter()(validRoleInDom, name: fuzzyValue, errorMessage: 'This is custom'),
+                    throwsA(allOf(
+                        isA<TestingLibraryElementError>(),
+                        hasToStringValue(contains('</div>')),
+                        hasToStringValue(contains('This is custom')))));
+              }
+            } else {
+              expect(() => queryGetter()(fuzzyValue, errorMessage: 'This is custom'),
+                  throwsA(allOf(
+                      isA<TestingLibraryElementError>(),
+                      hasToStringValue(contains('</div>')),
+                      hasToStringValue(contains('This is custom')))));
+            }
+          });
+        });
+
+        findQueriesByName.forEach((queryName, queryGetter) {
+          test('$queryName query', () async {
+            final query = queryGetter();
+            if (queryTypeName == 'Role') {
+              if (textMatchArgName == 'role') {
+                expect(() async => await query(validRoleNotInDom, errorMessage: 'This is custom'),
+                    throwsA(allOf(
+                        isA<TestingLibraryElementError>(),
+                        hasToStringValue(contains('</div>')),
+                        hasToStringValue(contains('This is custom')))));
+              } else if (textMatchArgName == 'name') {
+                expect(() async => await query(validRoleInDom, name: fuzzyValue, errorMessage: 'This is custom'),
+                    throwsA(allOf(
+                        isA<TestingLibraryElementError>(),
+                        hasToStringValue(contains('</div>')),
+                        hasToStringValue(contains('This is custom')))));
+              }
+            } else {
+              expect(() async => await query(fuzzyValue, errorMessage: 'This is custom'),
+                  throwsA(allOf(
+                      isA<TestingLibraryElementError>(),
+                      hasToStringValue(contains('</div>')),
+                      hasToStringValue(contains('This is custom')))));
+            }
+          }, timeout: asyncQueryTestTimeout);
+        });
       });
     });
 

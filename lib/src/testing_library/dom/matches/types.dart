@@ -119,6 +119,13 @@ class MatcherOptions {
   /// {@endtemplate}
   external NormalizerFn Function(NormalizerOptions) get normalizer;
   external set normalizer(NormalizerFn Function(NormalizerOptions) value);
+
+  /// {@template MatcherOptionsErrorMessage}
+  /// ### Error Message
+  ///
+  /// Use the `errorMessage` argument to customize error messages displayed when
+  /// tests using the query fail.
+  /// {@endtemplate}
 }
 
 @JS()

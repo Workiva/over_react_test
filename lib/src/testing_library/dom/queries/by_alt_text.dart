@@ -10,8 +10,7 @@ import 'package:over_react_test/src/testing_library/dom/async/types.dart';
 import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -34,13 +33,17 @@ mixin ByAltTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ImageElement getByAltText(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByAltText(
-          getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetByAltText(
+              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer)),
+          errorMessage: errorMessage);
 
   /// Returns a list of [ImageElement]s with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -58,15 +61,19 @@ mixin ByAltTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   List<ImageElement> getAllByAltText(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByAltText(
-              getContainerForScope(), TextMatch.parse(text), buildMatcherOptions(exact: exact, normalizer: normalizer))
-          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
-          .cast<ImageElement>());
+      withErrorInterop(
+          () => _jsGetAllByAltText(getContainerForScope(), TextMatch.parse(text),
+                  buildMatcherOptions(exact: exact, normalizer: normalizer))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<ImageElement>(),
+          errorMessage: errorMessage);
 
   /// Returns a single [ImageElement] with the given [text] as the value of the `alt` attribute,
   /// defaulting to an [exact] match.
@@ -136,6 +143,7 @@ mixin ByAltTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -147,25 +155,20 @@ mixin ByAltTextQueries on IQueries {
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
     // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByAltText for consistency with our
-    // need to us it on the analogous `findAllByAltText` query.
-    // return promiseToFutureWithErrorInterop(
-    // return promiseToFutureWithErrorInterop(
-    //     _jsFindByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // need to use it on the analogous `findAllByAltText` query.
     return waitFor(
       () => getByAltText(
         text,
         exact: exact,
         normalizer: normalizer,
+        errorMessage: errorMessage,
       ),
       container: getContainerForScope(),
       timeout: timeout,
@@ -193,6 +196,7 @@ mixin ByAltTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -204,25 +208,21 @@ mixin ByAltTextQueries on IQueries {
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
     // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByAltText because of the inability
     // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
     // like we can/must on the `getAllByAltText` return value.
-    // return promiseToFutureWithErrorInterop(
-    //     _jsFindAllByAltText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
     return waitFor(
       () => getAllByAltText(
         text,
         exact: exact,
         normalizer: normalizer,
+        errorMessage: errorMessage,
       ),
       container: getContainerForScope(),
       timeout: timeout,
@@ -263,22 +263,4 @@ external List<ImageElement> _jsQueryAllByAltText(
   /*TextMatch*/
   text, [
   MatcherOptions options,
-]);
-
-@JS('rtl.findByAltText')
-external /*Promise<Element>*/ _jsFindByAltText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByAltText')
-external /*Promise<List<Element>>*/ _jsFindAllByAltText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

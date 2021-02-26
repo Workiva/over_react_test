@@ -7,10 +7,10 @@ import 'dart:html' show Element;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -33,13 +33,17 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByTitle(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByTitle(
-          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetByTitle(getContainerForScope(), TextMatch.parse(title),
+              buildMatcherOptions(exact: exact, normalizer: normalizer)),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
@@ -57,13 +61,19 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByTitle(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByTitle(
-          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetAllByTitle(getContainerForScope(), TextMatch.parse(title),
+                  buildMatcherOptions(exact: exact, normalizer: normalizer))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match.
@@ -81,7 +91,7 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByTitle(
+  E queryByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -105,13 +115,15 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByTitle(
+  List<E> queryAllByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByTitle(
-          getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer));
+              getContainerForScope(), TextMatch.parse(title), buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element value with the given [title] as the value of the `title` attribute,
   /// defaulting to an [exact] match after waiting `1000ms` (or the specified [timeout] duration).
@@ -131,6 +143,7 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -138,21 +151,31 @@ mixin ByTitleQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByTitle(
+  Future<E> findByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByTitle(getContainerForScope(), TextMatch.parse(title), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByTitle for consistency with our
+    // need to use it on the analogous `findAllByTitle` query.
+    return waitFor(
+      () => getByTitle<E>(
+        title,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements with the given [title] as the value of the `title` attribute,
@@ -173,6 +196,7 @@ mixin ByTitleQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -180,21 +204,32 @@ mixin ByTitleQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByTitle(
+  Future<List<E>> findAllByTitle<E extends Element>(
     /*TextMatch*/ dynamic title, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByTitle(getContainerForScope(), TextMatch.parse(title), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByTitle because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByTitle` return value.
+    return waitFor(
+      () => getAllByTitle<E>(
+        title,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -228,22 +263,4 @@ external List<Element> _jsQueryAllByTitle(
   /*TextMatch*/
   title, [
   MatcherOptions options,
-]);
-
-@JS('rtl.findByTitle')
-external /*Promise<Element>*/ _jsFindByTitle(
-  Element container,
-  /*TextMatch*/
-  title, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByTitle')
-external /*Promise<List<Element>>*/ _jsFindAllByTitle(
-  Element container,
-  /*TextMatch*/
-  title, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

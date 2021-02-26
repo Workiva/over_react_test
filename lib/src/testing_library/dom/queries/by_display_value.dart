@@ -7,10 +7,10 @@ import 'dart:html' show Element, InputElement, SelectElement, TextAreaElement;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -31,13 +31,17 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByDisplayValue(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByDisplayValue(
-          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetByDisplayValue(getContainerForScope(), TextMatch.parse(value),
+              buildMatcherOptions(exact: exact, normalizer: normalizer)),
+          errorMessage: errorMessage);
 
   /// Returns a list of [InputElement]s, [TextAreaElement]s or [SelectElement]s that have the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -55,13 +59,22 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByDisplayValue(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByDisplayValue(
-          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetAllByDisplayValue(
+                  getContainerForScope(),
+                  TextMatch.parse(value),
+                  buildMatcherOptions(
+                      exact: exact,
+                      normalizer: normalizer)) // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
   /// defaulting to an [exact] match.
@@ -79,7 +92,7 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByDisplayValue(
+  E queryByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -103,13 +116,15 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByDisplayValue(
+  List<E> queryAllByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
       _jsQueryAllByDisplayValue(
-          getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer));
+              getContainerForScope(), TextMatch.parse(value), buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
   /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -129,6 +144,7 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -136,21 +152,31 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByDisplayValue(
+  Future<E> findByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByDisplayValue for consistency with our
+    // need to use it on the analogous `findAllByDisplayValue` query.
+    return waitFor(
+      () => getByDisplayValue(
+        value,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of [InputElement], [TextAreaElement] or [SelectElement] that has the matching [value] displayed,
@@ -171,6 +197,7 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -178,21 +205,32 @@ mixin ByDisplayValueQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByDisplayValue(
+  Future<List<E>> findAllByDisplayValue<E extends Element>(
     /*TextMatch*/ dynamic value, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByDisplayValue(getContainerForScope(), TextMatch.parse(value), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByDisplayValue because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByDisplayValue` return value.
+    return waitFor(
+      () => getAllByDisplayValue<E>(
+        value,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -226,22 +264,4 @@ external List<Element> _jsQueryAllByDisplayValue(
   /*TextMatch*/
   value, [
   MatcherOptions options,
-]);
-
-@JS('rtl.findByDisplayValue')
-external /*Promise<Element>*/ _jsFindByDisplayValue(
-  Element container,
-  /*TextMatch*/
-  value, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByDisplayValue')
-external /*Promise<List<Element>>*/ _jsFindAllByDisplayValue(
-  Element container,
-  /*TextMatch*/
-  value, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

@@ -7,10 +7,10 @@ import 'dart:html' show Element;
 import 'package:js/js.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -33,13 +33,20 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByTestId(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetByTestId(
-          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetByTestId(
+                getContainerForScope(),
+                TextMatch.parse(testId),
+                buildMatcherOptions(exact: exact, normalizer: normalizer),
+              ),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
   /// defaulting to an [exact] match.
@@ -57,13 +64,19 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByTestId(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
   }) =>
-      withErrorInterop(() => _jsGetAllByTestId(
-          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer)));
+      withErrorInterop(
+          () => _jsGetAllByTestId(getContainerForScope(), TextMatch.parse(testId),
+                  buildMatcherOptions(exact: exact, normalizer: normalizer))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element with the given [testId] value for the `data-test-id` attribute,
   /// defaulting to an [exact] match.
@@ -81,7 +94,7 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByTestId(
+  E queryByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -105,13 +118,15 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByTestId(
+  List<E> queryAllByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
   }) =>
-      _jsQueryAllByTestId(
-          getContainerForScope(), TextMatch.parse(testId), buildMatcherOptions(exact: exact, normalizer: normalizer));
+      _jsQueryAllByTestId(getContainerForScope(), TextMatch.parse(testId),
+              buildMatcherOptions(exact: exact, normalizer: normalizer))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element value with the given [testId] value for the `data-test-id` attribute,
   /// defaulting to an [exact] match after waiting 1000ms (or the provided [timeout] duration).
@@ -131,6 +146,7 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -138,21 +154,31 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByTestId(
+  Future<E> findByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByTestId(getContainerForScope(), TextMatch.parse(testId), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByTestId for consistency with our
+    // need to use it on the analogous `findAllByTestId` query.
+    return waitFor(
+      () => getByTestId<E>(
+        testId,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements with the given [testId] value for the `data-test-id` attribute,
@@ -173,6 +199,7 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -180,21 +207,32 @@ mixin ByTestIdQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByTestId(
+  Future<List<E>> findAllByTestId<E extends Element>(
     /*TextMatch*/ dynamic testId, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildMatcherOptions(exact: exact, normalizer: normalizer);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByTestId(getContainerForScope(), TextMatch.parse(testId), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByTestId because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByTestId` return value.
+    return waitFor(
+      () => getAllByTestId<E>(
+        testId,
+        exact: exact,
+        normalizer: normalizer,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -228,22 +266,4 @@ external List<Element> _jsQueryAllByTestId(
   /*TextMatch*/
   testId, [
   MatcherOptions options,
-]);
-
-@JS('rtl.findByTestId')
-external /*Promise<Element>*/ _jsFindByTestId(
-  Element container,
-  /*TextMatch*/
-  testId, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByTestId')
-external /*Promise<List<Element>>*/ _jsFindAllByTestId(
-  Element container,
-  /*TextMatch*/
-  testId, [
-  MatcherOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);

@@ -8,10 +8,10 @@ import 'package:js/js.dart';
 import 'package:meta/meta.dart';
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart';
+import 'package:over_react_test/src/testing_library/dom/async/wait_for.dart';
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/dom/queries/interface.dart';
-import 'package:over_react_test/src/testing_library/util/error_message_utils.dart'
-    show promiseToFutureWithErrorInterop, withErrorInterop;
+import 'package:over_react_test/src/testing_library/util/error_message_utils.dart' show withErrorInterop;
 
 /// PRIVATE. Do not export from this library.
 ///
@@ -61,15 +61,19 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element getByText(
+  /// {@macro MatcherOptionsErrorMessage}
+  E getByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      withErrorInterop(() => _jsGetByText(getContainerForScope(), TextMatch.parse(text),
-          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector)));
+      withErrorInterop(
+          () => _jsGetByText(getContainerForScope(), TextMatch.parse(text),
+              buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector)),
+          errorMessage: errorMessage);
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match.
   ///
@@ -97,15 +101,21 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> getAllByText(
+  /// {@macro MatcherOptionsErrorMessage}
+  List<E> getAllByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     String selector,
     /*String|bool*/ ignore,
   }) =>
-      withErrorInterop(() => _jsGetAllByText(getContainerForScope(), TextMatch.parse(text),
-          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector)));
+      withErrorInterop(
+          () => _jsGetAllByText(getContainerForScope(), TextMatch.parse(text),
+                  buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector))
+              // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+              .cast<E>(),
+          errorMessage: errorMessage);
 
   /// Returns a single element with the given [text] content, defaulting to an [exact] match.
   ///
@@ -133,7 +143,7 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  Element queryByText(
+  E queryByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -169,7 +179,7 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
-  List<Element> queryAllByText(
+  List<E> queryAllByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
@@ -177,7 +187,9 @@ mixin ByTextQueries on IQueries {
     /*String|bool*/ ignore,
   }) =>
       _jsQueryAllByText(getContainerForScope(), TextMatch.parse(text),
-          buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector));
+              buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector))
+          // <vomit/> https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5
+          .cast<E>();
 
   /// Returns a future with a single element value with the given [text] content, defaulting to an [exact] match after
   /// waiting 1000ms (or the provided [timeout] duration).
@@ -208,6 +220,7 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -215,23 +228,34 @@ mixin ByTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<Element> findByText(
+  Future<E> findByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     String selector,
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindByText for consistency with our
+    // need to use it on the analogous `findAllByText` query.
+    return waitFor(
+      () => getByText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 
   /// Returns a list of elements with the given [text] content, defaulting to an [exact] match after
@@ -263,6 +287,7 @@ mixin ByTextQueries on IQueries {
   /// {@macro TextMatchArgDescription}
   /// {@macro MatcherOptionsExactArgDescription}
   /// {@macro MatcherOptionsNormalizerArgDescription}
+  /// {@macro MatcherOptionsErrorMessage}
   ///
   /// ## Async Options
   ///
@@ -270,23 +295,35 @@ mixin ByTextQueries on IQueries {
   /// {@macro sharedWaitForOptionsIntervalDescription}
   /// {@macro sharedWaitForOptionsOnTimeoutDescription}
   /// {@macro sharedWaitForOptionsMutationObserverDescription}
-  Future<List<Element>> findAllByText(
+  Future<List<E>> findAllByText<E extends Element>(
     /*TextMatch*/ dynamic text, {
     bool exact = true,
     NormalizerFn Function(NormalizerOptions) normalizer,
+    String errorMessage,
     String selector,
     /*String|bool*/ ignore,
     Duration timeout,
     Duration interval,
-    /*Error*/ dynamic Function(/*Error*/ dynamic originalError) onTimeout,
+    QueryTimeoutFn onTimeout,
     MutationObserverOptions mutationObserverOptions = defaultMutationObserverOptions,
   }) {
-    final matcherOptions = buildByTextOptions(exact: exact, normalizer: normalizer, ignore: ignore, selector: selector);
-    final waitForOptions = buildWaitForOptions(
-        timeout: timeout, interval: interval, onTimeout: onTimeout, mutationObserverOptions: mutationObserverOptions);
-
-    return promiseToFutureWithErrorInterop(
-        _jsFindAllByText(getContainerForScope(), TextMatch.parse(text), matcherOptions, waitForOptions));
+    // NOTE: Using our own Dart waitFor as a wrapper instead of calling _jsFindAllByText because of the inability
+    // to call `.cast<E>` on the list before returning to consumers (https://dartpad.dev/6d3df9e7e03655ed33f5865596829ef5)
+    // like we can/must on the `getAllByText` return value.
+    return waitFor(
+      () => getAllByText<E>(
+        text,
+        exact: exact,
+        normalizer: normalizer,
+        selector: selector,
+        errorMessage: errorMessage,
+      ),
+      container: getContainerForScope(),
+      timeout: timeout,
+      interval: interval ?? defaultAsyncCallbackCheckInterval,
+      onTimeout: onTimeout,
+      mutationObserverOptions: mutationObserverOptions ?? defaultMutationObserverOptions,
+    );
   }
 }
 
@@ -320,24 +357,6 @@ external List<Element> _jsQueryAllByText(
   /*TextMatch*/
   text, [
   ByTextOptions options,
-]);
-
-@JS('rtl.findByText')
-external /*Promise<Element>*/ _jsFindByText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  ByTextOptions options,
-  SharedJsWaitForOptions waitForOptions,
-]);
-
-@JS('rtl.findAllByText')
-external /*Promise<List<Element>>*/ _jsFindAllByText(
-  Element container,
-  /*TextMatch*/
-  text, [
-  ByTextOptions options,
-  SharedJsWaitForOptions waitForOptions,
 ]);
 
 @JS()
