@@ -15,13 +15,18 @@ import '../../../util/matchers.dart';
 import '../../../util/rendering.dart';
 import 'text_match_type_parsing_tests.dart';
 
+class ScopedQueriesTestWrapper {
+  ScopedQueriesTestWrapper(this.queries, [rtl.RenderResult renderResult]) : renderResult = renderResult ?? queries;
+
+  final ScopedQueries queries;
+  final rtl.RenderResult renderResult;
+}
+
 @isTestGroup
 void hasQueriesScopedTo(
-  String scopeName,
-  ScopedQueries Function(String scopeName, {bool testAsyncQuery}) getQueries, {
-  // Optional because in the case of RenderResult, calling `getQueries` will render AND return the ScopedQueries object.
-  rtl.RenderResult Function({bool testAsyncQuery}) render,
-}) {
+    String scopeName,
+    ScopedQueriesTestWrapper Function(String scopeName, {bool testAsyncQuery, bool renderMultipleElsMatchingQuery})
+        getWrapper) {
   group('$scopeName:', () {
     ScopedQueries queries;
     String expectedPrettyDom;
@@ -45,19 +50,16 @@ void hasQueriesScopedTo(
       expect(document.body.children, isEmpty);
     });
 
-    ScopedQueries renderAndGetQueries({bool testAsyncQuery = false}) {
+    ScopedQueries renderAndGetQueries({
+      bool testAsyncQuery = false,
+      bool renderMultipleElsMatchingQuery,
+    }) {
       rtl.RenderResult renderResult;
+      final wrapper = getWrapper(scopeName,
+          testAsyncQuery: testAsyncQuery, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery);
 
-      queries ??= getQueries(scopeName, testAsyncQuery: testAsyncQuery);
-      if (queries is! rtl.RenderResult) {
-        if (render == null) {
-          throw ArgumentError('When getQueries() does not return a RenderResult, the render argument must do so.');
-        }
-
-        renderResult = render(testAsyncQuery: testAsyncQuery);
-      } else {
-        renderResult = queries as rtl.RenderResult;
-      }
+      queries ??= wrapper.queries;
+      renderResult = wrapper.renderResult;
 
       expectedPrettyDom = prettyDOM(renderResult.container);
 
@@ -141,17 +143,25 @@ void hasQueriesScopedTo(
         'AltText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByAltText': () => renderAndGetQueries().queryByAltText,
-          'queryAllByAltText': () => renderAndGetQueries().queryAllByAltText,
+        scopedQueryQueriesByName: {
+          'queryByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByAltText,
+          'queryAllByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByAltText,
         },
-        getQueriesByName: {
-          'getByAltText': () => renderAndGetQueries().getByAltText,
-          'getAllByAltText': () => renderAndGetQueries().getAllByAltText,
+        scopedGetQueriesByName: {
+          'getByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByAltText,
+          'getAllByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByAltText,
         },
-        findQueriesByName: {
-          'findByAltText': () => renderAndGetQueries(testAsyncQuery: true).findByAltText,
-          'findAllByAltText': () => renderAndGetQueries(testAsyncQuery: true).findAllByAltText,
+        scopedFindQueriesByName: {
+          'findByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByAltText,
+          'findAllByAltText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByAltText,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'alt text: $valueNotFoundPlaceholder',
@@ -161,17 +171,26 @@ void hasQueriesScopedTo(
         'DisplayValue',
         textMatchArgName: 'value',
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByDisplayValue': () => renderAndGetQueries().queryByDisplayValue,
-          'queryAllByDisplayValue': () => renderAndGetQueries().queryAllByDisplayValue,
+        scopedQueryQueriesByName: {
+          'queryByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByDisplayValue,
+          'queryAllByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .queryAllByDisplayValue,
         },
-        getQueriesByName: {
-          'getByDisplayValue': () => renderAndGetQueries().getByDisplayValue,
-          'getAllByDisplayValue': () => renderAndGetQueries().getAllByDisplayValue,
+        scopedGetQueriesByName: {
+          'getByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByDisplayValue,
+          'getAllByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByDisplayValue,
         },
-        findQueriesByName: {
-          'findByDisplayValue': () => renderAndGetQueries(testAsyncQuery: true).findByDisplayValue,
-          'findAllByDisplayValue': () => renderAndGetQueries(testAsyncQuery: true).findAllByDisplayValue,
+        scopedFindQueriesByName: {
+          'findByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByDisplayValue,
+          'findAllByDisplayValue': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByDisplayValue,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'display value: $valueNotFoundPlaceholder',
@@ -181,17 +200,25 @@ void hasQueriesScopedTo(
         'LabelText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByLabelText': () => renderAndGetQueries().queryByLabelText,
-          'queryAllByLabelText': () => renderAndGetQueries().queryAllByLabelText,
+        scopedQueryQueriesByName: {
+          'queryByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByLabelText,
+          'queryAllByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByLabelText,
         },
-        getQueriesByName: {
-          'getByLabelText': () => renderAndGetQueries().getByLabelText,
-          'getAllByLabelText': () => renderAndGetQueries().getAllByLabelText,
+        scopedGetQueriesByName: {
+          'getByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByLabelText,
+          'getAllByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByLabelText,
         },
-        findQueriesByName: {
-          'findByLabelText': () => renderAndGetQueries(testAsyncQuery: true).findByLabelText,
-          'findAllByLabelText': () => renderAndGetQueries(testAsyncQuery: true).findAllByLabelText,
+        scopedFindQueriesByName: {
+          'findByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByLabelText,
+          'findAllByLabelText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByLabelText,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'label with the text of: $valueNotFoundPlaceholder',
@@ -201,17 +228,28 @@ void hasQueriesScopedTo(
         'PlaceholderText',
         textMatchArgName: 'text',
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByPlaceholderText': () => renderAndGetQueries().queryByPlaceholderText,
-          'queryAllByPlaceholderText': () => renderAndGetQueries().queryAllByPlaceholderText,
+        scopedQueryQueriesByName: {
+          'queryByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .queryByPlaceholderText,
+          'queryAllByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .queryAllByPlaceholderText,
         },
-        getQueriesByName: {
-          'getByPlaceholderText': () => renderAndGetQueries().getByPlaceholderText,
-          'getAllByPlaceholderText': () => renderAndGetQueries().getAllByPlaceholderText,
+        scopedGetQueriesByName: {
+          'getByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByPlaceholderText,
+          'getAllByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .getAllByPlaceholderText,
         },
-        findQueriesByName: {
-          'findByPlaceholderText': () => renderAndGetQueries(testAsyncQuery: true).findByPlaceholderText,
-          'findAllByPlaceholderText': () => renderAndGetQueries(testAsyncQuery: true).findAllByPlaceholderText,
+        scopedFindQueriesByName: {
+          'findByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByPlaceholderText,
+          'findAllByPlaceholderText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByPlaceholderText,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'placeholder text of: $valueNotFoundPlaceholder',
@@ -222,17 +260,25 @@ void hasQueriesScopedTo(
         textMatchArgName: 'role',
         textMatchArgSupportsFuzzyMatching: false, // exact = false is not supported by role queries
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByRole': () => renderAndGetQueries().queryByRole,
-          'queryAllByRole': () => renderAndGetQueries().queryAllByRole,
+        scopedQueryQueriesByName: {
+          'queryByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByRole,
+          'queryAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByRole,
         },
-        getQueriesByName: {
-          'getByRole': () => renderAndGetQueries().getByRole,
-          'getAllByRole': () => renderAndGetQueries().getAllByRole,
+        scopedGetQueriesByName: {
+          'getByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByRole,
+          'getAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByRole,
         },
-        findQueriesByName: {
-          'findByRole': () => renderAndGetQueries(testAsyncQuery: true).findByRole,
-          'findAllByRole': () => renderAndGetQueries(testAsyncQuery: true).findAllByRole,
+        scopedFindQueriesByName: {
+          'findByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByRole,
+          'findAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByRole,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'with the role "$valueNotFoundPlaceholder"',
@@ -243,20 +289,112 @@ void hasQueriesScopedTo(
         textMatchArgName: 'name',
         textMatchArgSupportsFuzzyMatching: false, // exact = false is not supported by role queries
         queryShouldMatchOn: scopeName,
-        queryQueriesByName: {
-          'queryByRole': () => renderAndGetQueries().queryByRole,
-          'queryAllByRole': () => renderAndGetQueries().queryAllByRole,
+        scopedQueryQueriesByName: {
+          'queryByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByRole,
+          'queryAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByRole,
         },
-        getQueriesByName: {
-          'getByRole': () => renderAndGetQueries().getByRole,
-          'getAllByRole': () => renderAndGetQueries().getAllByRole,
+        scopedGetQueriesByName: {
+          'getByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByRole,
+          'getAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByRole,
         },
-        findQueriesByName: {
-          'findByRole': () => renderAndGetQueries(testAsyncQuery: true).findByRole,
-          'findAllByRole': () => renderAndGetQueries(testAsyncQuery: true).findAllByRole,
+        scopedFindQueriesByName: {
+          'findByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByRole,
+          'findAllByRole': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByRole,
         },
         getExpectedPrettyDom: () => expectedPrettyDom,
         failureSnapshotPattern: 'with the role "$validRoleInDom" and name "$valueNotFoundPlaceholder"',
+      );
+
+      testTextMatchTypes(
+        'TestId',
+        textMatchArgName: 'testId',
+        queryShouldMatchOn: scopeName,
+        scopedQueryQueriesByName: {
+          'queryByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByTestId,
+          'queryAllByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByTestId,
+        },
+        scopedGetQueriesByName: {
+          'getByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByTestId,
+          'getAllByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByTestId,
+        },
+        scopedFindQueriesByName: {
+          'findByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByTestId,
+          'findAllByTestId': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByTestId,
+        },
+        getExpectedPrettyDom: () => expectedPrettyDom,
+        failureSnapshotPattern: 'an element by: [data-test-id="$valueNotFoundPlaceholder"]',
+      );
+
+      testTextMatchTypes(
+        'Text',
+        textMatchArgName: 'text',
+        queryShouldMatchOn: '$scopeName single byText match',
+        scopedQueryQueriesByName: {
+          'queryByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByText,
+          'queryAllByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByText,
+        },
+        scopedGetQueriesByName: {
+          'getByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByText,
+          'getAllByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByText,
+        },
+        scopedFindQueriesByName: {
+          'findByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByText,
+          'findAllByText': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByText,
+        },
+        getExpectedPrettyDom: () => expectedPrettyDom,
+        failureSnapshotPattern: 'an element with the text: $valueNotFoundPlaceholder',
+      );
+
+      testTextMatchTypes(
+        'Title',
+        textMatchArgName: 'title',
+        queryShouldMatchOn: scopeName,
+        scopedQueryQueriesByName: {
+          'queryByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryByTitle,
+          'queryAllByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).queryAllByTitle,
+        },
+        scopedGetQueriesByName: {
+          'getByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getByTitle,
+          'getAllByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery).getAllByTitle,
+        },
+        scopedFindQueriesByName: {
+          'findByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findByTitle,
+          'findAllByTitle': ({bool renderMultipleElsMatchingQuery}) =>
+              renderAndGetQueries(testAsyncQuery: true, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery)
+                  .findAllByTitle,
+        },
+        getExpectedPrettyDom: () => expectedPrettyDom,
+        failureSnapshotPattern: 'title: $valueNotFoundPlaceholder',
       );
     });
 

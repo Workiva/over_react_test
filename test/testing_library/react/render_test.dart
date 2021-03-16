@@ -27,10 +27,15 @@ main() {
       });
 
       group('that contains queries scoped to', () {
-        hasQueriesScopedTo('RenderResult.container', (scopeName, {bool testAsyncQuery = false}) {
-          final els =
-              testAsyncQuery ? DelayedRenderOf()(elementsForQuerying(scopeName)) : elementsForQuerying(scopeName);
-          return rtl.render(els);
+        hasQueriesScopedTo('RenderResult.container', (
+          scopeName, {
+          bool testAsyncQuery = false,
+          bool renderMultipleElsMatchingQuery,
+        }) {
+          final elsForQuerying =
+              elementsForQuerying(scopeName, renderMultipleElsMatchingQuery: renderMultipleElsMatchingQuery);
+          final els = testAsyncQuery ? DelayedRenderOf()(elsForQuerying) : elsForQuerying;
+          return ScopedQueriesTestWrapper(rtl.render(els));
         });
       });
     });
