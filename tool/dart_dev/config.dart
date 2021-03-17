@@ -1,3 +1,4 @@
+// @dart = 2.7
 import 'package:dart_dev/dart_dev.dart';
 import 'package:glob/glob.dart';
 

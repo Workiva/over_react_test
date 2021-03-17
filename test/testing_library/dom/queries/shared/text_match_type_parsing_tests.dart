@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'dart:html';
 
 import 'package:meta/meta.dart';

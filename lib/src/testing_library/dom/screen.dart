@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'dart:html' show document;
 
 import 'package:over_react_test/src/testing_library/dom/within.dart' show within;

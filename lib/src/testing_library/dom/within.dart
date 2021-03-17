@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'dart:html' show document, Element;
 
 import 'package:over_react/over_react.dart';

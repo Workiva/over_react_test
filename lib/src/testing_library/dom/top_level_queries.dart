@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'dart:html' show Element, ImageElement, InputElement, LabelElement, SelectElement, TextAreaElement;
 
 import 'package:over_react_test/src/testing_library/dom/async/types.dart'

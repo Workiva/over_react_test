@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'dart:html' show Element;
 import 'dart:js' show allowInterop;
 

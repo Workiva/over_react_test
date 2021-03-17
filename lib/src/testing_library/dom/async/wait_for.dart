@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 /// https://testing-library.com/docs/dom-testing-library/api-async/#waitfor
 @JS()
 library over_react_test.src.testing_library.dom.async.wait_for;

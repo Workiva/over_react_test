@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 // ignore_for_file: invalid_use_of_protected_member, await_only_futures
 import 'dart:html';
 

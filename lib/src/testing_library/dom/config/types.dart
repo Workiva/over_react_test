@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 @JS()
 library over_react_test.src.testing_library.dom.config.types;
 

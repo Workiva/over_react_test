@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 @TestOn('browser')
 library over_react_test.testing_library_test.react.render_test;
 

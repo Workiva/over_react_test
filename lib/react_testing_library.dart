@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 /// A testing library for OverReact components that mimics the API of
 /// the [JS `react-testing-library` package](https://testing-library.com/docs/react-testing-library/intro)
 @experimental

@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 import 'package:over_react_test/src/testing_library/dom/matches/types.dart';
 import 'package:over_react_test/src/testing_library/util/error_message_utils.dart';
 import 'package:test/test.dart';

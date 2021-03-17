@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 /// https://testing-library.com/docs/react-testing-library/api#render
 @JS()
 library over_react_test.src.testing_library.react.render.render;

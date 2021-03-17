@@ -1,3 +1,5 @@
+// @dart = 2.7
+
 /// https://testing-library.com/docs/queries/bydisplayvalue/
 @JS()
 library over_react_test.src.testing_library.dom.queries.by_display_value;
