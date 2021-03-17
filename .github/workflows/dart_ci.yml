@@ -34,10 +34,18 @@ jobs:
         run: pub run dart_dev analyze
         if: always() && ${{ matrix.sdk == '2.8.4' }} && steps.install.outcome == 'success'
 
-      - name: Run tests (DDC)
-        run: pub run dart_dev test
+      - name: Run over_react_test tests (DDC)
+        run: pub run dart_dev test test/over_react_test.dart
         if: always() && steps.install.outcome == 'success'
 
-      - name: Run tests (dart2js)
-        run: pub run dart_dev test --build-args="-r"
+      - name: Run over_react_test tests (dart2js)
+        run: pub run dart_dev test test/over_react_test.dart --build-args="-r"
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Run react_testing_library tests (DDC)
+        run: pub run dart_dev test test/react_testing_library_test.dart
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Run react_testing_library tests (dart2js)
+        run: pub run dart_dev test test/react_testing_library_test.dart --build-args="-r"
         if: always() && steps.install.outcome == 'success'
