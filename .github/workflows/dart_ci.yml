@@ -28,24 +28,23 @@ jobs:
 
       - name: Validate dependencies
         run: pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers,pedantic
-        if: steps.install.outcome == 'success'
 
-      - name: Analyze project source
+      - name: Analyze project source (ddev analyze)
         run: pub run build_runner build && pub run dart_dev analyze
-        if: ${{ matrix.sdk == '2.8.4' }} && steps.install.outcome == 'success'
+        if: ${{ matrix.sdk == '2.8.4' }}
+
+      - name: Analyze project source (dart analyze)
+        run: pub run build_runner build && dart analyze
+        if: ${{ matrix.sdk != '2.8.4' }}
 
       - name: Run over_react_test tests (DDC)
         run: pub run dart_dev test test/over_react_test.dart
-        if: steps.install.outcome == 'success'
 
       - name: Run over_react_test tests (dart2js)
         run: pub run dart_dev test test/over_react_test.dart --build-args="-r"
-        if: steps.install.outcome == 'success'
 
       - name: Run react_testing_library tests (DDC)
         run: pub run dart_dev test test/react_testing_library_test.dart
-        if: steps.install.outcome == 'success'
 
       - name: Run react_testing_library tests (dart2js)
         run: pub run dart_dev test test/react_testing_library_test.dart --build-args="-r"
-        if: steps.install.outcome == 'success'
