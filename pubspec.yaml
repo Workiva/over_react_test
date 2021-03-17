@@ -29,10 +29,8 @@ transformers:
 
 
 dependency_overrides:
-#  react:
-#    git:
-#      url: https://github.com/workiva/react-dart.git
-#      ref: react-testing-library
   react:
-    path: /Users/aaronlademann/.publink/react
+    git:
+      url: https://github.com/workiva/react-dart.git
+      ref: react-testing-library
 
