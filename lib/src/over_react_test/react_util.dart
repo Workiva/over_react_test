@@ -446,7 +446,7 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 2}) {
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 1}) {
   var results = _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
   return results == null || results.isEmpty ? null : results.first;
 }
@@ -482,24 +482,26 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 2}) {
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 1}) {
   return _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
 }
 
-List<Element> _findAllDeep(dynamic parent, String itemSelector, List<String>shadowSelectors, {int depth = 2}) {
+List<Element> _findAllDeep(dynamic parent, String itemSelector, List<String>shadowSelectors, {int depth = 1}) {
   List<Element> nodes = [];
-  var currentDepth = 1;
+  var currentDepth = 0;
   shadowSelectors ??= [];
-  depth ??= 2;
+  depth ??= 1;
   void recursiveSeek(dynamic _parent) {
     // save the found nodes and keep moving
-    var foundShadows = _parent.querySelectorAll(shadowSelectors.join(',')).map((el) => el.shadowRoot).toList();
     var foundItems = _parent.querySelectorAll(itemSelector);
     nodes = [...nodes, ...foundItems];
     // now loop of each of the found see if we can sniff out more slots
-    if (depth != null && currentDepth < depth && foundShadows.isNotEmpty) {
-      currentDepth++;
-      foundShadows.forEach(recursiveSeek);
+    if (depth != null && currentDepth < depth && shadowSelectors.isNotEmpty) {
+      var foundShadows = _parent.querySelectorAll(shadowSelectors.join(',')).map((el) => el.shadowRoot).toList();
+      if (foundShadows.isNotEmpty) {
+        foundShadows.forEach(recursiveSeek);
+        currentDepth++;
+      }
     }
   }
   recursiveSeek(parent);
