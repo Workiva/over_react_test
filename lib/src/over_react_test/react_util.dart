@@ -446,8 +446,9 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
-  return findDomNode(root).querySelector('[$key~="$value"]');
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 2}) {
+  var results = _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
+  return results == null || results.isEmpty ? null : results.first;
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
@@ -481,8 +482,28 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
-  return findDomNode(root).querySelectorAll('[$key~="$value"]');
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 2}) {
+  return _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
+}
+
+List<Element> _findAllDeep(dynamic parent, String itemSelector, List<String>shadowSelectors, {int depth = 2}) {
+  List<Element> nodes = [];
+  var currentDepth = 1;
+  shadowSelectors ??= [];
+  depth ??= 2;
+  void recursiveSeek(dynamic _parent) {
+    // save the found nodes and keep moving
+    var foundShadows = _parent.querySelectorAll(shadowSelectors.join(',')).map((el) => el.shadowRoot).toList();
+    var foundItems = _parent.querySelectorAll(itemSelector);
+    nodes = [...nodes, ...foundItems];
+    // now loop of each of the found see if we can sniff out more slots
+    if (depth != null && currentDepth < depth && foundShadows.isNotEmpty) {
+      currentDepth++;
+      foundShadows.forEach(recursiveSeek);
+    }
+  }
+  recursiveSeek(parent);
+  return nodes;
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
