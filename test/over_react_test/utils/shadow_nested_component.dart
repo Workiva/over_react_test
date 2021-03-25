@@ -56,7 +56,6 @@ UiFactory<UiProps> DeeplyShadowNested = uiFunction(
       render((Dom.div()
         ..addUnconsumedDomProps(props, {})
         ..addTestId('deeplyNested')
-        ..addTestId('deepestNested')
       )(), level3Div);
     }, [firstShadowDivRef.current]);
 

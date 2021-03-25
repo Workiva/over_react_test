@@ -446,8 +446,8 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false}) {
-  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false);
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth = 1}) {
+  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
@@ -504,8 +504,8 @@ dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSele
     if (depth != null && currentDepth < depth && searchInShadowDom == true) {
       var foundShadows = _root.querySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
-        foundShadows.forEach(recursiveSeek);
         currentDepth++;
+        foundShadows.forEach(recursiveSeek);
       }
     }
   }
