@@ -1,4 +1,4 @@
-// Copyright 2017 Workiva Inc.
+// Copyright 2021 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,5 +62,5 @@ UiFactory<UiProps> DeeplyShadowNested = uiFunction(
 
     return (Dom.div()..addTestId('firstShadow')..ref = firstShadowDivRef)();
   },
-  UiFactoryConfig(displayName: 'ShadowNested'), // ignore: undefined_identifier
+  UiFactoryConfig(displayName: 'DeeplyShadowNested'), // ignore: undefined_identifier
 );

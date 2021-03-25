@@ -482,7 +482,7 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
 List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth = 1}) {
-  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true);
+  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
 }
 
 String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
