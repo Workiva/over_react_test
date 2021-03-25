@@ -446,7 +446,7 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth = 1}) {
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
   return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
 }
 
@@ -481,16 +481,15 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth = 1}) {
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
   return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
 }
 
 String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
 
-dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth = 1}) {
+dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
   List<Element> nodes = [];
   var currentDepth = 0;
-  depth ??= 1;
   var lightElement = root.querySelector(itemSelector);
   if (!findMany && lightElement != null){
     return lightElement;
@@ -501,7 +500,7 @@ dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSele
       return;
     }
     // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
-    if (depth != null && currentDepth < depth && searchInShadowDom == true) {
+    if (depth == null || (depth != null && currentDepth < depth && searchInShadowDom == true)) {
       var foundShadows = _root.querySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
         currentDepth++;

@@ -836,6 +836,18 @@ main() {
 
           expect(queryAllByTestId(jacket.mountNode, 'deeplyNested', searchInShadowDom: true), [level2deeplyNested, level3deeplyNested]);
         });
+
+        test('and will stop looking at the `shadowDepth` specified', () async {
+          var jacket = mount(DeeplyShadowNested()());
+
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          var firstShadow = jacket.mountNode.querySelector('[data-test-id~="firstShadow"]');
+          var level2deeplyNested = firstShadow.shadowRoot.children.first.querySelector('[data-test-id~="deeplyNested"]');
+
+          expect(queryAllByTestId(jacket.mountNode, 'deeplyNested', searchInShadowDom: true, shadowDepth: 1), [level2deeplyNested]);
+        });
       });
     });
 
