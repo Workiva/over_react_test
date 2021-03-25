@@ -22,6 +22,7 @@ import 'package:test/test.dart';
 
 import 'helper_components/sample_function_component.dart';
 import 'utils/nested_component.dart';
+import 'utils/shadow_nested_component.dart';
 
 part 'react_util_test.over_react.g.dart';
 
@@ -744,39 +745,74 @@ main() {
       });
     });
 
-    group('queryByTestId returns the topmost Element that has the appropriate value for the', () {
-      group('`data-test-id` html attribute key', () {
-        test('', () {
-          var renderedInstance = render((Nested()..addTestId('value'))());
-          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+    group('queryByTestId returns the topmost Element', () {
+      group('that has the appropriate value for the', () {
+        group('`data-test-id` html attribute key', () {
+          test('', () {
+            var renderedInstance = render((Nested()..addTestId('value'))());
+            var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
 
-          expect(queryByTestId(renderedInstance, 'value'), innerNode);
+            expect(queryByTestId(renderedInstance, 'value'), innerNode);
+          });
+
+          test('expect when no matching element exists', () {
+            var renderedInstance = render(Dom.div()());
+
+            expect(queryByTestId(renderedInstance, 'value'), isNull);
+          });
         });
 
-        test('expect when no matching element exists', () {
+        test('custom html attribute key', () {
+          var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
+          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+
+          expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
+        });
+
+        test('`data-test-id` html attribute, expect when no matching element exists', () {
           var renderedInstance = render(Dom.div()());
 
           expect(queryByTestId(renderedInstance, 'value'), isNull);
         });
       });
 
-      test('custom html attribute key', () {
-        var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
-        var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+      group('from within a ShadowRoot when `searchInShadowDom` is `true`', () {
+        test('', () async {
+          var jacket = mount(ShadowNested()());
 
-        expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          var shadowNode = jacket.mountNode.querySelector('[data-test-id~="shadow"]');
+          var innerNode = shadowNode.shadowRoot.querySelector('[data-test-id~="inner"]');
+
+          expect(queryByTestId(jacket.mountNode, 'inner', searchInShadowDom: true), innerNode);
+        });
       });
 
-      test('`data-test-id` html attribute, expect when no matching element exists', () {
-        var renderedInstance = render(Dom.div()());
-
-        expect(queryByTestId(renderedInstance, 'value'), isNull);
-      });
     });
 
-    group('queryAllByTestId returns all Elements that have the appropriate value for the', () {
-      group('`data-test-id` html attribute key', () {
-        test('', () {
+    group('queryAllByTestId returns all Elements', () {
+      group('that have the appropriate value for the', () {
+        group('`data-test-id` html attribute key', () {
+          test('', () {
+            var renderedInstance = render(Wrapper()(
+              (Nested()..addTestId('value'))(),
+              (Nested()..addTestId('value'))(),
+            ));
+            var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+
+            expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
+          });
+
+          test('expect when no matching element exists', () {
+            var renderedInstance = render(Dom.div()());
+
+            expect(queryAllByTestId(renderedInstance, 'value'), isEmpty);
+          });
+        });
+
+        test('custom html attribute key', () {
           var renderedInstance = render(Wrapper()(
             (Nested()..addTestId('value'))(),
             (Nested()..addTestId('value'))(),
@@ -785,22 +821,21 @@ main() {
 
           expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
         });
-
-        test('expect when no matching element exists', () {
-          var renderedInstance = render(Dom.div()());
-
-          expect(queryAllByTestId(renderedInstance, 'value'), isEmpty);
-        });
       });
 
-      test('custom html attribute key', () {
-        var renderedInstance = render(Wrapper()(
-          (Nested()..addTestId('value'))(),
-          (Nested()..addTestId('value'))(),
-        ));
-        var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+      group('from multiple layers within nested ShadowRoots when `searchInShadowDom` is `true`', () {
+        test('', () async {
+          var jacket = mount(DeeplyShadowNested()());
 
-        expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          var firstShadow = jacket.mountNode.querySelector('[data-test-id~="firstShadow"]');
+          var level2deeplyNested = firstShadow.shadowRoot.children.first.querySelector('[data-test-id~="deeplyNested"]');
+          var level3deeplyNested = firstShadow.shadowRoot.children.first.children.first.shadowRoot.querySelector('[data-test-id~="deeplyNested"]');
+
+          expect(queryAllByTestId(jacket.mountNode, 'deeplyNested', searchInShadowDom: true), [level2deeplyNested, level3deeplyNested]);
+        });
       });
     });
 

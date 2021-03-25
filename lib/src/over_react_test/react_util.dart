@@ -446,9 +446,8 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 1}) {
-  var results = _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
-  return results == null || results.isEmpty ? null : results.first;
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false}) {
+  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false);
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
@@ -482,30 +481,36 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, List<String> shadowSelectors = const [], int shadowDepth = 1}) {
-  return _findAllDeep(findDomNode(root), '[$key~="$value"]', shadowSelectors, depth: shadowDepth);
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth = 1}) {
+  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true);
 }
 
-List<Element> _findAllDeep(dynamic parent, String itemSelector, List<String>shadowSelectors, {int depth = 1}) {
+String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
+
+dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth = 1}) {
   List<Element> nodes = [];
   var currentDepth = 0;
-  shadowSelectors ??= [];
   depth ??= 1;
-  void recursiveSeek(dynamic _parent) {
-    // save the found nodes and keep moving
-    var foundItems = _parent.querySelectorAll(itemSelector);
-    nodes = [...nodes, ...foundItems];
-    // now loop of each of the found see if we can sniff out more slots
-    if (depth != null && currentDepth < depth && shadowSelectors.isNotEmpty) {
-      var foundShadows = _parent.querySelectorAll(shadowSelectors.join(',')).map((el) => el.shadowRoot).toList();
+  var lightElement = root.querySelector(itemSelector);
+  if (!findMany && lightElement != null){
+    return lightElement;
+  }
+  void recursiveSeek(dynamic _root) {
+    nodes = [...nodes, ..._root.querySelectorAll(itemSelector)];
+    if (!findMany && nodes.isNotEmpty) {
+      return;
+    }
+    // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
+    if (depth != null && currentDepth < depth && searchInShadowDom == true) {
+      var foundShadows = _root.querySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
         foundShadows.forEach(recursiveSeek);
         currentDepth++;
       }
     }
   }
-  recursiveSeek(parent);
-  return nodes;
+  recursiveSeek(root);
+  return findMany ? nodes : nodes.isNotEmpty ? nodes.first : null;
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
