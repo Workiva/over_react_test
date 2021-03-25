@@ -789,6 +789,19 @@ main() {
           expect(queryByTestId(jacket.mountNode, 'inner', searchInShadowDom: true), innerNode);
         });
       });
+      group('excluding when within a ShadowRoot when `searchInShadowDom` is `false`', () {
+        test('', () async {
+          var jacket = mount(ShadowNested()());
+
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          var shadowNode = jacket.mountNode.querySelector('[data-test-id~="shadow"]');
+          var innerNode = shadowNode.shadowRoot.querySelector('[data-test-id~="inner"]');
+
+          expect(queryByTestId(jacket.mountNode, 'inner', searchInShadowDom: false), isNull);
+        });
+      });
 
     });
 

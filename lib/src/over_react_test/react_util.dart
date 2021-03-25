@@ -500,7 +500,7 @@ dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSele
       return;
     }
     // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
-    if (depth == null || (depth != null && currentDepth < depth && searchInShadowDom == true)) {
+    if ((depth == null || (depth != null && currentDepth < depth)) && searchInShadowDom == true) {
       var foundShadows = _root.querySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
         currentDepth++;
