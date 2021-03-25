@@ -59,7 +59,10 @@ UiFactory<UiProps> DeeplyShadowNested = uiFunction(
       )(), level3Div);
     }, [firstShadowDivRef.current]);
 
-    return (Dom.div()..addTestId('firstShadow')..ref = firstShadowDivRef)();
+    return (Dom.div()
+      ..addTestId('firstShadow')
+      ..ref = firstShadowDivRef
+    )();
   },
   UiFactoryConfig(displayName: 'DeeplyShadowNested'), // ignore: undefined_identifier
 );
