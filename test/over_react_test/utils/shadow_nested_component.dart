@@ -37,7 +37,6 @@ UiFactory<UiProps> ShadowNested = uiFunction(
 
 UiFactory<UiProps> DeeplyShadowNested = uiFunction(
   (props) {
-    enableTestMode();
     final firstShadowDivRef = useRef<DivElement>();
 
     useEffect(() {
