@@ -787,7 +787,7 @@ main() {
             )());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
-          await Future.delayed(const Duration(milliseconds: 500));
+          await pumpEventQueue();
 
           var innerNode = shadowHostRef.current.shadowRoot.querySelector('[data-test-id~="$searchId"]');
 
@@ -805,7 +805,7 @@ main() {
             )());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
-          await Future.delayed(const Duration(milliseconds: 500));
+          await pumpEventQueue();
 
           expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: false), isNull);
         });
@@ -880,7 +880,7 @@ main() {
           );
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
-          await Future.delayed(const Duration(milliseconds: 500));
+          await pumpEventQueue();
 
           var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
           var level2 = shadow2Ref.current.shadowRoot.querySelector('.div2');
@@ -921,7 +921,7 @@ main() {
           );
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
-          await Future.delayed(const Duration(milliseconds: 500));
+          await pumpEventQueue();
 
           var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
 
