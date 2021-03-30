@@ -16,6 +16,7 @@
 library over_react_test.react_util;
 
 import 'dart:collection';
+import 'dart:developer';
 import 'dart:html';
 
 import 'package:js/js.dart';
@@ -504,9 +505,8 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
     return [lightElement];
   }
   void recursiveSeek(Node _root, int _currentDepth) {
-
-    final rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
-    nodes.addAll(List<Element>.from(rootQuerySelectorAll(itemSelector).toList()));
+    final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
+    nodes.addAll(rootQuerySelectorAll(itemSelector).toList());
     if (!findMany && nodes.isNotEmpty) {
       return;
     }
@@ -514,12 +514,11 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
     if (searchInShadowDom && (depth == null || _currentDepth <= depth)) {
       var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
-
         foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
       }
     }
   }
-  recursiveSeek(root, 0);
+  recursiveSeek(root, 1);
   return nodes;
 }
 

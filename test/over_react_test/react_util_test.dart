@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:developer';
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';
@@ -778,28 +779,35 @@ main() {
 
       group('from within a ShadowRoot when `searchInShadowDom` is `true`', () {
         test('', () async {
-          var jacket = mount(ShadowNested()());
+          final searchId = 'inner';
+          final shadowHostRef = createRef<DivElement>();
+          var jacket = mount((ShadowNested()
+              ..shadowRootFirstChildTestId = searchId
+              ..shadowRootHostRef = shadowHostRef
+            )());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await Future.delayed(const Duration(milliseconds: 500));
 
-          var shadowNode = jacket.mountNode.querySelector('[data-test-id~="shadow"]');
-          var innerNode = shadowNode.shadowRoot.querySelector('[data-test-id~="inner"]');
+          var innerNode = shadowHostRef.current.shadowRoot.querySelector('[data-test-id~="$searchId"]');
 
-          expect(queryByTestId(jacket.mountNode, 'inner', searchInShadowDom: true), innerNode);
+          expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: true), innerNode);
         });
       });
+
       group('excluding when within a ShadowRoot when `searchInShadowDom` is `false`', () {
         test('', () async {
-          var jacket = mount(ShadowNested()());
+          final searchId = 'inner';
+          final shadowHostRef = createRef<DivElement>();
+          var jacket = mount((ShadowNested()
+              ..shadowRootFirstChildTestId = searchId
+              ..shadowRootHostRef = shadowHostRef
+            )());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await Future.delayed(const Duration(milliseconds: 500));
 
-          var shadowNode = jacket.mountNode.querySelector('[data-test-id~="shadow"]');
-          var innerNode = shadowNode.shadowRoot.querySelector('[data-test-id~="inner"]');
-
-          expect(queryByTestId(jacket.mountNode, 'inner', searchInShadowDom: false), isNull);
+          expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: false), isNull);
         });
       });
 
@@ -838,28 +846,86 @@ main() {
 
       group('from multiple layers within nested ShadowRoots when `searchInShadowDom` is `true`', () {
         test('', () async {
-          var jacket = mount(DeeplyShadowNested()());
+          var shadow1Ref = createRef<DivElement>();
+          var shadow2Ref = createRef<DivElement>();
+          var shadow3Ref = createRef<DivElement>();
+          var jacket = mount(
+            (ShadowNested()
+              ..shadowRootHostTestId = 'shadow1'
+              ..shadowRootHostRef = shadow1Ref
+            )(
+              (Dom.div()
+                ..addTestId('findMe')
+                ..className = 'div1'
+              )(),
+              (ShadowNested()
+                ..shadowRootHostTestId = 'shadow2'
+                ..shadowRootHostRef = shadow2Ref
+              )(
+                (Dom.div()
+                  ..addTestId('findMe')
+                  ..className = 'div2'
+                )(),
+                (ShadowNested()
+                  ..shadowRootHostTestId = 'shadow3'
+                  ..shadowRootHostRef = shadow3Ref
+                )(
+                  (Dom.div()
+                    ..addTestId('findMe')
+                    ..className = 'div3'
+                  )(),
+                ),
+              ),
+            ),
+          );
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await Future.delayed(const Duration(milliseconds: 500));
 
-          var firstShadow = jacket.mountNode.querySelector('[data-test-id~="firstShadow"]');
-          var level2deeplyNested = firstShadow.shadowRoot.children.first.querySelector('[data-test-id~="deeplyNested"]');
-          var level3deeplyNested = firstShadow.shadowRoot.children.first.children.first.shadowRoot.querySelector('[data-test-id~="deeplyNested"]');
+          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
+          var level2 = shadow2Ref.current.shadowRoot.querySelector('.div2');
+          var level3 = shadow3Ref.current.shadowRoot.querySelector('.div3');
 
-          expect(queryAllByTestId(jacket.mountNode, 'deeplyNested', searchInShadowDom: true), [level2deeplyNested, level3deeplyNested]);
+          expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true), [level1, level2, level3]);
         });
 
         test('and will stop looking at the `shadowDepth` specified', () async {
-          var jacket = mount(DeeplyShadowNested()());
+          var shadow1Ref = createRef<DivElement>();
+          var shadow2Ref = createRef<DivElement>();
+          var shadow3Ref = createRef<DivElement>();
+          var jacket = mount(
+            (ShadowNested()
+              ..shadowRootHostRef = shadow1Ref
+            )(
+              (Dom.div()
+                  ..addTestId('findMe')
+                  ..className = 'div1'
+                )(),
+              (ShadowNested()
+                ..shadowRootHostRef = shadow2Ref
+              )(
+                (Dom.div()
+                  ..addTestId('findMe')
+                  ..className = 'div2'
+                )(),
+                (ShadowNested()
+                  ..shadowRootHostRef = shadow3Ref
+                )(
+                  (Dom.div()
+                    ..addTestId('findMe')
+                    ..className = 'div2'
+                  )(),
+                ),
+              ),
+            ),
+          );
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await Future.delayed(const Duration(milliseconds: 500));
 
-          var firstShadow = jacket.mountNode.querySelector('[data-test-id~="firstShadow"]');
-          var level2deeplyNested = firstShadow.shadowRoot.children.first.querySelector('[data-test-id~="deeplyNested"]');
+          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
 
-          expect(queryAllByTestId(jacket.mountNode, 'deeplyNested', searchInShadowDom: true, shadowDepth: 1), [level2deeplyNested]);
+          expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
         });
       });
     });

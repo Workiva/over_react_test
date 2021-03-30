@@ -17,56 +17,27 @@ import 'dart:html';
 import 'package:over_react/over_react.dart';
 import 'package:over_react/react_dom.dart';
 
+part 'shadow_nested_component.over_react.g.dart';
 
+mixin ShadowNestedProps on UiProps {
+  String shadowRootHostTestId;
+  String shadowRootFirstChildTestId;
+  Ref shadowRootHostRef;
+}
 
-UiFactory<UiProps> ShadowNested = uiFunction(
+UiFactory<ShadowNestedProps> ShadowNested = uiFunction(
   (props) {
-    final divRef = useRef<DivElement>();
+    final divRef = props.shadowRootHostRef ?? useRef<DivElement>();
 
     useEffect(() {
       if (divRef.current.shadowRoot == null) {
-        var inner = DivElement();
-        divRef.current.attachShadow({'mode':'open'}).append(inner);
-        render((Dom.div()
-          ..addTestId('inner')
-        )(), inner);
+        var shadowRootFirstChild = DivElement()..dataset['test-id'] = props.shadowRootFirstChildTestId ?? 'shadowRootFirstChild';
+        divRef.current.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
+        render(Fragment()(props.children), shadowRootFirstChild);
       }
-    });
+    }, [props]);
 
-    return (Dom.div()..addTestId('shadow')..ref = divRef)();
+    return (Dom.div()..addTestId(props.shadowRootHostTestId ?? 'shadowRootHost')..ref = divRef)();
   },
-  UiFactoryConfig(displayName: 'ShadowNested'), // ignore: undefined_identifier
-);
-
-UiFactory<UiProps> DeeplyShadowNested = uiFunction(
-  (props) {
-    final firstShadowDivRef = useRef<DivElement>();
-
-    useEffect(() {
-      if (firstShadowDivRef.current.shadowRoot == null) {
-        var level1Div = DivElement();
-        var level2Div = DivElement();
-        var level2DivSibling = DivElement()..dataset['test-id'] = 'deeplyNested';
-        var level3Div = DivElement();
-        var level0Shadow = firstShadowDivRef.current.attachShadow({'mode':'open'});
-        level0Shadow.append(level1Div);
-
-        level1Div.append(level2Div);
-        level1Div.append(level2DivSibling);
-
-        var level2Shadow = level2Div.attachShadow({'mode':'open'});
-        level2Shadow.append(level3Div);
-
-        render((Dom.div()
-          ..addTestId('deeplyNested')
-        )(), level3Div);
-      }
-    });
-
-    return (Dom.div()
-      ..addTestId('firstShadow')
-      ..ref = firstShadowDivRef
-    )();
-  },
-  UiFactoryConfig(displayName: 'DeeplyShadowNested'), // ignore: undefined_identifier
+  _$ShadowNestedConfig, // ignore: undefined_identifier
 );
