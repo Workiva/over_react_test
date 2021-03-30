@@ -3,7 +3,6 @@ targets:
     builders:
       build_web_compilers|entrypoint:
         generate_for:
-          - web/*.dart
           # Only compile the top-level "aggregate" test runner
           - test/*.browser_test.dart
         options:
