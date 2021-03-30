@@ -1,3 +1,17 @@
+
+import 'dart:html';
+
+import 'package:over_react/over_react.dart';
+import 'package:over_react/react_dom.dart';
+
+
+import 'package:over_react/react_dom.dart';
+
+main() {
+
+  enableTestMode();
+  render(ShadowNested()(), document.querySelector('#output'));
+}
 // Copyright 2021 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +25,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import 'dart:html';
-
-import 'package:over_react/over_react.dart';
-import 'package:over_react/react_dom.dart';
 
 
 

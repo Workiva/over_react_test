@@ -422,6 +422,10 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 /// Returns the [Element] of the first descendant of [root] that has its [key] html attribute value set to a
 /// space-delimited string containing [value].
 ///
+/// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched, by default it will seach infinately deep, this
+/// should only be needed if there is alot of ShadowRoots within ShadowRoots.
+///
 /// __Example:__
 ///
 ///     // Render method for `Test` `UiFactory`:
@@ -447,10 +451,15 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
 Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
-  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
+  var results = _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
+  return results.isNotEmpty ? results.first : null;
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
+///
+/// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched, by default it will seach infinately deep, this
+/// should only be needed if there is alot of ShadowRoots within ShadowRoots.
 ///
 /// __Example:__
 ///
@@ -482,34 +491,36 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
 List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
-  return _findAllDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
+  return _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
 }
 
 String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
 
-dynamic /* Element | List<Element> */ _findAllDeep(Element root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
+List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
   List<Element> nodes = [];
-  var currentDepth = 0;
-  var lightElement = root.querySelector(itemSelector);
+  final rootQuerySelector = root is ShadowRoot ? root.querySelector : root is Element ? root.querySelector : null;
+  var lightElement = rootQuerySelector(itemSelector);
   if (!findMany && lightElement != null){
-    return lightElement;
+    return [lightElement];
   }
-  void recursiveSeek(dynamic _root) {
-    nodes = [...nodes, ..._root.querySelectorAll(itemSelector)];
+  void recursiveSeek(Node _root, int _currentDepth) {
+
+    final rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
+    nodes.addAll(List<Element>.from(rootQuerySelectorAll(itemSelector).toList()));
     if (!findMany && nodes.isNotEmpty) {
       return;
     }
     // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
-    if (searchInShadowDom && (depth == null || currentDepth < depth)) {
-      var foundShadows = _root.querySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
+    if (searchInShadowDom && (depth == null || _currentDepth <= depth)) {
+      var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       if (foundShadows.isNotEmpty) {
-        currentDepth++;
-        foundShadows.forEach(recursiveSeek);
+
+        foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
       }
     }
   }
-  recursiveSeek(root);
-  return findMany ? nodes : nodes.isNotEmpty ? nodes.first : null;
+  recursiveSeek(root, 0);
+  return nodes;
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
