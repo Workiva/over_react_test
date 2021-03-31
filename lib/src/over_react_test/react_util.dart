@@ -499,6 +499,7 @@ String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$
 List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
   List<Element> nodes = [];
   void recursiveSeek(Node _root, int _currentDepth) {
+    // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
     final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
     nodes.addAll(rootQuerySelectorAll(itemSelector));
     if (!findMany && nodes.isNotEmpty) {
