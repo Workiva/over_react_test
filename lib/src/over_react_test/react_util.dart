@@ -498,11 +498,6 @@ String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$
 
 List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
   List<Element> nodes = [];
-  final rootQuerySelector = root is ShadowRoot ? root.querySelector : root is Element ? root.querySelector : null;
-  var lightElement = rootQuerySelector(itemSelector);
-  if (!findMany && lightElement != null){
-    return [lightElement];
-  }
   void recursiveSeek(Node _root, int _currentDepth) {
     final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
     nodes.addAll(rootQuerySelectorAll(itemSelector));
