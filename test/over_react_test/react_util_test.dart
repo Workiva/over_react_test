@@ -783,7 +783,7 @@ main() {
           final shadowHostRef = createRef<DivElement>();
           var jacket = mount((ShadowNested()
               ..shadowRootFirstChildTestId = searchId
-              ..shadowRootHostRef = shadowHostRef
+              ..ref = shadowHostRef
             )());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
@@ -849,7 +849,7 @@ main() {
           var jacket = mount(
             (ShadowNested()
               ..shadowRootHostTestId = 'shadow1'
-              ..shadowRootHostRef = shadow1Ref
+              ..ref = shadow1Ref
             )(
               (Dom.div()
                 ..addTestId('findMe')
@@ -857,7 +857,7 @@ main() {
               )(),
               (ShadowNested()
                 ..shadowRootHostTestId = 'shadow2'
-                ..shadowRootHostRef = shadow2Ref
+                ..ref = shadow2Ref
               )(
                 (Dom.div()
                   ..addTestId('findMe')
@@ -865,7 +865,7 @@ main() {
                 )(),
                 (ShadowNested()
                   ..shadowRootHostTestId = 'shadow3'
-                  ..shadowRootHostRef = shadow3Ref
+                  ..ref = shadow3Ref
                 )(
                   (Dom.div()
                     ..addTestId('findMe')
@@ -892,21 +892,21 @@ main() {
           var shadow3Ref = createRef<DivElement>();
           var jacket = mount(
             (ShadowNested()
-              ..shadowRootHostRef = shadow1Ref
+              ..ref = shadow1Ref
             )(
               (Dom.div()
                 ..addTestId('findMe')
                 ..className = 'div1'
               )(),
               (ShadowNested()
-                ..shadowRootHostRef = shadow2Ref
+                ..ref = shadow2Ref
               )(
                 (Dom.div()
                   ..addTestId('findMe')
                   ..className = 'div2'
                 )(),
                 (ShadowNested()
-                  ..shadowRootHostRef = shadow3Ref
+                  ..ref = shadow3Ref
                 )(
                   (Dom.div()
                     ..addTestId('findMe')

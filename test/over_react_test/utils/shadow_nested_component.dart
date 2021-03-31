@@ -15,29 +15,27 @@
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';
-import 'package:over_react/react_dom.dart';
+import 'package:over_react/react_dom.dart' as react_dom;
 
 part 'shadow_nested_component.over_react.g.dart';
 
 mixin ShadowNestedProps on UiProps {
   String shadowRootHostTestId;
   String shadowRootFirstChildTestId;
-  Ref shadowRootHostRef;
 }
 
-UiFactory<ShadowNestedProps> ShadowNested = uiFunction(
-  (props) {
-    final divRef = props.shadowRootHostRef ?? useRef<DivElement>();
+UiFactory<ShadowNestedProps> ShadowNested = uiForwardRef(
+  (props, ref) {
+    final divRef = useRef<DivElement>();
 
     useEffect(() {
-      if (divRef.current.shadowRoot == null) {
-        var shadowRootFirstChild = DivElement()..dataset['test-id'] = props.shadowRootFirstChildTestId ?? 'shadowRootFirstChild';
-        divRef.current.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
-        render(Fragment()(props.children), shadowRootFirstChild);
-      }
-    }, [props]);
+	      var shadowRootFirstChild = DivElement()..dataset['test-id'] = props.shadowRootFirstChildTestId ?? 'shadowRootFirstChild';
+	      divRef.current.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
+	      react_dom.render(Fragment()(props.children), shadowRootFirstChild);
+	      return () => react_dom.unmountComponentAtNode(shadowRootFirstChild);
+	    }, []);
 
-    return (Dom.div()..addTestId(props.shadowRootHostTestId ?? 'shadowRootHost')..ref = divRef)();
+    return (Dom.div()..addTestId(props.shadowRootHostTestId ?? 'shadowRootHost')..ref = chainRefs(ref, divRef))();
   },
   _$ShadowNestedConfig, // ignore: undefined_identifier
 );
