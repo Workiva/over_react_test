@@ -505,7 +505,7 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
     if (!findMany && nodes.isNotEmpty) {
       return;
     }
-    // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
+    // This method of finding shadow roots may not be performant, but it's good enough for usage in tests.
     if (searchInShadowDom && (depth == null || _currentDepth < depth)) {
       var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
