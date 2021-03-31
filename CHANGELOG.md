@@ -1,8 +1,12 @@
 # OverReact Test Changelog
 
+## 2.11.0
+
+* Added support for searching within ShadowDOM roots to `queryByTestId` and `queryAllByTestId`.
+
 ## 2.10.2
 
-* Widen over_react and react version constraints in preparation for v4.0.0 and v6.0.0, respectively. 
+* Widen over_react and react version constraints in preparation for v4.0.0 and v6.0.0, respectively.
 
 ## 2.10.1
 
@@ -12,13 +16,13 @@ _Re-tag of 2.10.0 release which was not released correctly_
 
 ## 2.9.6
 * Fix prop forwarding tests false positives
-  
+
   Tests that had `commonComponentTests.getUnconsumedPropKeys()` returning a list of
   keys that included keys within mixins that were actually being consumed by the component
   were not failing as expected.
-  
+
   e.g. this situation should have resulted in test failures, but it did not:
-  
+
   Component's consumedProps:
   ```dart
   @override
@@ -26,15 +30,15 @@ _Re-tag of 2.10.0 release which was not released correctly_
     SomePropsMixin,
   });
   ```
-  
+
   Component's commonComponentTests:
-  ```dart  
+  ```dart
   group('common component tests', () {
     commonComponentTests(ComponentFactory, getUnconsumedProps: (propsMeta) => [
       ...propsMeta.forMixin(SomePropsMixin).keys,
     ]);
   });
-  ``` 
+  ```
 
 ## 2.9.5
 * Add `Object.values` shim for MSIE 11.
@@ -47,10 +51,10 @@ _Re-tag of 2.10.0 release which was not released correctly_
 * Fix typo in `logsPropError` matcher to ensure consumers can easily migrate from `throwsPropError` when appropriate.
 
 ## 2.9.2
-* Move `isComponent2` call inside a `test` block to address consumer issues when the provided factory accesses values that are initialized within `setUp`.  
+* Move `isComponent2` call inside a `test` block to address consumer issues when the provided factory accesses values that are initialized within `setUp`.
 
 ## 2.9.1
-* Move `getPropsMeta` call inside a `test` block to address consumer issues when the provided factory has required props that come from `setUp`-initialized variables.  
+* Move `getPropsMeta` call inside a `test` block to address consumer issues when the provided factory has required props that come from `setUp`-initialized variables.
 
 ## 2.9.0
 * Add Component Version Auto Detection
@@ -64,7 +68,7 @@ _Re-tag of 2.10.0 release which was not released correctly_
 * Add propTypes testing utilities
 
 ## 2.6.0
-* Drop support for React 15 
+* Drop support for React 15
 * Support Component2 in commonComponentTests
 
 ## 2.5.2
