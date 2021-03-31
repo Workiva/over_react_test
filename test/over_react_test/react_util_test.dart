@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'dart:developer';
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';
