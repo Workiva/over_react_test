@@ -22,6 +22,7 @@ import 'package:test/test.dart';
 
 import 'helper_components/sample_function_component.dart';
 import 'utils/nested_component.dart';
+import 'utils/shadow_nested_component.dart';
 
 part 'react_util_test.over_react.g.dart';
 
@@ -744,39 +745,91 @@ main() {
       });
     });
 
-    group('queryByTestId returns the topmost Element that has the appropriate value for the', () {
-      group('`data-test-id` html attribute key', () {
-        test('', () {
-          var renderedInstance = render((Nested()..addTestId('value'))());
-          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+    group('queryByTestId returns the topmost Element', () {
+      group('that has the appropriate value for the', () {
+        group('`data-test-id` html attribute key', () {
+          test('', () {
+            var renderedInstance = render((Nested()..addTestId('value'))());
+            var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
 
-          expect(queryByTestId(renderedInstance, 'value'), innerNode);
+            expect(queryByTestId(renderedInstance, 'value'), innerNode);
+          });
+
+          test('expect when no matching element exists', () {
+            var renderedInstance = render(Dom.div()());
+
+            expect(queryByTestId(renderedInstance, 'value'), isNull);
+          });
         });
 
-        test('expect when no matching element exists', () {
+        test('custom html attribute key', () {
+          var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
+          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+
+          expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
+        });
+
+        test('`data-test-id` html attribute, expect when no matching element exists', () {
           var renderedInstance = render(Dom.div()());
 
           expect(queryByTestId(renderedInstance, 'value'), isNull);
         });
       });
 
-      test('custom html attribute key', () {
-        var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
-        var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+      group('from within a ShadowRoot when `searchInShadowDom` is `true`', () {
+        test('', () async {
+          final searchId = 'inner';
+          final shadowHostRef = createRef<DivElement>();
+          var jacket = mount((ShadowNested()
+              ..shadowRootFirstChildTestId = searchId
+              ..ref = shadowHostRef
+            )());
 
-        expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await pumpEventQueue();
+
+          var innerNode = shadowHostRef.current.shadowRoot.querySelector('[data-test-id~="$searchId"]');
+
+          expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: true), innerNode);
+        });
       });
 
-      test('`data-test-id` html attribute, expect when no matching element exists', () {
-        var renderedInstance = render(Dom.div()());
+      group('excluding when within a ShadowRoot when `searchInShadowDom` is `false`', () {
+        test('', () async {
+          final searchId = 'inner';
 
-        expect(queryByTestId(renderedInstance, 'value'), isNull);
+          var jacket = mount((ShadowNested()..shadowRootFirstChildTestId = searchId)());
+
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await pumpEventQueue();
+
+          expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: false), isNull);
+        });
       });
+
     });
 
-    group('queryAllByTestId returns all Elements that have the appropriate value for the', () {
-      group('`data-test-id` html attribute key', () {
-        test('', () {
+    group('queryAllByTestId returns all Elements', () {
+      group('that have the appropriate value for the', () {
+        group('`data-test-id` html attribute key', () {
+          test('', () {
+            var renderedInstance = render(Wrapper()(
+              (Nested()..addTestId('value'))(),
+              (Nested()..addTestId('value'))(),
+            ));
+            var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+
+            expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
+          });
+
+          test('expect when no matching element exists', () {
+            var renderedInstance = render(Dom.div()());
+
+            expect(queryAllByTestId(renderedInstance, 'value'), isEmpty);
+          });
+        });
+
+        test('custom html attribute key', () {
           var renderedInstance = render(Wrapper()(
             (Nested()..addTestId('value'))(),
             (Nested()..addTestId('value'))(),
@@ -785,22 +838,91 @@ main() {
 
           expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
         });
-
-        test('expect when no matching element exists', () {
-          var renderedInstance = render(Dom.div()());
-
-          expect(queryAllByTestId(renderedInstance, 'value'), isEmpty);
-        });
       });
 
-      test('custom html attribute key', () {
-        var renderedInstance = render(Wrapper()(
-          (Nested()..addTestId('value'))(),
-          (Nested()..addTestId('value'))(),
-        ));
-        var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+      group('from multiple layers within nested ShadowRoots when `searchInShadowDom` is `true`', () {
+        test('', () async {
+          var shadow1Ref = createRef<DivElement>();
+          var shadow2Ref = createRef<DivElement>();
+          var shadow3Ref = createRef<DivElement>();
+          var jacket = mount(
+            (ShadowNested()
+              ..shadowRootHostTestId = 'shadow1'
+              ..ref = shadow1Ref
+            )(
+              (Dom.div()
+                ..addTestId('findMe')
+                ..className = 'div1'
+              )(),
+              (ShadowNested()
+                ..shadowRootHostTestId = 'shadow2'
+                ..ref = shadow2Ref
+              )(
+                (Dom.div()
+                  ..addTestId('findMe')
+                  ..className = 'div2'
+                )(),
+                (ShadowNested()
+                  ..shadowRootHostTestId = 'shadow3'
+                  ..ref = shadow3Ref
+                )(
+                  (Dom.div()
+                    ..addTestId('findMe')
+                    ..className = 'div3'
+                  )(),
+                ),
+              ),
+            ),
+          );
 
-        expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await pumpEventQueue();
+
+          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
+          var level2 = shadow2Ref.current.shadowRoot.querySelector('.div2');
+          var level3 = shadow3Ref.current.shadowRoot.querySelector('.div3');
+
+          expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true), [level1, level2, level3]);
+        });
+
+        test('and will stop looking at the `shadowDepth` specified', () async {
+          var shadow1Ref = createRef<DivElement>();
+          var shadow2Ref = createRef<DivElement>();
+          var shadow3Ref = createRef<DivElement>();
+          var jacket = mount(
+            (ShadowNested()
+              ..ref = shadow1Ref
+            )(
+              (Dom.div()
+                ..addTestId('findMe')
+                ..className = 'div1'
+              )(),
+              (ShadowNested()
+                ..ref = shadow2Ref
+              )(
+                (Dom.div()
+                  ..addTestId('findMe')
+                  ..className = 'div2'
+                )(),
+                (ShadowNested()
+                  ..ref = shadow3Ref
+                )(
+                  (Dom.div()
+                    ..addTestId('findMe')
+                    ..className = 'div2'
+                  )(),
+                ),
+              ),
+            ),
+          );
+
+          // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
+          await pumpEventQueue();
+
+          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
+
+          expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
+        });
       });
     });
 

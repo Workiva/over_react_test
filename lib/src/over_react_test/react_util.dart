@@ -422,6 +422,10 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 /// Returns the [Element] of the first descendant of [root] that has its [key] html attribute value set to a
 /// space-delimited string containing [value].
 ///
+/// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
+/// should only be needed if there are a lot of ShadowRoots within ShadowRoots.
+///
 /// __Example:__
 ///
 ///     // Render method for `Test` `UiFactory`:
@@ -446,11 +450,16 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
-  return findDomNode(root).querySelector('[$key~="$value"]');
+Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
+  var results = _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
+  return results.isNotEmpty ? results.first : null;
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
+///
+/// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
+/// should only be needed if there are a lot of ShadowRoots within ShadowRoots.
 ///
 /// __Example:__
 ///
@@ -481,8 +490,29 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
-  return findDomNode(root).querySelectorAll('[$key~="$value"]');
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int shadowDepth}) {
+  return _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
+}
+
+String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
+
+List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int depth}) {
+  List<Element> nodes = [];
+  void recursiveSeek(Node _root, int _currentDepth) {
+    // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
+    final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
+    nodes.addAll(rootQuerySelectorAll(itemSelector));
+    if (!findMany && nodes.isNotEmpty) {
+      return;
+    }
+    // This method of finding shadow roots may not be performant, but it's good enough for usage in tests.
+    if (searchInShadowDom && (depth == null || _currentDepth < depth)) {
+      var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
+      foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
+    }
+  }
+  recursiveSeek(root, 0);
+  return nodes;
 }
 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
