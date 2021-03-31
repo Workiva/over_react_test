@@ -510,12 +510,12 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
       return;
     }
     // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
-    if (searchInShadowDom && (depth == null || _currentDepth <= depth)) {
+    if (searchInShadowDom && (depth == null || _currentDepth < depth)) {
       var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
       foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
     }
   }
-  recursiveSeek(root, 1);
+  recursiveSeek(root, 0);
   return nodes;
 }
 
