@@ -798,11 +798,8 @@ main() {
       group('excluding when within a ShadowRoot when `searchInShadowDom` is `false`', () {
         test('', () async {
           final searchId = 'inner';
-          final shadowHostRef = createRef<DivElement>();
-          var jacket = mount((ShadowNested()
-              ..shadowRootFirstChildTestId = searchId
-              ..shadowRootHostRef = shadowHostRef
-            )());
+
+          var jacket = mount((ShadowNested()..shadowRootFirstChildTestId = searchId)());
 
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
@@ -898,9 +895,9 @@ main() {
               ..shadowRootHostRef = shadow1Ref
             )(
               (Dom.div()
-                  ..addTestId('findMe')
-                  ..className = 'div1'
-                )(),
+                ..addTestId('findMe')
+                ..className = 'div1'
+              )(),
               (ShadowNested()
                 ..shadowRootHostRef = shadow2Ref
               )(
