@@ -16,7 +16,6 @@
 library over_react_test.react_util;
 
 import 'dart:collection';
-import 'dart:developer';
 import 'dart:html';
 
 import 'package:js/js.dart';
@@ -424,8 +423,8 @@ Element getComponentRootDomByTestId(dynamic root, String value, {String key = de
 /// space-delimited string containing [value].
 ///
 /// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
-/// [shadowDepth] will limit how many layers of ShadowDOM will searched, by default it will seach infinately deep, this
-/// should only be needed if there is alot of ShadowRoots within ShadowRoots.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
+/// should only be needed if there are a lot of ShadowRoots within ShadowRoots.
 ///
 /// __Example:__
 ///
@@ -459,8 +458,8 @@ Element queryByTestId(dynamic root, String value, {String key = defaultTestIdKey
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
 ///
 /// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
-/// [shadowDepth] will limit how many layers of ShadowDOM will searched, by default it will seach infinately deep, this
-/// should only be needed if there is alot of ShadowRoots within ShadowRoots.
+/// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
+/// should only be needed if there are a lot of ShadowRoots within ShadowRoots.
 ///
 /// __Example:__
 ///
@@ -506,16 +505,14 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
   }
   void recursiveSeek(Node _root, int _currentDepth) {
     final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
-    nodes.addAll(rootQuerySelectorAll(itemSelector).toList());
+    nodes.addAll(rootQuerySelectorAll(itemSelector));
     if (!findMany && nodes.isNotEmpty) {
       return;
     }
     // This is kinda gross but I figured this was only ever used in test situations so its probably alright.
     if (searchInShadowDom && (depth == null || _currentDepth <= depth)) {
       var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
-      if (foundShadows.isNotEmpty) {
-        foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
-      }
+      foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot, _currentDepth + 1));
     }
   }
   recursiveSeek(root, 1);
