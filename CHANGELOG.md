@@ -1,5 +1,11 @@
 # OverReact Test Changelog
 
+## 2.11.1
+
+* [Remove deprecated authors field from pubspec.yaml](https://github.com/Workiva/over_react_test/pull/117)
+* [Widen Dependency Ranges Blocking Dart 2.13](https://github.com/Workiva/over_react_test/pull/120)
+* [Switch to Github CI](https://github.com/Workiva/over_react_test/pull/121/commits/14dd95454d3c4f1c087af6ed9b4aeb3b2f0c0b2d)
+
 ## 2.11.0
 
 * Added support for searching within ShadowDOM roots to `queryByTestId` and `queryAllByTestId`.
