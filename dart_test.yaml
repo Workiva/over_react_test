@@ -1,0 +1,5 @@
+platforms:
+  - chrome
+
+paths:
+  - test/over_react_test.dart
