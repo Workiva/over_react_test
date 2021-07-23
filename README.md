@@ -1,8 +1,7 @@
 # OverReact Test
 
 [![Pub](https://img.shields.io/pub/v/over_react_test.svg)](https://pub.dartlang.org/packages/over_react_test)
-[![Build Status](https://travis-ci.org/Workiva/over_react_test.svg?branch=master)](https://travis-ci.org/Workiva/over_react_test)
-[![Test Coverage](https://codecov.io/github/Workiva/over_react_test/coverage.svg?branch=master)](https://codecov.io/github/Workiva/over_react_test?branch=master)
+[![Build Status](https://github.com/Workiva/over_react_test/workflows/Dart%20CI/badge.svg?branch=master)](https://github.com/Workiva/over_react_test/actions?query=workflow%3A%22Dart+CI%22+branch%3Amaster)
 [![Documentation](https://img.shields.io/badge/Documentation-over_react_test-blue.svg)](http://www.dartdocs.org/documentation/over_react_test/latest/)
 
 > A library for testing [OverReact][over-react] components.

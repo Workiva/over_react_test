@@ -1,0 +1,114 @@
+name: Dart CI
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'test_consume_*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [ 2.7.2, stable, dev ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v0.2
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - id: install
+        name: Install dependencies
+        run: pub get --no-precompile
+
+      - name: Validate dependencies
+        run: pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers,meta,pedantic
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Analyze project source
+        run: if [ ${{ matrix.sdk }} = '2.7.2' ]; then pub global activate tuneup && tuneup check --ignore-infos; else dart analyze; fi
+        if: always() && steps.install.outcome == 'success'
+
+  test_ddc:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [ 2.7.2, stable ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v0.2
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - id: install
+        name: Install dependencies
+        run: pub get --no-precompile
+
+      - name: Run tests (DDC)
+        run: pub run build_runner test -- --file-reporter json:reports/${{ matrix.sdk }}/ddc/test-results.json
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Upload Unit Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ steps.install.outcome == 'success' && (success() || failure()) }} # run this step even if previous step failed, but not if it was skipped
+        with:
+          name: ddc-test-results@${{ matrix.sdk }}
+          path: reports/${{ matrix.sdk }}/ddc/test-results.json
+
+      - name: Report Unit Test Results
+        uses: dorny/test-reporter@v1
+        if: ${{ always() && steps.install.outcome == 'success' }}
+        with:
+          name: Unit Test Results (ddc - ${{ matrix.sdk }})
+          path: 'reports/${{ matrix.sdk }}/ddc/test-results.json'
+          reporter: dart-json
+
+  test_dart2js:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [ 2.7.2, stable ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v0.2
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - id: install
+        name: Install dependencies
+        run: pub get --no-precompile
+
+      - name: Run tests (dart2js)
+        run: pub run build_runner test -r -- --file-reporter json:reports/${{ matrix.sdk }}/dart2js/test-results.json
+        if: always() && steps.install.outcome == 'success'
+
+      - name: Upload Unit Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ steps.install.outcome == 'success' && (success() || failure()) }} # run this step even if previous step failed, but not if it was skipped
+        with:
+          name: dart2js-test-results@${{ matrix.sdk }}
+          path: reports/${{ matrix.sdk }}/dart2js/test-results.json
+
+      - name: Report Unit Test Results
+        uses: dorny/test-reporter@v1
+        if: ${{ always() && steps.install.outcome == 'success' }}
+        with:
+          name: Unit Test Results (dart2js - ${{ matrix.sdk }})
+          path: 'reports/${{ matrix.sdk }}/dart2js/test-results.json'
+          reporter: dart-json
