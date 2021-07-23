@@ -19,8 +19,3 @@ dev_dependencies:
   dart_dev: ^2.2.0
   dependency_validator: ^1.4.0
   pedantic: ^1.8.0
-
-transformers:
-  - over_react
-  - test/pub_serve:
-      $include: test/**_test{.*,}.dart
