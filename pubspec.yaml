@@ -5,6 +5,11 @@ homepage: https://github.com/Workiva/over_react_test/
 environment:
   sdk: '>=2.7.0 <3.0.0'
 
+dependency_overrides:
+  over_react:
+    git:
+      url: git@github.com:Workiva/over_react.git
+      ref: conditionallly-unconvert-style-children
 dependencies:
   js: ^0.6.1+1
   matcher: ^0.12.1+4
