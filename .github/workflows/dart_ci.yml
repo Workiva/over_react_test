@@ -30,7 +30,7 @@ jobs:
         run: pub get --no-precompile
 
       - name: Validate dependencies
-        run: pub run dependency_validator -i coverage,build_runner,build_test,build_web_compilers,meta,pedantic
+        run: dart run dependency_validator
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
