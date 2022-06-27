@@ -22,7 +22,7 @@
 2. Run your tests:
 
     ```bash
-    $ pub run test test/your_test_file.dart
+    $ dart run test test/your_test_file.dart
     ```
 
 

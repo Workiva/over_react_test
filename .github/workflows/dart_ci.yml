@@ -27,17 +27,21 @@ jobs:
 
       - id: install
         name: Install dependencies
-        run: pub get --no-precompile
+        run: dart pub get --no-precompile
 
       - name: Validate dependencies
         run: dart run dependency_validator
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
-        run: if [ ${{ matrix.sdk }} = '2.7.2' ]; then pub global activate tuneup && tuneup check --ignore-infos; else dart analyze; fi
+        run: if [ ${{ matrix.sdk }} = '2.7.2' ]; then dart pub global activate tuneup && tuneup check --ignore-infos; else dart analyze; fi
         if: always() && steps.install.outcome == 'success'
 
   test_ddc:
+    permissions:
+        id-token: write
+        contents: read
+        checks: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -54,10 +58,10 @@ jobs:
 
       - id: install
         name: Install dependencies
-        run: pub get --no-precompile
+        run: dart pub get --no-precompile
 
       - name: Run tests (DDC)
-        run: pub run build_runner test -- --file-reporter json:reports/${{ matrix.sdk }}/ddc/test-results.json
+        run: dart run build_runner test -- --file-reporter json:reports/${{ matrix.sdk }}/ddc/test-results.json
         if: always() && steps.install.outcome == 'success'
 
       - name: Upload Unit Test Results
@@ -76,6 +80,10 @@ jobs:
           reporter: dart-json
 
   test_dart2js:
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -92,10 +100,10 @@ jobs:
 
       - id: install
         name: Install dependencies
-        run: pub get --no-precompile
+        run: dart pub get --no-precompile
 
       - name: Run tests (dart2js)
-        run: pub run build_runner test -r -- --file-reporter json:reports/${{ matrix.sdk }}/dart2js/test-results.json
+        run: dart run build_runner test -r -- --file-reporter json:reports/${{ matrix.sdk }}/dart2js/test-results.json
         if: always() && steps.install.outcome == 'success'
 
       - name: Upload Unit Test Results
