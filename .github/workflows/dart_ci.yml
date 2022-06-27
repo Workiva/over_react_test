@@ -38,6 +38,10 @@ jobs:
         if: always() && steps.install.outcome == 'success'
 
   test_ddc:
+    permissions:
+        id-token: write
+        contents: read
+        checks: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -76,6 +80,10 @@ jobs:
           reporter: dart-json
 
   test_dart2js:
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
