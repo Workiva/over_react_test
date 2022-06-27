@@ -24,5 +24,5 @@ RUN chmod 600 /root/.ssh/id_rsa
 WORKDIR /build/
 ADD . /build/
 
-RUN pub get
+RUN dart pub get
 FROM scratch
