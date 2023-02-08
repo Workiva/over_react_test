@@ -1,5 +1,17 @@
 # OverReact Test Changelog
 
+## 2.11.5
+* Unpin meta dependency
+
+## 2.11.4
+* Internal updates (dev_dependencies, CI)
+
+## 2.11.3
+* Internal updates (dev_dependencies, cleanup)
+
+## 2.11.2
+* Set minimum Dart SDK to 2.11.0
+
 ## 2.11.1
 
 * [Remove deprecated authors field from pubspec.yaml](https://github.com/Workiva/over_react_test/pull/117)
