@@ -34,16 +34,16 @@ import 'package:react/react_client/react_interop.dart';
 /// props that are not valid, the errors will be caught to allow the test to complete.
 ///
 /// To handle asynchronous behavior, see [recordConsoleLogsAsync].
-List<String/*?*/> recordConsoleLogs(
+List<String?> recordConsoleLogs(
   Function() callback, {
   ConsoleConfiguration configuration = allConfig,
   bool shouldResetPropTypesWarningCache = true,
 }) {
-  final consoleLogs = <String/*?*/>[];
+  final consoleLogs = <String?>[];
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
-  Map<String, JsFunction/*?*/> consoleRefs = {};
+  Map<String, JsFunction?> consoleRefs = {};
 
   if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 
@@ -54,7 +54,7 @@ List<String/*?*/> recordConsoleLogs(
       // NOTE: Using console.log or print within this function will cause an infinite
       // loop when the logType is set to `log`.
       consoleLogs.add(message);
-      consoleRefs[config]
+      consoleRefs[config]!
           .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
     });
   }
@@ -81,16 +81,16 @@ List<String/*?*/> recordConsoleLogs(
 /// with the exception being the provided callback should be asynchronous.
 ///
 /// Related: [recordConsoleLogs]
-FutureOr<List<String/*?*/>> recordConsoleLogsAsync(
+FutureOr<List<String?>> recordConsoleLogsAsync(
   Future Function() asyncCallback, {
   ConsoleConfiguration configuration = allConfig,
   bool shouldResetPropTypesWarningCache = true,
 }) async {
-  var consoleLogs = <String/*?*/>[];
+  var consoleLogs = <String?>[];
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
-  Map<String, JsFunction/*?*/> consoleRefs = {};
+  Map<String, JsFunction?> consoleRefs = {};
 
   if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 
@@ -101,7 +101,7 @@ FutureOr<List<String/*?*/>> recordConsoleLogsAsync(
       // NOTE: Using console.log or print within this function will cause an infinite
       // loop when the logType is set to `log`.
       consoleLogs.add(message);
-      consoleRefs[config]/*!*/
+      consoleRefs[config]!
           .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
     });
   }

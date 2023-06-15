@@ -23,17 +23,17 @@ main() {
   test('triggerTransitionEnd correctly dispatches a transitionend event', () async {
     var flag = false;
 
-    document.body/*!*/.onTransitionEnd.listen((Event event) {
+    document.body!.onTransitionEnd.listen((Event event) {
       flag = true;
     });
 
-    await triggerTransitionEnd(document.body/*!*/);
+    await triggerTransitionEnd(document.body!);
 
     expect(flag, isTrue);
   });
 
   group('triggerDocumentClick correctly dispatches a click event', () {
-    var flag;
+    late var flag;
 
     setUp((){
       flag = false;
@@ -42,7 +42,7 @@ main() {
     test('when the target is attached to the document', () {
       var renderedInstance = renderAttachedToDocument((Dom.div()..onClick = ((_) => flag = true))());
 
-      triggerDocumentClick(findDomNode(renderedInstance)/*!*/);
+      triggerDocumentClick(findDomNode(renderedInstance)!);
 
       expect(flag, isTrue);
     });
@@ -50,13 +50,13 @@ main() {
     test('and throws when the target is not attached to the document', () {
       var renderedInstance = render((Dom.div()..onClick = ((_) => flag = true))());
 
-      expect(() => triggerDocumentClick(findDomNode(renderedInstance)/*!*/), throwsArgumentError);
+      expect(() => triggerDocumentClick(findDomNode(renderedInstance)!), throwsArgumentError);
       expect(flag, isFalse);
     });
   });
 
   group('triggerDocumentMouseEvent correctly dispatches an event', () {
-    var flag;
+    late var flag;
 
     setUp((){
       flag = false;
@@ -65,7 +65,7 @@ main() {
     test('when the target is attached to the document', () {
       var renderedInstance = renderAttachedToDocument((Dom.div()..onMouseDown = ((_) => flag = true))());
 
-      triggerDocumentMouseEvent(findDomNode(renderedInstance)/*!*/, 'mousedown');
+      triggerDocumentMouseEvent(findDomNode(renderedInstance)!, 'mousedown');
 
       expect(flag, isTrue);
     });
@@ -73,13 +73,13 @@ main() {
     test('and throws when the target is not attached to the document', () {
       var renderedInstance = render((Dom.div()..onMouseDown = ((_) => flag = true))());
 
-      expect(() => triggerDocumentMouseEvent(findDomNode(renderedInstance)/*!*/, 'mousedown'), throwsArgumentError);
+      expect(() => triggerDocumentMouseEvent(findDomNode(renderedInstance)!, 'mousedown'), throwsArgumentError);
       expect(flag, isFalse);
     });
   });
 
   group('triggerFocus correctly dispatches a focus event', () {
-    var flag;
+    late var flag;
 
     setUp((){
       flag = false;
@@ -91,7 +91,7 @@ main() {
         ..tabIndex = '1'
       )());
 
-      await triggerFocus(findDomNode(renderedInstance)/*!*/);
+      await triggerFocus(findDomNode(renderedInstance)!);
 
       expect(flag, isTrue);
     });
@@ -99,7 +99,7 @@ main() {
     test('and throws when the target is not attached to the document', () {
       var renderedInstance = render((Dom.div()..onFocus = ((_) => flag = true))());
 
-      expect(() => triggerFocus(findDomNode(renderedInstance)/*!*/), throwsArgumentError);
+      expect(() => triggerFocus(findDomNode(renderedInstance)!), throwsArgumentError);
       expect(flag, isFalse);
     });
   });

@@ -61,7 +61,7 @@ void triggerDocumentClick(Element target) {
 ///
 /// Verifies that the [target] element is not a detached node.
 void triggerDocumentMouseEvent(Element target, String event) {
-  if (!document.documentElement/*!*/.contains(target)) {
+  if (!document.documentElement!.contains(target)) {
     throw ArgumentError.value(target, 'target', 'Target should be attached to the document.');
   }
 
@@ -76,7 +76,7 @@ void triggerDocumentMouseEvent(Element target, String event) {
 ///
 /// See: <https://connect.microsoft.com/IE/feedback/details/2238257/ie11-focus-change-delayed-when-using-the-focus-method>.
 Future triggerFocus(Element target, {Duration timeout = _defaultTriggerTimeout}) {
-  if (!document.documentElement/*!*/.contains(target)) {
+  if (!document.documentElement!.contains(target)) {
     throw ArgumentError.value(target, 'target', 'Target should be attached to the document.');
   }
 

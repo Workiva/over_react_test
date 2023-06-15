@@ -81,16 +81,16 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestPropForwarding = true,
   List unconsumedPropKeys = const [],
   List skippedPropKeys = const [],
-  List Function(PropsMetaCollection)/*?*/ getUnconsumedPropKeys,
-  List Function(PropsMetaCollection)/*?*/ getSkippedPropKeys,
+  List Function(PropsMetaCollection)? getUnconsumedPropKeys,
+  List Function(PropsMetaCollection)? getSkippedPropKeys,
   Map nonDefaultForwardingTestProps = const {},
   bool shouldTestClassNameMerging = true,
   bool shouldTestClassNameOverrides = true,
   bool ignoreDomProps = true,
   bool shouldTestRequiredProps = true,
   @Deprecated('This flag is not needed as the test will auto detect the version')
-  bool/*?*/ isComponent2,
-  dynamic childrenFactory()/*?*/
+  bool? isComponent2,
+  dynamic childrenFactory()?
 }) {
   childrenFactory ??= _defaultChildrenFactory;
 
@@ -132,14 +132,14 @@ Iterable _flatten(Iterable iterable) =>
 ///       });
 ///     }
 void expectCleanTestSurfaceAtEnd() {
-  Set<Element> nodesBefore;
+  late Set<Element> nodesBefore;
 
   setUpAll(() {
-    nodesBefore = document.body/*!*/.children.toSet();
+    nodesBefore = document.body!.children.toSet();
   });
 
   tearDownAll(() {
-    Set<Element> nodesAfter = document.body/*!*/.children.toSet();
+    Set<Element> nodesAfter = document.body!.children.toSet();
     var nodesAdded = nodesAfter.difference(nodesBefore).map((element) => element.outerHtml).toList();
 
     expect(nodesAdded, isEmpty, reason: 'tests should leave the test surface clean.');
@@ -161,12 +161,12 @@ void expectCleanTestSurfaceAtEnd() {
 /// todo make this public again if there's a need to expose it, once the API has stabilized
 @isTest
 void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
-  @required List unconsumedPropKeys,
-  @required List skippedPropKeys,
-  @required List Function(PropsMetaCollection)/*?*/ getUnconsumedPropKeys,
-  @required List Function(PropsMetaCollection)/*?*/ getSkippedPropKeys,
-  @required bool ignoreDomProps,
-  @required Map nonDefaultForwardingTestProps,
+  required List unconsumedPropKeys,
+  required List skippedPropKeys,
+  required List Function(PropsMetaCollection)? getUnconsumedPropKeys,
+  required List Function(PropsMetaCollection)? getSkippedPropKeys,
+  required bool ignoreDomProps,
+  required Map nonDefaultForwardingTestProps,
 }) {
   testFunction('forwards unconsumed props as expected', () {
     // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
@@ -335,18 +335,18 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
         final forwardingTargetType = (forwardingTarget as ReactElement).type as ReactClass;
-        Map/*?*/ forwardingTargetDefaults;
+        Map? forwardingTargetDefaults;
         switch (forwardingTargetType.dartComponentVersion) { // ignore: invalid_use_of_protected_member
           case ReactDartComponentVersion.component: // ignore: invalid_use_of_protected_member
             forwardingTargetDefaults = forwardingTargetType.dartDefaultProps; // ignore: deprecated_member_use
             break;
           case ReactDartComponentVersion.component2: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps);
+            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps!);
             break;
         }
 
         var commonForwardedAndDefaults = propKeysThatShouldNotGetForwarded
-            .intersection(forwardingTargetDefaults.keys.toSet());
+            .intersection(forwardingTargetDefaults!.keys.toSet());
 
         /// Don't count these as unexpected keys in later assertions; we'll verify them within this block.
         unexpectedKeys.removeAll(commonForwardedAndDefaults);
@@ -427,7 +427,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
       ..classNameBlacklist = 'blacklisted-class-1 blacklisted-class-2';
 
     var renderedInstance = render(builder(childrenFactory()));
-    Iterable<Element/*?*/> forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
+    Iterable<Element?> forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
 
     expect(forwardingTargetNodes, everyElement(
         allOf(
@@ -461,7 +461,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
 /// > Related: [testClassNameMerging]
 @isTestGroup
 void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  Set<String> classesToOverride;
+  late Set<String> classesToOverride;
   var error;
 
   setUp(() {
@@ -477,7 +477,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
     // but still fail the test if something goes wrong.
     try {
       classesToOverride = getForwardingTargets(reactInstanceWithoutOverrides)
-          .map((target) => findDomNode(target)/*!*/.classes)
+          .map((target) => findDomNode(target)!.classes)
           .expand((CssClassSet classSet) => classSet)
           .toSet();
     } catch(e) {
@@ -500,7 +500,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
         )(childrenFactory())
     );
 
-    Iterable<Element/*?*/> forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
+    Iterable<Element?> forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
     expect(forwardingTargetNodes, everyElement(
         hasExactClasses('')
     ), reason: '$classesToOverride not overridden');
@@ -514,7 +514,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// __Note__: All required props must be provided by [factory].
 @isTestGroup
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  bool isComponent2;
+  late bool isComponent2;
 
   var keyToErrorMessage = {};
   var nullableProps = <String>[];
@@ -531,7 +531,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 = version == ReactDartComponentVersion.component2;
 
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
-    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
+    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps!;
     jacket.unmount();
 
     for (var consumedProp in consumedProps) {
@@ -580,20 +580,20 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     void component2RequiredPropsTest() {
       PropTypes.resetWarningCache();
 
-      List<String/*?*/> consoleErrors = [];
-      JsFunction/*?*/ originalConsoleError = context['console']['error'];
+      List<String?> consoleErrors = [];
+      JsFunction? originalConsoleError = context['console']['error'];
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
-        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
+        originalConsoleError!.apply([message, arg1, arg2, arg3,  arg4, arg5],
             thisArg: self);
       });
 
       final reactComponentFactory = factory().componentFactory as
-      ReactDartComponentFactoryProxy2/*?*//*!*//*!*/; // ignore: avoid_as
+      ReactDartComponentFactoryProxy2?/*!*//*!*/; // ignore: avoid_as
 
       for (var propKey in requiredProps) {
-        if (!reactComponentFactory/*!*/.defaultProps.containsKey(propKey)) {
+        if (!reactComponentFactory!.defaultProps.containsKey(propKey)) {
 
           try {
             mount((factory()
@@ -657,21 +657,21 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     } else {
       PropTypes.resetWarningCache();
 
-      List<String/*!*/> consoleErrors = [];
-      JsFunction/*?*//*?*/ originalConsoleError = context['console']['error'];
+      List<String> consoleErrors = [];
+      JsFunction?/*?*/ originalConsoleError = context['console']['error'];
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
-        originalConsoleError/*!*/.apply([message, arg1, arg2, arg3,  arg4, arg5],
+        originalConsoleError!.apply([message, arg1, arg2, arg3,  arg4, arg5],
             thisArg: self);
       });
 
       final reactComponentFactory = factory().componentFactory as
-          ReactDartComponentFactoryProxy2; // ignore: avoid_as
+          ReactDartComponentFactoryProxy2?; // ignore: avoid_as
 
       for (var propKey in nullableProps) {
         // Props that are defined in the default props map will never not be set.
-        if (!reactComponentFactory/*!*/.defaultProps.containsKey(propKey)) {
+        if (!reactComponentFactory!.defaultProps.containsKey(propKey)) {
           try {
             mount((factory()
               ..remove(propKey)

@@ -48,7 +48,7 @@ main() {
     });
 
     group('should skip checking for certain props', () {
-      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()())/*!*/;
+      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()())!;
       final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
       final skippedKey = consumedKeys.first;
 
@@ -93,7 +93,7 @@ main() {
     group('does not call `factory` directly within the consuming group', () {
       void sharedTest(
         BuilderOnlyUiFactory factory, {
-        List Function(PropsMetaCollection)/*?*/ getUnconsumedPropKeys,
+        List Function(PropsMetaCollection)? getUnconsumedPropKeys,
       }) {
         var wasFactoryCalled = false;
 
@@ -158,10 +158,10 @@ main() {
       /// Declares a [group] in which tests declared via [testFunction] are expected to fail
       /// with an error matching [testFailureMatcher].
       @isTestGroup
-      void expectedFailGroup(String description, void Function() groupBody, {@required dynamic testFailureMatcher}) {
+      void expectedFailGroup(String description, void Function() groupBody, {required dynamic testFailureMatcher}) {
         group(description, () {
           int totalTestCount = 0;
-          /*late*/List<TestFailure> testFailureErrors;
+          late List<TestFailure> testFailureErrors;
           setUpAll(() => testFailureErrors = []);
 
           void testButReAndIgnoreExceptions(name, testBody) {
@@ -199,7 +199,7 @@ main() {
       });
 
       expectedFailGroup('forwards consumed props -', () {
-        final factory = registerHelperComponent(
+        final UiProps Function([Map<dynamic, dynamic>]) factory = registerHelperComponent(
           propsMeta: testPropsMeta,
           consumedProps: testPropsMeta.all,
           render: (component) => (Wrapper()..addAll(component.props))(),
@@ -213,7 +213,7 @@ main() {
       }, testFailureMatcher: contains('Unexpected keys on forwarding target'));
 
       expectedFailGroup('does not forward all of the unconsumed props in propsMeta -', () {
-        var factory = registerHelperComponent(
+        UiProps Function([Map<dynamic, dynamic>]) factory = registerHelperComponent(
           propsMeta: testPropsMeta,
           consumedProps: [],
           render: (component) => (Wrapper()
@@ -249,10 +249,10 @@ typedef HelperRenderFunction = dynamic Function(CommonHelperComponent component)
 const UiFactory<UiProps> arbitraryUiFactory = domProps;
 
 UiFactory<UiProps> registerHelperComponent({
-  @required HelperRenderFunction render,
-  Map/*?*/ defaultProps,
-  Iterable<ConsumedProps>/*?*/ consumedProps,
-  PropsMetaCollection/*?*/ propsMeta,
+  required HelperRenderFunction render,
+  Map? defaultProps,
+  Iterable<ConsumedProps>? consumedProps,
+  PropsMetaCollection? propsMeta,
 }) {
   final factory = registerComponent2(() {
     return CommonHelperComponent(
@@ -263,7 +263,7 @@ UiFactory<UiProps> registerHelperComponent({
       );
   });
 
-  return ([Map/*?*/ backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
+  return ([Map? backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
 }
 
 class CommonHelperComponent extends UiComponent2<UiProps> {
@@ -273,10 +273,10 @@ class CommonHelperComponent extends UiComponent2<UiProps> {
   final HelperRenderFunction renderValue;
 
   CommonHelperComponent({
-    @required Map/*?*/ defaultPropsValue,
-    @required Iterable<ConsumedProps>/*?*/ consumedPropsValue,
-    @required PropsMetaCollection/*?*/ propsMetaValue,
-    @required this.renderValue,
+    required Map? defaultPropsValue,
+    required Iterable<ConsumedProps>? consumedPropsValue,
+    required PropsMetaCollection? propsMetaValue,
+    required this.renderValue,
   }) :
     defaultPropsValue = defaultPropsValue ?? {},
     propsMetaValue = propsMetaValue ?? const PropsMetaCollection({}),
@@ -305,7 +305,7 @@ class CommonHelperComponent extends UiComponent2<UiProps> {
   @override
   typedPropsFactoryJs(map) => typedPropsFactory(map);
 
-  UiProps _cachedTypedProps;
+  late UiProps _cachedTypedProps;
 
   @override
   UiProps get props => _cachedTypedProps;
