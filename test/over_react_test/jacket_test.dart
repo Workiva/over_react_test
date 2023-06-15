@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2017 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +28,7 @@ main() {
   group('mount: renders the given instance', () {
     group('attached to the document', () {
       group('and unmounts after the test is done', () {
-        late TestJacket? jacket;
+        late TestJacket jacket;
 
         setUp(() {
           expect(document.body!.children, isEmpty);
@@ -35,9 +36,8 @@ main() {
 
         tearDown(() {
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isFalse);
+          expect(jacket.isMounted, isFalse);
 
-          jacket = null;
         });
 
         test('with the given container', () {
@@ -45,15 +45,15 @@ main() {
           jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode);
 
           expect(document.body!.children[0], mountNode);
-          expect(jacket!.isMounted, isTrue);
-          expect(mountNode.children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()(), attachedToDocument: true);
 
-          expect(jacket!.isMounted, isTrue);
-          expect(document.body!.children[0].children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(document.body!.children[0].children[0], jacket.getNode());
         });
       });
 
@@ -66,14 +66,13 @@ main() {
 
         tearDown(() {
           expect(document.body!.children, isNotEmpty);
-          expect(jacket!.isMounted, isTrue);
+          expect(jacket.isMounted, isTrue);
 
-          jacket!.unmount();
+          jacket.unmount();
 
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isFalse);
+          expect(jacket.isMounted, isFalse);
 
-          jacket = null;
         });
 
         test('with the given container', () {
@@ -85,23 +84,23 @@ main() {
           );
 
           expect(document.body!.children[0], mountNode);
-          expect(jacket!.isMounted, isTrue);
-          expect(mountNode.children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket =
               mount(Sample()(), attachedToDocument: true, autoTearDown: false);
 
-          expect(jacket!.isMounted, isTrue);
-          expect(document.body!.children[0].children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(document.body!.children[0].children[0], jacket.getNode());
         });
       });
     });
 
     group('not attached to the document', () {
       group('and unmounts after the test is done', () {
-        late TestJacket? jacket;
+        late TestJacket jacket;
 
         setUp(() {
           expect(document.body!.children, isEmpty);
@@ -109,9 +108,7 @@ main() {
 
         tearDown(() {
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isFalse);
-
-          jacket = null;
+          expect(jacket.isMounted, isFalse);
         });
 
         test('with the given container', () {
@@ -119,14 +116,14 @@ main() {
           jacket = mount(Sample()(), mountNode: mountNode);
 
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isTrue);
-          expect(mountNode.children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()());
 
-          expect(jacket!.isMounted, isTrue);
+          expect(jacket.isMounted, isTrue);
         });
       });
 
@@ -216,7 +213,7 @@ main() {
   });
 
   group('TestJacket: DOM component:', () {
-    late Element? mountNode;
+    late Element mountNode;
     late TestJacket jacket;
 
     setUp(() {
@@ -226,18 +223,17 @@ main() {
         attachedToDocument: true
       );
 
-      expect(mountNode!.children.single, isA<SpanElement>());
+      expect(mountNode.children.single, isA<SpanElement>());
     });
 
     tearDown(() {
-      mountNode!.remove();
-      mountNode = null;
+      mountNode.remove();
     });
 
     test('rerender', () {
       jacket.rerender((Dom.span()..id = 'foo')());
 
-      expect(mountNode!.children.single.id, 'foo');
+      expect(mountNode.children.single.id, 'foo');
     });
 
     test('getProps throws a StateError', () {
@@ -245,7 +241,7 @@ main() {
     });
 
     test('getNode', () {
-      expect(jacket.getNode(), mountNode!.children.single);
+      expect(jacket.getNode(), mountNode.children.single);
     });
 
     test('getDartInstance returns null', () {
@@ -266,7 +262,7 @@ main() {
   });
 
   group('TestJacket: function component:', () {
-    late Element? mountNode;
+    late Element mountNode;
     late TestJacket jacket;
 
     setUp(() {
@@ -276,18 +272,17 @@ main() {
         attachedToDocument: true
       );
 
-      expect(mountNode!.children.single.id, 'foo');
+      expect(mountNode.children.single.id, 'foo');
     });
 
     tearDown(() {
-      mountNode!.remove();
-      mountNode = null;
+      mountNode.remove();
     });
 
     test('rerender', () {
       jacket.rerender(testFunctionComponent({'id': 'bar'}));
 
-      expect(mountNode!.children.single.id, 'bar');
+      expect(mountNode.children.single.id, 'bar');
     });
 
     test('getProps throws a StateError', () {
@@ -319,11 +314,11 @@ main() {
 UiFactory<SampleProps> Sample = castUiFactory(_$Sample); // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
-  bool foo;
+  late bool foo;
 }
 
 mixin SampleState on UiState {
-  bool bar;
+  late bool bar;
 }
 
 class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {

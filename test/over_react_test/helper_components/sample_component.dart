@@ -1,3 +1,4 @@
+// @dart = 2.14
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';
@@ -7,21 +8,21 @@ part 'sample_component.over_react.g.dart';
 UiFactory<SampleProps> Sample = castUiFactory(_$Sample); // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
-  bool shouldNeverBeNull;
+  late bool shouldNeverBeNull;
 
-  bool shouldAlwaysBeFalse;
+  late bool shouldAlwaysBeFalse;
 
-  bool shouldErrorInRender;
+  late bool shouldErrorInRender;
 
-  bool shouldErrorInMount;
+  late bool shouldErrorInMount;
 
-  bool shouldErrorInUnmount;
+  late bool shouldErrorInUnmount;
 
-  bool addExtraLogAndWarn;
+  late bool addExtraLogAndWarn;
 
-  Function() onComponentDidMount;
+  Function()? onComponentDidMount;
 
-  bool shouldLog;
+  late bool shouldLog;
 }
 
 class SampleComponent extends UiComponent2<SampleProps> {

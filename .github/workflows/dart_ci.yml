@@ -71,14 +71,6 @@ jobs:
           name: ddc-test-results@${{ matrix.sdk }}
           path: reports/${{ matrix.sdk }}/ddc/test-results.json
 
-      - name: Report Unit Test Results
-        uses: dorny/test-reporter@v1
-        if: ${{ always() && steps.install.outcome == 'success' }}
-        with:
-          name: Unit Test Results (ddc - ${{ matrix.sdk }})
-          path: 'reports/${{ matrix.sdk }}/ddc/test-results.json'
-          reporter: dart-json
-
   test_dart2js:
     permissions:
       id-token: write
@@ -112,11 +104,3 @@ jobs:
         with:
           name: dart2js-test-results@${{ matrix.sdk }}
           path: reports/${{ matrix.sdk }}/dart2js/test-results.json
-
-      - name: Report Unit Test Results
-        uses: dorny/test-reporter@v1
-        if: ${{ always() && steps.install.outcome == 'success' }}
-        with:
-          name: Unit Test Results (dart2js - ${{ matrix.sdk }})
-          path: 'reports/${{ matrix.sdk }}/dart2js/test-results.json'
-          reporter: dart-json

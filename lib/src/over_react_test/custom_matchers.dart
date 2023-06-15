@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2017 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,11 +121,11 @@ class ClassNameMatcher extends Matcher {
 
     List<String> descriptionParts = [];
     if (allowExtraneous) {
-      if (unwantedClasses!.isNotEmpty) {
+      if (unwantedClasses.isNotEmpty) {
         descriptionParts.add('has unwanted classes: $unwantedClasses');
       }
     } else {
-      if (extraneousClasses!.isNotEmpty) {
+      if (extraneousClasses.isNotEmpty) {
         descriptionParts.add('has extraneous classes: $extraneousClasses');
       }
     }

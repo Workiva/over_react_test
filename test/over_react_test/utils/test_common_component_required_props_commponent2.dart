@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2019 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,13 +22,13 @@ UiFactory<TestCommonRequired2Props> TestCommonRequired2 =
 
 mixin TestCommonRequired2Props on UiProps {
   @nullableRequiredProp
-  bool foobar;
+  bool? foobar;
 
   @requiredProp
-  bool bar;
+  bool? bar;
 
   @nullableRequiredProp
-  bool defaultFoo;
+  bool? defaultFoo;
 }
 
 class TestCommonRequired2Component extends

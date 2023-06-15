@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2017 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -233,7 +234,7 @@ class TestJacket<T extends react.Component?> {
   void unmount() {
     _isMounted = false;
     react_util.unmount(_renderedInstance);
-    mountNode?.remove();
+    mountNode.remove();
     react_util.tearDownAttachedNodes();
   }
 }

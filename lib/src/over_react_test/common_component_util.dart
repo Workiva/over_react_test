@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2017 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -542,7 +543,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
           requiredProps.add(prop.key);
         }
 
-        keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
+        keyToErrorMessage[prop.key] = prop.errorMessage;
       }
     }
   });

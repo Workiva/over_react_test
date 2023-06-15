@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2020 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,13 +48,13 @@ class TestCommonForwardingComponent extends UiComponent2<TestCommonForwardingPro
 }
 
 mixin ShouldBeForwardedProps on UiProps {
-  bool foo;
-  bool foo2;
+  bool? foo;
+  bool? foo2;
 }
 
 mixin ShouldNotBeForwardedProps on UiProps {
-  bool bar;
-  Iterable propKeysToForwardAnyways;
+  bool? bar;
+  late Iterable propKeysToForwardAnyways;
 }
 
 UiFactory<TestCommonDomOnlyForwardingProps> TestCommonDomOnlyForwarding =

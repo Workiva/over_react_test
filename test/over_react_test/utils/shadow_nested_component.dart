@@ -1,3 +1,4 @@
+// @dart = 2.14
 // Copyright 2021 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +21,8 @@ import 'package:over_react/react_dom.dart' as react_dom;
 part 'shadow_nested_component.over_react.g.dart';
 
 mixin ShadowNestedProps on UiProps {
-  String shadowRootHostTestId;
-  String shadowRootFirstChildTestId;
+  String? shadowRootHostTestId;
+  String? shadowRootFirstChildTestId;
 }
 
 UiFactory<ShadowNestedProps> ShadowNested = uiForwardRef(

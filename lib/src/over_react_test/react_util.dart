@@ -297,7 +297,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-/* [1] */ getByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
+/* [1] */ getByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
   final results = getAllByTestId(root, value, key: key);
   return results.isEmpty ? null : results.first;
 }
@@ -344,7 +344,8 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
+List /* < [1] > */ getAllByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
+  if (value == null || value.toLowerCase() == 'null') return [];
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {
@@ -501,7 +502,7 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
   List<Element> nodes = [];
   void recursiveSeek(Node _root, int _currentDepth) {
     // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
-    final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : null;
+    final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : (String s) => [];
     nodes.addAll(rootQuerySelectorAll(itemSelector));
     if (!findMany && nodes.isNotEmpty) {
       return;
@@ -519,7 +520,7 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-react.Component? getComponentByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
+react.Component? getComponentByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getDartComponent(instance);
@@ -531,7 +532,7 @@ react.Component? getComponentByTestId(dynamic root, String value, {String key = 
 /// Returns the props of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Map? getPropsByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
+Map? getPropsByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getProps(instance);
