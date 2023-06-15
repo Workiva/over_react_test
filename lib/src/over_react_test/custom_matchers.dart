@@ -61,7 +61,7 @@ class ClassNameMatcher extends Matcher {
     // There's a bug in DDC where, though the docs say `className` should
     // return `String`, it will return `AnimatedString` for `SvgElement`s. See
     // https://github.com/dart-lang/sdk/issues/36200.
-    String castClassName;
+    /*late*/String castClassName;
     if (className is String) {
       castClassName = className;
     } else if (className is AnimatedString) {
@@ -114,16 +114,16 @@ class ClassNameMatcher extends Matcher {
   @override
   Description describeMismatch(item, Description mismatchDescription, Map matchState, bool verbose) {
     Set missingClasses = matchState['missingClasses'];
-    Set unwantedClasses = matchState['unwantedClasses'];
-    List extraneousClasses = matchState['extraneousClasses'];
+    Set/*!*/ unwantedClasses = matchState['unwantedClasses'];
+    List/*!*/ extraneousClasses = matchState['extraneousClasses'];
 
     List<String> descriptionParts = [];
     if (allowExtraneous) {
-      if (unwantedClasses.isNotEmpty) {
+      if (unwantedClasses/*!*/.isNotEmpty) {
         descriptionParts.add('has unwanted classes: $unwantedClasses');
       }
     } else {
-      if (extraneousClasses.isNotEmpty) {
+      if (extraneousClasses/*!*/.isNotEmpty) {
         descriptionParts.add('has extraneous classes: $extraneousClasses');
       }
     }
@@ -164,7 +164,7 @@ class _HasToStringValue extends CustomMatcher {
   _HasToStringValue(matcher) : super('Object with toString() value', 'toString()', matcher);
 
   @override
-  featureValueOf(Object item) => item.toString();
+  featureValueOf(Object/*?*/ item) => item.toString();
 }
 
 class _HasPropMatcher extends CustomMatcher {
@@ -187,7 +187,7 @@ class _HasPropMatcher extends CustomMatcher {
 
   @override
   Map featureValueOf(item) {
-    if (_useDomAttributes(item)) return findDomNode(item).attributes;
+    if (_useDomAttributes(item)) return findDomNode(item)/*!*/.attributes;
     if (item is react.Component) return item.props;
 
     return getProps(item);
@@ -269,7 +269,7 @@ class _IsFocused extends Matcher {
         ..add('is not a valid Element.');
     }
 
-    if (!document.documentElement.contains(item)) {
+    if (!document.documentElement/*!*/.contains(item)) {
       return mismatchDescription
         ..add('is not attached to the document, and thus cannot be focused.')
         ..add(' If testing with React, you can use `renderAttachedToDocument`.');
@@ -314,7 +314,7 @@ Matcher throwsPropError(String propName, [String message = '']) {
 ///
 /// __Note__: The [message] is matched rather than the [Error] instance due to Dart's wrapping of all `throw`
 ///  as a [DomException]
-Matcher throwsPropError_Required(String propName, [String message = '']) {
+Matcher throwsPropError_Required(String propName, [String/*?*/ message = '']) {
   return throwsA(anyOf(
       hasToStringValue('V8 Exception'), /* workaround for https://github.com/dart-lang/sdk/issues/26093 */
       hasToStringValue(contains('RequiredPropError: Prop $propName is required. $message'.trim()))
@@ -362,10 +362,10 @@ Matcher throwsPropError_Combination(String propName, String prop2Name, [String m
 /// and pass it to [recordConsoleLogs] to run the function and record the resulting
 /// logs that are emitted during the function runtime.
 class _LoggingFunctionMatcher extends CustomMatcher {
-  _LoggingFunctionMatcher(dynamic matcher, {this.config, String description, String name, bool onlyIfAssertsAreEnabled = false})
+  _LoggingFunctionMatcher(dynamic matcher, {this.config, String/*?*/ description, String/*?*/ name, bool onlyIfAssertsAreEnabled = false})
       : super(description ?? 'emits the logs', name ?? 'logs', _wrapMatcherForSingleLog(matcher, onlyIfAssertsAreEnabled));
 
-  final ConsoleConfiguration config;
+  final ConsoleConfiguration/*?*/ config;
 
   static dynamic _wrapMatcherForSingleLog(dynamic expected, [bool onlyIfAssertsAreEnabled = false]) {
     if (onlyIfAssertsAreEnabled && !assertsEnabled()) return anything;
@@ -400,7 +400,7 @@ class _LoggingFunctionMatcher extends CustomMatcher {
 /// caught error.
 ///
 /// Related: [logsToConsole], [hasNoLogs]
-Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
+Matcher hasLog(dynamic expected, {ConsoleConfiguration/*?*/ consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
     _LoggingFunctionMatcher(anyElement(contains(expected)), config: consoleConfig, onlyIfAssertsAreEnabled: onlyIfAssertsAreEnabled);
 
 /// A Matcher used to compare a list of logs against a provided matcher.
@@ -440,7 +440,7 @@ Matcher hasLog(dynamic expected, {ConsoleConfiguration consoleConfig, bool onlyI
 /// ```
 ///
 /// Related: [hasLog], [hasNoLogs]
-Matcher logsToConsole(dynamic expected, {ConsoleConfiguration consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
+Matcher logsToConsole(dynamic expected, {ConsoleConfiguration/*?*/ consoleConfig, bool onlyIfAssertsAreEnabled = false}) =>
     _LoggingFunctionMatcher(expected, config: consoleConfig, onlyIfAssertsAreEnabled: onlyIfAssertsAreEnabled);
 
 /// A matcher to verify that a callback function does not emit any logs.

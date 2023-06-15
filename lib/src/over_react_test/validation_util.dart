@@ -170,7 +170,7 @@ void clearValidationWarnings() {
   _validationWarnings.clear();
 }
 
-List<String> _validationWarnings;
+List<String>/*?*/ _validationWarnings;
 void _recordValidationWarning(String warningMessage) {
-  _validationWarnings.add(warningMessage);
+  _validationWarnings/*!*/.add(warningMessage);
 }

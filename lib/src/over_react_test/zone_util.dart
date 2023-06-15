@@ -17,7 +17,7 @@ import 'dart:async';
 import 'package:react/react_client.dart';
 import 'package:test/test.dart';
 
-Zone _zone;
+Zone/*?*/ _zone;
 
 /// Validates that [storeZone] was called before [zonedExpect] was.
 void validateZone() {
@@ -28,7 +28,7 @@ void validateZone() {
 
 /// Store the specified _(or current if none is specified)_ [zone]
 /// for use within [zonedExpect].
-void storeZone([Zone zone]) {
+void storeZone([Zone/*?*/ zone]) {
   if (zone == null) {
     zone = Zone.current;
   }
@@ -38,10 +38,10 @@ void storeZone([Zone zone]) {
 /// Calls [expect] in package:test/test.dart in the zone stored in [storeZone].
 ///
 /// Useful for expectations in blocks called in other zones.
-void zonedExpect(actual, matcher, {String reason}) {
+void zonedExpect(actual, matcher, {String/*?*/ reason}) {
   validateZone();
 
-  return _zone.run(() {
+  return _zone/*!*/.run(() {
     expect(actual, matcher, reason: reason);
   });
 }
@@ -73,6 +73,6 @@ void zonedExpect(actual, matcher, {String reason}) {
 ///       renderIntoDocument((
 ///           TestComponent()..onComponentDidMount = shouldPassTest)()); // Passes
 ///     });
-void setComponentZone([Zone zone]) {
+void setComponentZone([Zone/*?*/ zone]) {
   componentZone = zone ?? Zone.current;
 }
