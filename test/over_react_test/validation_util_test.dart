@@ -34,7 +34,7 @@ main() {
         assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
-        expect(getValidationWarnings().single, 'message1');
+        expect(getValidationWarnings()/*!*/.single, 'message1');
 
         assert(ValidationUtil.warn('message2'));
 
@@ -48,7 +48,7 @@ main() {
         assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
-        expect(getValidationWarnings().single, 'message1');
+        expect(getValidationWarnings()/*!*/.single, 'message1');
 
         stopRecordingValidationWarnings();
 
@@ -94,7 +94,7 @@ main() {
         assert(ValidationUtil.warn('message1'));
 
         expect(getValidationWarnings(), hasLength(1));
-        expect(getValidationWarnings().single, 'message1');
+        expect(getValidationWarnings()/*!*/.single, 'message1');
 
         clearValidationWarnings();
 
@@ -103,7 +103,7 @@ main() {
         assert(ValidationUtil.warn('message2'));
 
         expect(getValidationWarnings(), hasLength(1));
-        expect(getValidationWarnings().single, 'message2');
+        expect(getValidationWarnings()/*!*/.single, 'message2');
       });
     });
   }, testOn: '!js');

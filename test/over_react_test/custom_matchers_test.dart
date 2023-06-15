@@ -383,7 +383,7 @@ main() {
         List<Element> allAttachedNodes = [];
         Element makeAttachedNode() {
           var node = DivElement()..tabIndex = 1;
-          document.body.append(node);
+          document.body/*!*/.append(node);
 
           allAttachedNodes.add(node);
 
@@ -865,7 +865,7 @@ void shouldFail(value, Matcher matcher, expected) {
     if (expected is String) {
       expect(_errorString, equalsIgnoringWhitespace(expected));
     } else {
-      expect(_errorString.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
+      expect(_errorString/*!*/.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
     }
   }
 

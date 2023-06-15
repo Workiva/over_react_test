@@ -27,14 +27,14 @@ main() {
   group('mount: renders the given instance', () {
     group('attached to the document', () {
       group('and unmounts after the test is done', () {
-        TestJacket jacket;
+        /*late*/TestJacket jacket;
 
         setUp(() {
-          expect(document.body.children, isEmpty);
+          expect(document.body/*!*/.children, isEmpty);
         });
 
         tearDown(() {
-          expect(document.body.children, isEmpty);
+          expect(document.body/*!*/.children, isEmpty);
           expect(jacket.isMounted, isFalse);
 
           jacket = null;
@@ -44,34 +44,34 @@ main() {
           var mountNode = DivElement();
           jacket = mount(Sample()(), attachedToDocument: true, mountNode: mountNode);
 
-          expect(document.body.children[0], mountNode);
-          expect(jacket.isMounted, isTrue);
-          expect(mountNode.children[0], jacket.getNode());
+          expect(document.body/*!*/.children[0], mountNode);
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(mountNode.children[0], jacket/*!*/.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()(), attachedToDocument: true);
 
-          expect(jacket.isMounted, isTrue);
-          expect(document.body.children[0].children[0], jacket.getNode());
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(document.body/*!*/.children[0].children[0], jacket/*!*/.getNode());
         });
       });
 
       group('and does not unmount after the test is done', () {
-        TestJacket jacket;
+        /*late*/TestJacket/*!*/ jacket;
 
         setUp(() {
-          expect(document.body.children, isEmpty);
+          expect(document.body/*!*/.children, isEmpty);
         });
 
         tearDown(() {
           expect(document.body.children, isNotEmpty);
-          expect(jacket.isMounted, isTrue);
+          expect(jacket/*!*/.isMounted, isTrue);
 
-          jacket.unmount();
+          jacket/*!*/.unmount();
 
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isFalse);
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isFalse);
 
           jacket = null;
         });
@@ -84,32 +84,32 @@ main() {
               autoTearDown: false
           );
 
-          expect(document.body.children[0], mountNode);
-          expect(jacket.isMounted, isTrue);
-          expect(mountNode.children[0], jacket.getNode());
+          expect(document.body/*!*/.children[0], mountNode);
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(mountNode.children[0], jacket/*!*/.getNode());
         });
 
         test('without the given container', () {
           jacket =
               mount(Sample()(), attachedToDocument: true, autoTearDown: false);
 
-          expect(jacket.isMounted, isTrue);
-          expect(document.body.children[0].children[0], jacket.getNode());
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(document.body/*!*/.children[0].children[0], jacket/*!*/.getNode());
         });
       });
     });
 
     group('not attached to the document', () {
       group('and unmounts after the test is done', () {
-        TestJacket jacket;
+        /*late*/TestJacket jacket;
 
         setUp(() {
-          expect(document.body.children, isEmpty);
+          expect(document.body/*!*/.children, isEmpty);
         });
 
         tearDown(() {
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isFalse);
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isFalse);
 
           jacket = null;
         });
@@ -118,33 +118,33 @@ main() {
           var mountNode = DivElement();
           jacket = mount(Sample()(), mountNode: mountNode);
 
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isTrue);
-          expect(mountNode.children[0], jacket.getNode());
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(mountNode.children[0], jacket/*!*/.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()());
 
-          expect(jacket.isMounted, isTrue);
+          expect(jacket/*!*/.isMounted, isTrue);
         });
       });
 
       group('and does not unmount after the test is done', () {
-        TestJacket jacket;
+        /*late*/TestJacket jacket;
 
         setUp(() {
-          expect(document.body.children, isEmpty);
+          expect(document.body/*!*/.children, isEmpty);
         });
 
         tearDown(() {
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isTrue);
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isTrue);
 
-          jacket.unmount();
+          jacket/*!*/.unmount();
 
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isFalse);
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isFalse);
 
           jacket = null;
         });
@@ -153,16 +153,16 @@ main() {
           var mountNode = DivElement();
           jacket = mount(Sample()(), mountNode: mountNode, autoTearDown: false);
 
-          expect(document.body.children.isEmpty, isTrue);
-          expect(jacket.isMounted, isTrue);
-          expect(mountNode.children[0], jacket.getNode());
+          expect(document.body/*!*/.children.isEmpty, isTrue);
+          expect(jacket/*!*/.isMounted, isTrue);
+          expect(mountNode.children[0], jacket/*!*/.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()(), autoTearDown: false);
 
-          expect(document.body.children, isEmpty);
-          expect(jacket.isMounted, isTrue);
+          expect(document.body/*!*/.children, isEmpty);
+          expect(jacket/*!*/.isMounted, isTrue);
         });
       });
     });
@@ -179,7 +179,7 @@ main() {
       );
 
       expect(Sample(jacket.getProps()).foo, isFalse);
-      expect(jacket.getDartInstance().state.bar, isFalse);
+      expect(jacket.getDartInstance()/*!*/.state.bar, isFalse);
     });
 
     test('rerender', () {
@@ -201,9 +201,9 @@ main() {
     });
 
     test('setState', () {
-      jacket.setState(jacket.getDartInstance().newState()..bar = true);
+      jacket.setState(jacket.getDartInstance()/*!*/.newState()..bar = true);
 
-      expect(jacket.getDartInstance().state.bar, isTrue);
+      expect(jacket.getDartInstance()/*!*/.state.bar, isTrue);
     });
 
     test('unmount', () {
@@ -216,7 +216,7 @@ main() {
   });
 
   group('TestJacket: DOM component:', () {
-    Element mountNode;
+    /*late*/Element mountNode;
     TestJacket jacket;
 
     setUp(() {
@@ -266,7 +266,7 @@ main() {
   });
 
   group('TestJacket: function component:', () {
-    Element mountNode;
+    /*late*/Element mountNode;
     TestJacket jacket;
 
     setUp(() {
@@ -276,18 +276,18 @@ main() {
         attachedToDocument: true
       );
 
-      expect(mountNode.children.single.id, 'foo');
+      expect(mountNode/*!*/.children.single.id, 'foo');
     });
 
     tearDown(() {
-      mountNode.remove();
+      mountNode/*!*/.remove();
       mountNode = null;
     });
 
     test('rerender', () {
       jacket.rerender(testFunctionComponent({'id': 'bar'}));
 
-      expect(mountNode.children.single.id, 'bar');
+      expect(mountNode/*!*/.children.single.id, 'bar');
     });
 
     test('getProps throws a StateError', () {

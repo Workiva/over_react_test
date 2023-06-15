@@ -48,7 +48,7 @@ main() {
     });
 
     group('should skip checking for certain props', () {
-      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()());
+      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()())/*!*/;
       final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
       final skippedKey = consumedKeys.first;
 
@@ -93,7 +93,7 @@ main() {
     group('does not call `factory` directly within the consuming group', () {
       void sharedTest(
         BuilderOnlyUiFactory factory, {
-        List Function(PropsMetaCollection) getUnconsumedPropKeys,
+        List Function(PropsMetaCollection)/*?*/ getUnconsumedPropKeys,
       }) {
         var wasFactoryCalled = false;
 
@@ -161,7 +161,7 @@ main() {
       void expectedFailGroup(String description, void Function() groupBody, {@required dynamic testFailureMatcher}) {
         group(description, () {
           int totalTestCount = 0;
-          List<TestFailure> testFailureErrors;
+          /*late*/List<TestFailure> testFailureErrors;
           setUpAll(() => testFailureErrors = []);
 
           void testButReAndIgnoreExceptions(name, testBody) {
@@ -250,9 +250,9 @@ const UiFactory<UiProps> arbitraryUiFactory = domProps;
 
 UiFactory<UiProps> registerHelperComponent({
   @required HelperRenderFunction render,
-  Map defaultProps,
-  Iterable<ConsumedProps> consumedProps,
-  PropsMetaCollection propsMeta,
+  Map/*?*/ defaultProps,
+  Iterable<ConsumedProps>/*?*/ consumedProps,
+  PropsMetaCollection/*?*/ propsMeta,
 }) {
   final factory = registerComponent2(() {
     return CommonHelperComponent(
@@ -263,7 +263,7 @@ UiFactory<UiProps> registerHelperComponent({
       );
   });
 
-  return ([Map backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
+  return ([Map/*?*/ backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
 }
 
 class CommonHelperComponent extends UiComponent2<UiProps> {
@@ -273,9 +273,9 @@ class CommonHelperComponent extends UiComponent2<UiProps> {
   final HelperRenderFunction renderValue;
 
   CommonHelperComponent({
-    @required Map defaultPropsValue,
-    @required Iterable<ConsumedProps> consumedPropsValue,
-    @required PropsMetaCollection propsMetaValue,
+    @required Map/*?*/ defaultPropsValue,
+    @required Iterable<ConsumedProps>/*?*/ consumedPropsValue,
+    @required PropsMetaCollection/*?*/ propsMetaValue,
     @required this.renderValue,
   }) :
     defaultPropsValue = defaultPropsValue ?? {},

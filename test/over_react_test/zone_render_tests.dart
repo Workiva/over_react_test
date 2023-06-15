@@ -21,7 +21,7 @@ main() {
   });
 }
 
-void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) renderFunction) {
+void sharedZoneRenderTests(Function(ReactElement element, {bool/*?*/ autoTearDown}) renderFunction) {
   group('sharedZoneRenderTests:', () {
     setUp(() {
       setComponentZone(Zone.root);

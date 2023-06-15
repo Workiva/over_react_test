@@ -226,14 +226,14 @@ main() {
       var jacket = mount(Sample()(), attachedToDocument: true);
       var logs = await recordConsoleLogsAsync(() async {
         var button =
-            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button')/*!*/;
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
       }, configuration: warnConfig);
 
       expect(logs, hasLength(1));
-      expect(logs.first.contains('I have been clicked'), isTrue);
+      expect(logs.first/*!*/.contains('I have been clicked'), isTrue);
     });
 
     test('handles errors caused when rendering', () async {
@@ -298,7 +298,7 @@ main() {
         var jacket = mount((Sample()..addExtraLogAndWarn = true)(),
             attachedToDocument: true);
         var button =
-            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button')/*!*/;
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
@@ -312,7 +312,7 @@ main() {
         var jacket = mount((Sample()..addExtraLogAndWarn = true)(),
             attachedToDocument: true);
         var button =
-            queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
+            queryByTestId(jacket.getInstance(), 'ort_sample_component_button')/*!*/;
         await Future.delayed(Duration(milliseconds: 5));
 
         triggerDocumentClick(button);
