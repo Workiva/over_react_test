@@ -24,13 +24,13 @@ dependency_overrides:
   w_common: ^3.0.0
   w_flux:
     git:
-      url: git@github.com:Workiva/w_flux.git
+      url: https://github.com/Workiva/w_flux
       ref: null-safety
   over_react:
     git:
-      url: git@github.com:Workiva/over_react.git
+      url: https://github.com/Workiva/over_react
       ref: null-safety
   react:
     git:
-      url: git@github.com:Workiva/react-dart.git
+      url: https://github.com/Workiva/react-dart
       ref: null-safety-manual
