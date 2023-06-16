@@ -1,4 +1,4 @@
-// @dart = 2.14
+// @dart = 2.12
 /// Returns whether `assert`s are enabled in the current runtime.
 ///
 /// Unless the Dart SDK option to enable `assert`s in dart2js is configured,

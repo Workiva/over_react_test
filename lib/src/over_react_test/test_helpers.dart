@@ -1,4 +1,4 @@
-// @dart = 2.14
+// @dart = 2.12
 import 'dart:async';
 
 import 'package:test/test.dart';
