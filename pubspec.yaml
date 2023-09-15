@@ -26,3 +26,9 @@ dev_dependencies:
 dependency_validator:
   ignore:
     - workiva_dependency_constrainer
+
+dependency_overrides:
+  workiva_dependency_constrainer:
+    git:
+      url: ssh://git@github.com/Workiva/workiva_dependency_constrainer.git
+      ref: analyzer_5
