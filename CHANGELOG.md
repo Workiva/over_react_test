@@ -1,5 +1,9 @@
 # OverReact Test Changelog
 
+## 2.11.6
+* Remove usages of deprecated APIs that will be removed in react-dart 7.0.0
+* Bump dependencies: `meta: ^1.8.0`, `test: ^1.21.1`
+
 ## 2.11.5
 * Unpin meta dependency
 
