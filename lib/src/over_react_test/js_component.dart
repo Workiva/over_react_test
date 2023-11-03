@@ -25,9 +25,8 @@ final Function testJsComponentFactory = (() {
     render: allowInterop(() => react.div({}, 'test js component'))
   ));
 
-  var reactFactory = React.createFactory(componentClass);
-
   return ([props = const {}, children]) {
-    return reactFactory(jsifyAndAllowInterop(props), listifyChildren(children));
+    return React.createElement(
+        componentClass, jsifyAndAllowInterop(props), listifyChildren(children));
   };
 })();
