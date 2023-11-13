@@ -27,12 +27,7 @@ dependency_overrides:
     git:
       ref: fix_up_null_safety_hunter
       url: https://github.com/Workiva/dart_dev
-  w_flux:
-    git:
-      url: https://github.com/Workiva/w_flux
-      ref: null-safety
   over_react:
     git:
       url: https://github.com/Workiva/over_react
       ref: null-safety
-  react: ^7.0.0
