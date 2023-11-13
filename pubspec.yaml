@@ -11,7 +11,7 @@ dependencies:
   matcher: ^0.12.1+4
   meta: ^1.8.0
   over_react: ^4.1.2
-  react: '>=6.0.1 <8.0.0'
+  react: ^7.0.0
   test: ^1.21.1
 dev_dependencies:
   dart_dev: ^4.0.0
@@ -35,7 +35,4 @@ dependency_overrides:
     git:
       url: https://github.com/Workiva/over_react
       ref: null-safety
-  react:
-    git:
-      url: https://github.com/Workiva/react-dart
-      ref: null-safety-manual
+  react: ^7.0.0
