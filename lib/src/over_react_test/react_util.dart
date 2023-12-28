@@ -20,13 +20,11 @@ import 'dart:html';
 
 import 'package:collection/collection.dart' show IterableNullableExtension;
 import 'package:js/js.dart';
-import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
+import 'package:over_react/over_react.dart';
 import 'package:react/react.dart' as react;
-import 'package:react/react_dom.dart' as react_dom;
-import 'package:react/react_client.dart';
-import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_client/js_interop_helpers.dart';
+import 'package:react/react_dom.dart' as react_dom;
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
@@ -55,7 +53,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
 /// [autoTearDown] to false. If [autoTearDown] is set to true once it will, if provided, call [autoTearDownCallback]
 /// once the component has been unmounted.
 /* [1] */ render(dynamic component,
-    {bool? autoTearDown = true,
+    {bool autoTearDown = true,
     Element? container,
     Callback? autoTearDownCallback}) {
   var renderedInstance;
@@ -69,7 +67,7 @@ export 'package:over_react/src/util/react_wrappers.dart';
     renderedInstance = react_dom.render(component, container);
   }
 
-  if (autoTearDown!) {
+  if (autoTearDown) {
     addTearDown(() {
       unmount(renderedInstance);
       if (autoTearDownCallback != null) autoTearDownCallback();
@@ -178,29 +176,29 @@ List<Element> _attachedReactContainers = [];
 ///
 /// Returns the rendered component.
 /* [1] */ renderAttachedToDocument(dynamic component,
-    {bool? autoTearDown = true,
+    {bool autoTearDown = true,
     Element? container,
     Callback? autoTearDownCallback}) {
-  container ??= DivElement()
+  final containerElement = container ??= DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
 
   setComponentZone();
 
-  document.body!.append(container);
+  document.body!.append(containerElement);
 
-  if (autoTearDown!) {
+  if (autoTearDown) {
     addTearDown(() {
-      react_dom.unmountComponentAtNode(container);
-      container!.remove();
+      react_dom.unmountComponentAtNode(containerElement);
+      containerElement.remove();
       if (autoTearDownCallback != null) autoTearDownCallback();
     });
   } else {
-    _attachedReactContainers.add(container);
+    _attachedReactContainers.add(containerElement);
   }
 
-  return react_dom.render(component is component_base.UiProps ? component.build() : component, container);
+  return react_dom.render(component is component_base.UiProps ? component.build() : component, containerElement);
 }
 
 /// Unmounts and removes the mount nodes for components rendered via [renderAttachedToDocument] that are not
@@ -297,7 +295,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-/* [1] */ getByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
+/* [1] */ getByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   final results = getAllByTestId(root, value, key: key);
   return results.isEmpty ? null : results.first;
 }
@@ -344,8 +342,7 @@ bool _hasTestId(Map props, String key, String value) {
 ///
 /// It is recommended that, instead of setting this [key] prop manually, you should use the
 /// [UiProps.addTestId] method so the prop is only set in a test environment.
-List /* < [1] > */ getAllByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
-  if (value == null || value.toLowerCase() == 'null') return [];
+List /* < [1] > */ getAllByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   if (root is react.Component) root = root.jsThis;
 
   if (isValidElement(root)) {
@@ -353,13 +350,13 @@ List /* < [1] > */ getAllByTestId(dynamic root, String? value, {String key = def
   }
 
   return react_test_utils.findAllInRenderedTree(root, allowInterop((descendant) {
-    Map? props;
+    late Map props;
     if (react_test_utils.isDOMComponent(descendant)) {
       props = findDomNode(descendant)!.attributes;
     } else if (react_test_utils.isCompositeComponent(descendant)) {
       props = getProps(descendant);
     }
-    return props != null && _hasTestId(props, key, value);
+    return _hasTestId(props, key, value);
   }));
 }
 
@@ -453,7 +450,7 @@ Element? getComponentRootDomByTestId(dynamic root, String value, {String key = d
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
 Element? queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
-  var results = _findDeep(findDomNode(root)!, _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
+  var results = _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
   return results.isNotEmpty ? results.first : null;
 }
 
@@ -493,14 +490,14 @@ Element? queryByTestId(dynamic root, String value, {String key = defaultTestIdKe
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
 List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
-  return _findDeep(findDomNode(root)!, _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
+  return _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
 }
 
 String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
 
-List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int? depth}) {
+List<Element> _findDeep(Node? root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int? depth}) {
   List<Element> nodes = [];
-  void recursiveSeek(Node _root, int _currentDepth) {
+  void recursiveSeek(Node? _root, int _currentDepth) {
     // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
     final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : (String s) => [];
     nodes.addAll(rootQuerySelectorAll(itemSelector));
@@ -509,8 +506,10 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
     }
     // This method of finding shadow roots may not be performant, but it's good enough for usage in tests.
     if (searchInShadowDom && (depth == null || _currentDepth < depth)) {
-      var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot).toList();
-      foundShadows.forEach((shadowRoot) => recursiveSeek(shadowRoot!, _currentDepth + 1));
+      var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot!).toList();
+      for (var shadowRoot in foundShadows) {
+        recursiveSeek(shadowRoot, _currentDepth + 1);
+      }
     }
   }
   recursiveSeek(root, 0);
@@ -520,7 +519,7 @@ List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom 
 /// Returns the [react.Component] of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-react.Component? getComponentByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
+react.Component? getComponentByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getDartComponent(instance);
@@ -532,7 +531,7 @@ react.Component? getComponentByTestId(dynamic root, String? value, {String key =
 /// Returns the props of the first descendant of [root] that has its [key] prop value set to [value].
 ///
 /// Returns null if no descendant has its [key] prop value set to [value].
-Map? getPropsByTestId(dynamic root, String? value, {String key = defaultTestIdKey}) {
+Map? getPropsByTestId(dynamic root, String value, {String key = defaultTestIdKey}) {
   var instance = getByTestId(root, value, key: key);
   if (instance != null) {
     return getProps(instance);
@@ -577,14 +576,14 @@ List findDescendantsWithProp(/* [1] */ root, dynamic propKey) {
       return false;
     }
 
-    Map? props;
+    late Map props;
     if (react_test_utils.isDOMComponent(descendant)) {
       props = findDomNode(descendant)!.attributes;
     } else if (react_test_utils.isCompositeComponent(descendant)) {
       props = getProps(descendant);
     }
 
-    return props != null && props.containsKey(propKey);
+    return props.containsKey(propKey);
   }));
 
   return descendantsWithProp;

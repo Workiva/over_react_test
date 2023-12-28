@@ -29,10 +29,7 @@ void validateZone() {
 /// Store the specified _(or current if none is specified)_ [zone]
 /// for use within [zonedExpect].
 void storeZone([Zone? zone]) {
-  if (zone == null) {
-    zone = Zone.current;
-  }
-  _zone = zone;
+  _zone = zone ?? Zone.current;
 }
 
 /// Calls [expect] in package:test/test.dart in the zone stored in [storeZone].

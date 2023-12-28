@@ -23,6 +23,7 @@ import 'package:over_react_test/over_react_test.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
 import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
+import 'package:react/react_client/js_backed_map.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
@@ -333,18 +334,18 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
         final forwardingTargetType = (forwardingTarget as ReactElement).type as ReactClass;
-        Map? forwardingTargetDefaults;
+        late Map forwardingTargetDefaults;
         switch (forwardingTargetType.dartComponentVersion) { // ignore: invalid_use_of_protected_member
           case ReactDartComponentVersion.component: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps; // ignore: deprecated_member_use
+            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps ?? {}; // ignore: deprecated_member_use
             break;
           case ReactDartComponentVersion.component2: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps!);
+            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps ?? JsMap());
             break;
         }
 
         var commonForwardedAndDefaults = propKeysThatShouldNotGetForwarded
-            .intersection(forwardingTargetDefaults!.keys.toSet());
+            .intersection(forwardingTargetDefaults.keys.toSet());
 
         /// Don't count these as unexpected keys in later assertions; we'll verify them within this block.
         unexpectedKeys.removeAll(commonForwardedAndDefaults);
@@ -425,7 +426,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
       ..classNameBlacklist = 'blacklisted-class-1 blacklisted-class-2';
 
     var renderedInstance = render(builder(childrenFactory()));
-    Iterable<Element?> forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
+    final forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
 
     expect(forwardingTargetNodes, everyElement(
         allOf(
@@ -498,7 +499,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
         )(childrenFactory())
     );
 
-    Iterable<Element?> forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
+    final forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
     expect(forwardingTargetNodes, everyElement(
         hasExactClasses('')
     ), reason: '$classesToOverride not overridden');
@@ -529,7 +530,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 = version == ReactDartComponentVersion.component2;
 
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
-    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps!;
+    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps ?? [];
     jacket.unmount();
 
     for (var consumedProp in consumedProps) {
@@ -578,20 +579,20 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     void component2RequiredPropsTest() {
       PropTypes.resetWarningCache();
 
-      List<String?> consoleErrors = [];
-      JsFunction? originalConsoleError = context['console']['error'];
+      var consoleErrors = <String?>[];
+      final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
-        originalConsoleError!.apply([message, arg1, arg2, arg3,  arg4, arg5],
+        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
             thisArg: self);
       });
 
       final reactComponentFactory = factory().componentFactory as
-      ReactDartComponentFactoryProxy2?/*!*//*!*/; // ignore: avoid_as
+          ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       for (var propKey in requiredProps) {
-        if (!reactComponentFactory!.defaultProps.containsKey(propKey)) {
+        if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
 
           try {
             mount((factory()
@@ -655,21 +656,21 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     } else {
       PropTypes.resetWarningCache();
 
-      List<String> consoleErrors = [];
-      JsFunction?/*?*/ originalConsoleError = context['console']['error'];
+      var consoleErrors = <String?>[];
+      final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
-        originalConsoleError!.apply([message, arg1, arg2, arg3,  arg4, arg5],
+        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
             thisArg: self);
       });
 
       final reactComponentFactory = factory().componentFactory as
-          ReactDartComponentFactoryProxy2?; // ignore: avoid_as
+          ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       for (var propKey in nullableProps) {
         // Props that are defined in the default props map will never not be set.
-        if (!reactComponentFactory!.defaultProps.containsKey(propKey)) {
+        if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
           try {
             mount((factory()
               ..remove(propKey)

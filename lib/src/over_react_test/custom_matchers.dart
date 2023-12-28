@@ -17,7 +17,6 @@ import 'dart:svg';
 
 import 'package:collection/collection.dart' show IterableNullableExtension;
 import 'package:over_react/over_react.dart';
-import 'package:matcher/matcher.dart';
 import 'package:over_react_test/src/over_react_test/dart_util.dart';
 import 'package:react/react.dart' as react;
 import 'package:react/react_test_utils.dart' as react_test_utils;
@@ -62,7 +61,7 @@ class ClassNameMatcher extends Matcher {
     // There's a bug in DDC where, though the docs say `className` should
     // return `String`, it will return `AnimatedString` for `SvgElement`s. See
     // https://github.com/dart-lang/sdk/issues/36200.
-    late String? castClassName;
+    String? castClassName;
     if (className is String) {
       castClassName = className;
     } else if (className is AnimatedString) {
@@ -376,17 +375,13 @@ class _LoggingFunctionMatcher extends CustomMatcher {
 
   @override
   featureValueOf(actual) {
-    List<String?> logs = <String>[];
-
     if (actual is List) return actual;
 
     if (actual is! Function()) {
       throw ArgumentError('The actual value must be a callback or a List.');
     }
 
-    logs = recordConsoleLogs(actual, configuration: config ?? logConfig);
-
-    return logs;
+    return recordConsoleLogs(actual, configuration: config ?? logConfig);
   }
 }
 

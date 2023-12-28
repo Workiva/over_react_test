@@ -43,7 +43,7 @@ List<String?> recordConsoleLogs(
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
-  Map<String, JsFunction?> consoleRefs = {};
+  Map<String, JsFunction> consoleRefs = {};
 
   if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 
@@ -90,7 +90,7 @@ FutureOr<List<String?>> recordConsoleLogsAsync(
   final logTypeToCapture = configuration.logType == 'all'
       ? ConsoleConfiguration.types
       : [configuration.logType];
-  Map<String, JsFunction?> consoleRefs = {};
+  Map<String, JsFunction> consoleRefs = {};
 
   if (shouldResetPropTypesWarningCache) _resetPropTypeWarningCache();
 

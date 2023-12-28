@@ -167,10 +167,16 @@ List<String>? getValidationWarnings() => _validationWarnings?.toList();
 ///
 /// > Related: [getValidationWarnings]
 void clearValidationWarnings() {
+  if (_validationWarnings == null) {
+    throw StateError('Need to call startRecordingValidationWarnings() first.');
+  }
   _validationWarnings!.clear();
 }
 
 List<String>? _validationWarnings;
 void _recordValidationWarning(String warningMessage) {
+  if (_validationWarnings == null) {
+    throw StateError('Need to call startRecordingValidationWarnings() first.');
+  }
   _validationWarnings!.add(warningMessage);
 }

@@ -15,11 +15,10 @@
 import 'dart:html';
 
 import 'package:over_react/over_react.dart' as over_react;
+import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 import 'package:react/react.dart' as react;
 import 'package:react/react_client/react_interop.dart' show ReactComponent;
 import 'package:react/react_test_utils.dart' as react_test_utils;
-
-import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 
 import './zone_util.dart';
 
