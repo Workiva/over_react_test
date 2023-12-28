@@ -1,4 +1,3 @@
-// @dart = 2.12
 // Copyright 2017 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +17,8 @@ import 'dart:html';
 import 'dart:js';
 
 import 'package:meta/meta.dart';
-import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
+import 'package:over_react/over_react.dart';
 import 'package:over_react_test/over_react_test.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
 import 'package:over_react_test/src/over_react_test/test_helpers.dart';
@@ -28,8 +27,6 @@ import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
-import './custom_matchers.dart';
-import './react_util.dart';
 import 'dart_util.dart';
 
 /// Run common component tests around default props, prop forwarding, class name merging, and class name overrides.

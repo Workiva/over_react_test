@@ -1,4 +1,3 @@
-// @dart = 2.12
 import 'dart:async';
 
 import 'package:over_react_test/over_react_test.dart';
@@ -10,7 +9,7 @@ import 'helper_components/sample_component.dart';
 
 main() {
   group('TestJacket mount', () {
-    sharedZoneRenderTests(mount as dynamic Function(ReactElement, {bool? autoTearDown}));
+    sharedZoneRenderTests(mount);
   });
 
   group('render', () {
@@ -22,7 +21,7 @@ main() {
   });
 }
 
-void sharedZoneRenderTests(Function(ReactElement element, {bool? autoTearDown}) renderFunction) {
+void sharedZoneRenderTests(Function(ReactElement element, {bool autoTearDown}) renderFunction) {
   group('sharedZoneRenderTests:', () {
     setUp(() {
       setComponentZone(Zone.root);

@@ -1,4 +1,3 @@
-// @dart = 2.12
 import 'dart:html';
 
 import 'package:over_react/over_react.dart';

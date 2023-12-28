@@ -1,4 +1,3 @@
-// @dart = 2.12
 // Copyright 2020 Workiva Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +38,7 @@ class TestCommonForwardingComponent extends UiComponent2<TestCommonForwardingPro
       ..modifyProps(addUnconsumedProps)
       ..className = forwardingClassNameBuilder().toClassName()
       ..modifyProps((p) {
-        for (var key in props.propKeysToForwardAnyways) {
+        for (var key in (props.propKeysToForwardAnyways ?? [])) {
           p[key] = props[key];
         }
       })
@@ -54,7 +53,7 @@ mixin ShouldBeForwardedProps on UiProps {
 
 mixin ShouldNotBeForwardedProps on UiProps {
   bool? bar;
-  late Iterable propKeysToForwardAnyways;
+  Iterable? propKeysToForwardAnyways;
 }
 
 UiFactory<TestCommonDomOnlyForwardingProps> TestCommonDomOnlyForwarding =
