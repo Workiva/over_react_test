@@ -33,7 +33,7 @@ main() {
   });
 
   group('triggerDocumentClick correctly dispatches a click event', () {
-    late var flag;
+    var flag;
 
     setUp((){
       flag = false;
@@ -56,7 +56,7 @@ main() {
   });
 
   group('triggerDocumentMouseEvent correctly dispatches an event', () {
-    late var flag;
+    var flag;
 
     setUp((){
       flag = false;
@@ -79,7 +79,7 @@ main() {
   });
 
   group('triggerFocus correctly dispatches a focus event', () {
-    late var flag;
+    var flag;
 
     setUp((){
       flag = false;

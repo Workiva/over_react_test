@@ -36,7 +36,6 @@ main() {
         tearDown(() {
           expect(document.body!.children, isEmpty);
           expect(jacket.isMounted, isFalse);
-
         });
 
         test('with the given container', () {
@@ -71,7 +70,6 @@ main() {
 
           expect(document.body!.children, isEmpty);
           expect(jacket.isMounted, isFalse);
-
         });
 
         test('with the given container', () {
@@ -127,7 +125,7 @@ main() {
       });
 
       group('and does not unmount after the test is done', () {
-        late TestJacket? jacket;
+        late TestJacket jacket;
 
         setUp(() {
           expect(document.body!.children, isEmpty);
@@ -135,14 +133,12 @@ main() {
 
         tearDown(() {
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isTrue);
+          expect(jacket.isMounted, isTrue);
 
-          jacket!.unmount();
+          jacket.unmount();
 
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isFalse);
-
-          jacket = null;
+          expect(jacket.isMounted, isFalse);
         });
 
         test('with the given container', () {
@@ -150,15 +146,15 @@ main() {
           jacket = mount(Sample()(), mountNode: mountNode, autoTearDown: false);
 
           expect(document.body!.children.isEmpty, isTrue);
-          expect(jacket!.isMounted, isTrue);
-          expect(mountNode.children[0], jacket!.getNode());
+          expect(jacket.isMounted, isTrue);
+          expect(mountNode.children[0], jacket.getNode());
         });
 
         test('without the given container', () {
           jacket = mount(Sample()(), autoTearDown: false);
 
           expect(document.body!.children, isEmpty);
-          expect(jacket!.isMounted, isTrue);
+          expect(jacket.isMounted, isTrue);
         });
       });
     });
@@ -313,11 +309,11 @@ main() {
 UiFactory<SampleProps> Sample = castUiFactory(_$Sample); // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
-  late bool foo;
+  bool? foo;
 }
 
 mixin SampleState on UiState {
-  late bool bar;
+  bool? bar;
 }
 
 class SampleComponent extends UiStatefulComponent2<SampleProps, SampleState> {

@@ -48,8 +48,8 @@ main() {
     });
 
     group('should skip checking for certain props', () {
-      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()())!;
-      final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
+      final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()());
+      final consumedKeys = meta!.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
       final skippedKey = consumedKeys.first;
 
       commonComponentTests(
@@ -158,7 +158,7 @@ main() {
       /// Declares a [group] in which tests declared via [testFunction] are expected to fail
       /// with an error matching [testFailureMatcher].
       @isTestGroup
-      void expectedFailGroup(String description, void Function() groupBody, {required dynamic testFailureMatcher}) {
+      void expectedFailGroup(String description, void Function() groupBody, {@required dynamic testFailureMatcher}) {
         group(description, () {
           int totalTestCount = 0;
           late List<TestFailure> testFailureErrors;
@@ -199,7 +199,7 @@ main() {
       });
 
       expectedFailGroup('forwards consumed props -', () {
-        final UiProps Function([Map<dynamic, dynamic>]) factory = registerHelperComponent(
+        final factory = registerHelperComponent(
           propsMeta: testPropsMeta,
           consumedProps: testPropsMeta.all,
           render: (component) => (Wrapper()..addAll(component.props))(),
@@ -213,7 +213,7 @@ main() {
       }, testFailureMatcher: contains('Unexpected keys on forwarding target'));
 
       expectedFailGroup('does not forward all of the unconsumed props in propsMeta -', () {
-        UiProps Function([Map<dynamic, dynamic>]) factory = registerHelperComponent(
+        var factory = registerHelperComponent(
           propsMeta: testPropsMeta,
           consumedProps: [],
           render: (component) => (Wrapper()

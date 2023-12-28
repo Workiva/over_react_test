@@ -253,9 +253,9 @@ main() {
     });
 
     group('getByTestId returns', () {
-      sharedTests({bool? shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
-            shallow! ? renderShallow(instance) : render(instance);
+            shallow ? renderShallow(instance) : render(instance);
 
         group('the single descendant that has the appropriate value for the `data-test-id` prop key when it is a', () {
           const String targetFlagProp = 'data-name';
@@ -427,16 +427,6 @@ main() {
 
           expect(descendant, isNull);
         });
-
-        test('null if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))()
-          ));
-
-          var descendant = getByTestId(renderedInstance, null);
-
-          expect(descendant, isNull);
-        });
       }
 
       group('(rendered component)', () {
@@ -461,9 +451,9 @@ main() {
     });
 
     group('getAllByTestId returns', () {
-      sharedTests({bool? shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
-            shallow! ? renderShallow(instance) : render(instance);
+            shallow ? renderShallow(instance) : render(instance);
 
         group('a list containing the single descendant that have the appropriate value for the `data-test-id` prop key when it is a', () {
           const String targetFlagProp = 'data-name';
@@ -637,15 +627,6 @@ main() {
           var renderedInstance = testSpecificRender(Wrapper()());
 
           var descendants = getAllByTestId(renderedInstance, 'null');
-          expect(descendants, isEmpty);
-        });
-
-        test('an empty list if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))(),
-          ));
-
-          var descendants = getAllByTestId(renderedInstance, null);
           expect(descendants, isEmpty);
         });
 
@@ -1029,16 +1010,6 @@ main() {
 
         expect(descendant, isNull);
       });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, null);
-
-        expect(descendant, isNull);
-      });
     });
 
     group('getComponentByTestId returns', () {
@@ -1141,16 +1112,6 @@ main() {
         ));
 
         var descendant = getComponentByTestId(renderedInstance, 'null');
-
-        expect(descendant, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, null);
 
         expect(descendant, isNull);
       });
@@ -1262,16 +1223,6 @@ main() {
         ));
 
         var props = getPropsByTestId(renderedInstance, 'null');
-
-        expect(props, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var props = getPropsByTestId(renderedInstance, null);
 
         expect(props, isNull);
       });

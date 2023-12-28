@@ -865,6 +865,7 @@ void shouldFail(value, Matcher matcher, expected) {
     if (expected is String) {
       expect(_errorString, equalsIgnoringWhitespace(expected));
     } else {
+      expect(_errorString, isNotNull);
       expect(_errorString!.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
     }
   }
