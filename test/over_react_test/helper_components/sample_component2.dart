@@ -7,7 +7,7 @@ part 'sample_component2.over_react.g.dart';
 UiFactory<Sample2Props> Sample2 = castUiFactory(_$Sample2); // ignore: undefined_identifier
 
 mixin Sample2Props on UiProps {
-  late bool shouldNeverBeNull;
+  bool? shouldNeverBeNull;
 }
 
 class SampleComponent2 extends UiComponent2<Sample2Props> {
