@@ -28,8 +28,6 @@ mixin TestCommonRequired2Props on UiProps {
 
   @nullableRequiredProp
   bool? defaultFoo;
-
-  // todo add late prop??
 }
 
 class TestCommonRequired2Component extends
