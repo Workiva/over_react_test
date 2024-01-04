@@ -40,7 +40,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
             return PropError.required(info.propName, 'shouldNeverBeNull is necessary');
           }
 
-          if (shouldLog == false && shouldAlwaysBeFalse == false) {
+          if (props.shouldLog == false && (props.shouldAlwaysBeFalse ?? false) == false) {
             return PropError.combination('shouldLog', 'shouldAlwaysBeFalse', 'logging is required');
           }
 
@@ -51,8 +51,8 @@ class SampleComponent extends UiComponent2<SampleProps> {
           return null;
         },
         keyForProp((p) => p.shouldAlwaysBeFalse): (props, info) {
-          if (shouldAlwaysBeFalse) {
-            return PropError.value(shouldAlwaysBeFalse, info.propName, 'shouldAlwaysBeFalse should never equal true.');
+          if (props.shouldAlwaysBeFalse ?? false) {
+            return PropError.value(props.shouldAlwaysBeFalse, info.propName, 'shouldAlwaysBeFalse should never equal true.');
           }
 
           return null;
