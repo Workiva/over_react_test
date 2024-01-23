@@ -30,7 +30,7 @@ UiFactory<ShadowNestedProps> ShadowNested = uiForwardRef(
 
     useEffect(() {
 	      var shadowRootFirstChild = DivElement()..dataset['test-id'] = props.shadowRootFirstChildTestId ?? 'shadowRootFirstChild';
-	      divRef.current?.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
+	      divRef.current!.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
 	      react_dom.render(Fragment()(props.children), shadowRootFirstChild);
 	      return () => react_dom.unmountComponentAtNode(shadowRootFirstChild);
 	    }, []);

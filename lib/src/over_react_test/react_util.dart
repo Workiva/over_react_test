@@ -105,7 +105,7 @@ ReactElement renderShallow(ReactElement instance, {bool autoTearDown = true, Cal
 void unmount(dynamic instanceOrContainerNode) {
   if (instanceOrContainerNode == null) return;
 
-  late Element? containerNode;
+  final Element? containerNode;
 
   if (instanceOrContainerNode is Element) {
     containerNode = instanceOrContainerNode;
@@ -179,7 +179,7 @@ List<Element> _attachedReactContainers = [];
     {bool autoTearDown = true,
     Element? container,
     Callback? autoTearDownCallback}) {
-  final containerElement = container ??= DivElement()
+  final containerElement = container ?? DivElement()
     // Set arbitrary height and width for container to ensure nothing is cut off.
     ..style.setProperty('width', '800px')
     ..style.setProperty('height', '800px');
@@ -499,14 +499,21 @@ List<Element> _findDeep(Node? root, String itemSelector, {bool searchInShadowDom
   List<Element> nodes = [];
   void recursiveSeek(Node? _root, int _currentDepth) {
     // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
-    final List<Element> Function(String) rootQuerySelectorAll = _root is ShadowRoot ? _root.querySelectorAll : _root is Element ? _root.querySelectorAll : (String s) => [];
+    final List<Element> Function(String) rootQuerySelectorAll;
+    if ( _root is ShadowRoot) {
+      rootQuerySelectorAll = _root.querySelectorAll;
+    } else if (_root is Element) {
+      rootQuerySelectorAll =  _root.querySelectorAll;
+    } else {
+      throw Exception('Unhandled node that is neither a ShadowRoot nor an Element: $_root');
+    }
     nodes.addAll(rootQuerySelectorAll(itemSelector));
     if (!findMany && nodes.isNotEmpty) {
       return;
     }
     // This method of finding shadow roots may not be performant, but it's good enough for usage in tests.
     if (searchInShadowDom && (depth == null || _currentDepth < depth)) {
-      var foundShadows = rootQuerySelectorAll('*').where((el) => el.shadowRoot != null).map((el) => el.shadowRoot!).toList();
+      var foundShadows = rootQuerySelectorAll('*').map((el) => el.shadowRoot).whereNotNull().toList();
       for (var shadowRoot in foundShadows) {
         recursiveSeek(shadowRoot, _currentDepth + 1);
       }

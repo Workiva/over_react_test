@@ -57,7 +57,7 @@ TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElem
 }
 
 /// Provides more a more consistent and easier to use API to test and manipulate a rendered [ReactComponent].
-class TestJacket<T extends react.Component?> {
+class TestJacket<T extends react.Component> {
 
   TestJacket._(over_react.ReactElement reactElement, {Element? mountNode, this.attachedToDocument = false, this.autoTearDown = true})
       : mountNode = mountNode ?? (DivElement()
@@ -114,7 +114,7 @@ class TestJacket<T extends react.Component?> {
   /// >   ```
   /// >   queryByTestId(jacket.mountNode, yourTestId)
   /// >   ```
-  ReactComponent? getInstance() {
+  ReactComponent getInstance() {
     // [1] Adding an additional check for dom components here because the current behavior when `_renderedInstance` is
     //     a DOM component (Element) - does not throw. The cast to `ReactComponent` - while not "sound", is harmless
     //     since it is an anonymous JS interop class - not a Dart type.
@@ -136,7 +136,7 @@ class TestJacket<T extends react.Component?> {
       '''));
     }
 
-    return _renderedInstance as ReactComponent?;
+    return _renderedInstance as ReactComponent;
   }
 
   /// Returns the props associated with the mounted React composite component instance.
@@ -202,7 +202,7 @@ class TestJacket<T extends react.Component?> {
           'getDartInstance() is only supported when the rendered object is a composite (class based) component.');
     }
 
-    return over_react.getDartComponent(_renderedInstance) as T?;
+    return over_react.getDartComponent(_renderedInstance);
   }
 
   /// Returns if the jacket component is mounted or not.

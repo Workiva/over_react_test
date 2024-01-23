@@ -337,10 +337,10 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
         late Map forwardingTargetDefaults;
         switch (forwardingTargetType.dartComponentVersion) { // ignore: invalid_use_of_protected_member
           case ReactDartComponentVersion.component: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps ?? {}; // ignore: deprecated_member_use
+            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps!; // ignore: deprecated_member_use
             break;
           case ReactDartComponentVersion.component2: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps ?? JsMap());
+            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps!);
             break;
         }
 
@@ -530,7 +530,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 = version == ReactDartComponentVersion.component2;
 
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
-    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps ?? [];
+    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps!;
     jacket.unmount();
 
     for (var consumedProp in consumedProps) {
