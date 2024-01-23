@@ -21,13 +21,13 @@ UiFactory<TestCommonRequired2Props> TestCommonRequired2 =
 
 mixin TestCommonRequired2Props on UiProps {
   @nullableRequiredProp
-  bool foobar;
+  bool? foobar;
 
   @requiredProp
-  bool bar;
+  bool? bar;
 
   @nullableRequiredProp
-  bool defaultFoo;
+  bool? defaultFoo;
 }
 
 class TestCommonRequired2Component extends

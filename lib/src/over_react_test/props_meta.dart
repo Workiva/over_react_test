@@ -20,7 +20,7 @@ import 'package:react/react_client/react_interop.dart';
 ///
 /// Returns `null` if [el] does not render a UiComponent2 or does not use the
 /// new mixin syntax (determined by whether accessing propsMeta throws).
-PropsMetaCollection getPropsMeta(ReactElement el) {
+PropsMetaCollection? getPropsMeta(ReactElement el) {
   // ignore: invalid_use_of_protected_member
   final isComponent2 = ReactDartComponentVersion.fromType(el.type) == '2';
   if (!isComponent2) return null;

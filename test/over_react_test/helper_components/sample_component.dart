@@ -7,32 +7,31 @@ part 'sample_component.over_react.g.dart';
 UiFactory<SampleProps> Sample = castUiFactory(_$Sample); // ignore: undefined_identifier
 
 mixin SampleProps on UiProps {
-  bool shouldNeverBeNull;
+  bool? shouldNeverBeNull;
 
-  bool shouldAlwaysBeFalse;
+  bool? shouldAlwaysBeFalse;
 
-  bool shouldErrorInRender;
+  bool? shouldErrorInRender;
 
-  bool shouldErrorInMount;
+  bool? shouldErrorInMount;
 
-  bool shouldErrorInUnmount;
+  bool? shouldErrorInUnmount;
 
-  bool addExtraLogAndWarn;
+  bool? addExtraLogAndWarn;
 
-  Function() onComponentDidMount;
+  Function()? onComponentDidMount;
 
-  bool shouldLog;
+  bool? shouldLog;
 }
 
 class SampleComponent extends UiComponent2<SampleProps> {
-  @override
-  Map get defaultProps => (newProps()
-    ..shouldAlwaysBeFalse = false
-    ..shouldErrorInRender = false
-    ..shouldErrorInMount = false
-    ..shouldErrorInUnmount = false
-    ..addExtraLogAndWarn = false
-    ..shouldLog = true);
+  // Prop defaults
+  bool get shouldAlwaysBeFalse => props.shouldAlwaysBeFalse ?? false;
+  bool get shouldErrorInRender => props.shouldErrorInRender ?? false;
+  bool get shouldErrorInMount => props.shouldErrorInMount ?? false;
+  bool get shouldErrorInUnmount => props.shouldErrorInUnmount ?? false;
+  bool get addExtraLogAndWarn => props.addExtraLogAndWarn ?? false;
+  bool get shouldLog => props.shouldLog ?? true;
 
   @override
   get propTypes => {
@@ -41,7 +40,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
             return PropError.required(info.propName, 'shouldNeverBeNull is necessary');
           }
 
-          if (props.shouldLog == false && props.shouldAlwaysBeFalse == false) {
+          if (props.shouldLog == false && (props.shouldAlwaysBeFalse ?? false) == false) {
             return PropError.combination('shouldLog', 'shouldAlwaysBeFalse', 'logging is required');
           }
 
@@ -52,7 +51,7 @@ class SampleComponent extends UiComponent2<SampleProps> {
           return null;
         },
         keyForProp((p) => p.shouldAlwaysBeFalse): (props, info) {
-          if (props.shouldAlwaysBeFalse) {
+          if (props.shouldAlwaysBeFalse ?? false) {
             return PropError.value(props.shouldAlwaysBeFalse, info.propName, 'shouldAlwaysBeFalse should never equal true.');
           }
 
@@ -63,22 +62,22 @@ class SampleComponent extends UiComponent2<SampleProps> {
   @override
   componentDidMount() {
     window.console.warn('Just a lil warning');
-    if (props.shouldErrorInMount) throw Error();
+    if (shouldErrorInMount) throw Error();
     props.onComponentDidMount?.call();
   }
 
   @override
   render() {
     window.console.warn('A second warning');
-    if (props.shouldErrorInRender) {
+    if (shouldErrorInRender) {
       throw Error();
     } else {
-      if (props.addExtraLogAndWarn) {
+      if (addExtraLogAndWarn) {
         window.console.log('Extra Log');
         window.console.warn('Extra Warn');
       }
 
-      if (props.shouldLog) window.console.log('Logging a standard log');
+      if (shouldLog) window.console.log('Logging a standard log');
       window.console.warn('And a third');
       return Dom.div()(
           (Dom.button()
@@ -97,6 +96,6 @@ class SampleComponent extends UiComponent2<SampleProps> {
   void componentWillUnmount() {
     super.componentWillUnmount();
 
-    if (props.shouldErrorInUnmount) throw Error();
+    if (shouldErrorInUnmount) throw Error();
   }
 }

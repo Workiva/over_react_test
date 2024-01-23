@@ -59,37 +59,37 @@ main() {
             reason: 'The React instance should have been unmounted.'
         );
 
-        expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+        expect(document.body!.children, isEmpty, reason: 'All attached mount points should have been removed.');
       });
 
       test('renderAttachedToDocument renders the component into the document', () {
-        expect(document.body.children, isEmpty);
+        expect(document.body!.children, isEmpty);
 
         renderedInstance = renderAttachedToDocument(Wrapper());
 
-        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+        expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
             reason: 'The component should have been rendered into the container div.');
       });
 
       test('renderAttachedToDocument renders the component into the document with a given container', () {
-        expect(document.body.children, isEmpty);
+        expect(document.body!.children, isEmpty);
 
         var container = DivElement();
         renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
 
-        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+        expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
             reason: 'The component should have been rendered into the container div.');
-        expect(document.body.children[0], container);
+        expect(document.body!.children[0], container);
       });
     });
 
 
     test('renderAttachedToDocument renders the component into the document and tearDownAttachedNodes cleans them up', () {
-      expect(document.body.children, isEmpty);
+      expect(document.body!.children, isEmpty);
 
       var renderedInstance = renderAttachedToDocument(Wrapper(), autoTearDown: false);
 
-      expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+      expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
           reason: 'The component should have been rendered into the container div.');
 
       tearDownAttachedNodes();
@@ -102,7 +102,7 @@ main() {
           reason: 'The React instance should have been unmounted.'
       );
 
-      expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+      expect(document.body!.children, isEmpty, reason: 'All attached mount points should have been removed.');
     });
 
     group('renderAndGetDom', () {
@@ -145,7 +145,7 @@ main() {
 
       test('simulates a click on a component with additional event data', () {
         var flag = false;
-        SyntheticMouseEvent event;
+        late SyntheticMouseEvent event;
         var renderedInstance = render((Dom.div()
           ..onClick = (evt) {
             flag = true;
@@ -253,7 +253,7 @@ main() {
     });
 
     group('getByTestId returns', () {
-      sharedTests({bool shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
             shallow ? renderShallow(instance) : render(instance);
 
@@ -427,16 +427,6 @@ main() {
 
           expect(descendant, isNull);
         });
-
-        test('null if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))()
-          ));
-
-          var descendant = getByTestId(renderedInstance, null);
-
-          expect(descendant, isNull);
-        });
       }
 
       group('(rendered component)', () {
@@ -461,7 +451,7 @@ main() {
     });
 
     group('getAllByTestId returns', () {
-      sharedTests({bool shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
             shallow ? renderShallow(instance) : render(instance);
 
@@ -640,15 +630,6 @@ main() {
           expect(descendants, isEmpty);
         });
 
-        test('an empty list if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))(),
-          ));
-
-          var descendants = getAllByTestId(renderedInstance, null);
-          expect(descendants, isEmpty);
-        });
-
         test('without throwing when text nodes are present in the tree', () {
           var renderedInstance = render(Wrapper()(
             Dom.div()(),
@@ -750,7 +731,7 @@ main() {
         group('`data-test-id` html attribute key', () {
           test('', () {
             var renderedInstance = render((Nested()..addTestId('value'))());
-            var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+            var innerNode = findDomNode(renderedInstance)!.querySelector('[data-test-id~="inner"]');
 
             expect(queryByTestId(renderedInstance, 'value'), innerNode);
           });
@@ -764,7 +745,7 @@ main() {
 
         test('custom html attribute key', () {
           var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
-          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+          var innerNode = findDomNode(renderedInstance)!.querySelector('[data-test-id~="inner"]');
 
           expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
         });
@@ -788,7 +769,7 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var innerNode = shadowHostRef.current.shadowRoot.querySelector('[data-test-id~="$searchId"]');
+          var innerNode = shadowHostRef.current!.shadowRoot!.querySelector('[data-test-id~="$searchId"]');
 
           expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: true), innerNode);
         });
@@ -817,7 +798,7 @@ main() {
               (Nested()..addTestId('value'))(),
               (Nested()..addTestId('value'))(),
             ));
-            var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+            var innerNodes = findDomNode(renderedInstance)!.querySelectorAll('[data-test-id~="inner"]');
 
             expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
           });
@@ -834,7 +815,7 @@ main() {
             (Nested()..addTestId('value'))(),
             (Nested()..addTestId('value'))(),
           ));
-          var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+          var innerNodes = findDomNode(renderedInstance)!.querySelectorAll('[data-test-id~="inner"]');
 
           expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
         });
@@ -878,9 +859,9 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
-          var level2 = shadow2Ref.current.shadowRoot.querySelector('.div2');
-          var level3 = shadow3Ref.current.shadowRoot.querySelector('.div3');
+          var level1 = shadow1Ref.current!.shadowRoot!.querySelector('.div1');
+          var level2 = shadow2Ref.current!.shadowRoot!.querySelector('.div2');
+          var level3 = shadow3Ref.current!.shadowRoot!.querySelector('.div3');
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true), [level1, level2, level3]);
         });
@@ -919,7 +900,7 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
+          var level1 = shadow1Ref.current!.shadowRoot!.querySelector('.div1');
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
         });
@@ -1029,16 +1010,6 @@ main() {
 
         expect(descendant, isNull);
       });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, null);
-
-        expect(descendant, isNull);
-      });
     });
 
     group('getComponentByTestId returns', () {
@@ -1141,16 +1112,6 @@ main() {
         ));
 
         var descendant = getComponentByTestId(renderedInstance, 'null');
-
-        expect(descendant, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, null);
 
         expect(descendant, isNull);
       });
@@ -1262,16 +1223,6 @@ main() {
         ));
 
         var props = getPropsByTestId(renderedInstance, 'null');
-
-        expect(props, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var props = getPropsByTestId(renderedInstance, null);
 
         expect(props, isNull);
       });
