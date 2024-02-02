@@ -18,3 +18,13 @@ dev_dependencies:
   build_web_compilers: ^3.0.0
   dependency_validator: ^3.2.2
   pedantic: ^1.8.0
+
+dependency_overrides:
+  over_react:
+    git:
+      url: https://github.com/Workiva/over_react.git
+      ref: v5_wip
+  over_react_test:
+    git:
+      url: https://github.com/Workiva/over_react_test.git
+      ref: v3_wip
