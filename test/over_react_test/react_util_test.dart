@@ -788,6 +788,13 @@ main() {
         });
       });
 
+      test('throws a helpful error when findDomNode(root) is null', () {
+        var jacket = mount(RendersNothing()());
+        expect(
+            () => queryByTestId(jacket.getInstance(), 'unusedTestId'),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+                contains('findDomNode(root) must not be null'))));
+      });
     });
 
     group('queryAllByTestId returns all Elements', () {
@@ -904,6 +911,14 @@ main() {
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
         });
+      });
+
+      test('throws a helpful error when findDomNode(root) is null', () {
+        var jacket = mount(RendersNothing()());
+        expect(
+            () => queryByTestId(jacket.getInstance(), 'unusedTestId'),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+                contains('findDomNode(root) must not be null'))));
       });
     });
 
@@ -1342,4 +1357,14 @@ mixin Test2Props on UiProps {}
 class Test2Component extends UiComponent2<Test2Props> {
   @override
   render() => (Dom.div()..addProp('isRenderResult', true))();
+}
+
+
+UiFactory<RendersNothingProps> RendersNothing = castUiFactory(_$RendersNothing); // ignore: undefined_identifier
+
+mixin RendersNothingProps on UiProps {}
+
+class RendersNothingComponent extends UiComponent2<RendersNothingProps> {
+  @override
+  render() => null;
 }
