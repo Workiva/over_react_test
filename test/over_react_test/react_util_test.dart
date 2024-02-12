@@ -916,7 +916,7 @@ main() {
       test('throws a helpful error when findDomNode(root) is null', () {
         var jacket = mount(RendersNothing()());
         expect(
-            () => queryByTestId(jacket.getInstance(), 'unusedTestId'),
+            () => queryAllByTestId(jacket.getInstance(), 'unusedTestId'),
             throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
                 contains('findDomNode(root) must not be null'))));
       });
