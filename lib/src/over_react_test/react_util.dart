@@ -449,8 +449,15 @@ Element? getComponentRootDomByTestId(dynamic root, String value, {String key = d
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element? queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
-  var results = _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
+Element? queryByTestId(Object root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
+  ArgumentError.checkNotNull(root, 'root');
+
+  final node = findDomNode(root);
+  if (node == null) {
+    throw ArgumentError('findDomNode(root) must not be null. To use this function, your component must render DOM.');
+  }
+
+  var results = _findDeep(node, _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: false, depth: shadowDepth);
   return results.isNotEmpty ? results.first : null;
 }
 
@@ -489,15 +496,22 @@ Element? queryByTestId(dynamic root, String value, {String key = defaultTestIdKe
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
-  return _findDeep(findDomNode(root), _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
+List<Element> queryAllByTestId(Object root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
+  ArgumentError.checkNotNull(root, 'root');
+
+  final node = findDomNode(root);
+  if (node == null) {
+    throw ArgumentError('findDomNode(root) must not be null. To use this function, your component must render DOM.');
+  }
+
+  return _findDeep(node, _makeTestIdSelector(value, key: key), searchInShadowDom: searchInShadowDom, findMany: true, depth: shadowDepth);
 }
 
 String _makeTestIdSelector(String value, {String key = defaultTestIdKey}) => '[$key~="$value"]';
 
-List<Element> _findDeep(Node? root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int? depth}) {
+List<Element> _findDeep(Node root, String itemSelector, {bool searchInShadowDom = false, bool findMany = true, int? depth}) {
   List<Element> nodes = [];
-  void recursiveSeek(Node? _root, int _currentDepth) {
+  void recursiveSeek(Node _root, int _currentDepth) {
     // The LHS type prevents `rootQuerySelectorAll` from returning `_FrozenElementList<JSObject<undefined>>` instead of `<Element>` in DDC
     final List<Element> Function(String) rootQuerySelectorAll;
     if ( _root is ShadowRoot) {
