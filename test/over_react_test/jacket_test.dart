@@ -135,6 +135,26 @@ main() {
         });
       });
     });
+
+    test('uses an 800px by 800px mountNode when none is provided', () {
+      final jacket = mount(Sample()());
+      expect(jacket.mountNode.style.width, '800px');
+      expect(jacket.mountNode.style.height, '800px');
+    });
+
+    test('does not mutate the styles (including width/height) of the provided mountNode', () {
+      final mountNode = DivElement()
+        ..style.width = '123px'
+        ..style.height = '456px';
+      final initialMountNodeCssText = mountNode.style.cssText;
+
+      final jacket = mount(Sample()(), mountNode: mountNode);
+      expect(jacket.mountNode, mountNode, reason: 'test setup check');
+
+      expect(mountNode.style.width, '123px');
+      expect(mountNode.style.height, '456px');
+      expect(mountNode.style.cssText, initialMountNodeCssText);
+    });
   });
 
   group('TestJacket: composite component:', () {
