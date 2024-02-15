@@ -179,10 +179,11 @@ List<Element> _attachedReactContainers = [];
     {bool autoTearDown = true,
     Element? container,
     Callback? autoTearDownCallback}) {
-  final containerElement = container ?? DivElement()
-    // Set arbitrary height and width for container to ensure nothing is cut off.
-    ..style.setProperty('width', '800px')
-    ..style.setProperty('height', '800px');
+  final containerElement = container ??
+      (DivElement()
+        // Set arbitrary height and width for container to ensure nothing is cut off.
+        ..style.setProperty('width', '800px')
+        ..style.setProperty('height', '800px'));
 
   setComponentZone();
 

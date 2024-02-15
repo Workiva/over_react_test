@@ -105,6 +105,27 @@ main() {
       expect(document.body!.children, isEmpty, reason: 'All attached mount points should have been removed.');
     });
 
+    test('renderAttachedToDocument uses a 800px/800px container when none is provided', () {
+      final renderedInstance = renderAttachedToDocument(Wrapper());
+      final container = findDomNode(renderedInstance)!.parent!;
+      expect(container.style.width, '800px');
+      expect(container.style.height, '800px');
+    });
+
+    test('renderAttachedToDocument does not mutate the styles (including width/height) of the provided container', () {
+      var container = DivElement()
+        ..style.width = '123px'
+        ..style.height = '456px';
+      final initialContainerCssText = container.style.cssText;
+
+      final renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
+      expect(findDomNode(renderedInstance)!.parent!, container, reason: 'test setup check');
+
+      expect(container.style.width, '123px');
+      expect(container.style.height, '456px');
+      expect(container.style.cssText, initialContainerCssText);
+    });
+
     group('renderAndGetDom', () {
       test('renders and returns the root node of a composite component', () {
         expect(renderAndGetDom(Test()()), isA<Element>());
