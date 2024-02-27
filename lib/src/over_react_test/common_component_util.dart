@@ -535,7 +535,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
 
     for (var consumedProp in consumedProps) {
       for (var prop in consumedProp.props) {
-        if (prop.isNullable) {
+        if (prop.isNullable && !prop.isLate) {
           nullableProps.add(prop.key);
         } else if (prop.isRequired) {
           requiredProps.add(prop.key);
