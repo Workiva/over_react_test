@@ -68,7 +68,8 @@ main() {
       group('when passed a UiComponent', () {
         commonComponentTests(() => (TestCommonRequired()
               ..bar = true
-              ..foobar = true),
+              ..foobar = true
+              ..lateProp = true),
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
@@ -79,7 +80,8 @@ main() {
       group('when passed a UiComponent2', () {
         commonComponentTests(() => (TestCommonRequired2()
               ..bar = true
-              ..foobar = true),
+              ..foobar = true
+              ..lateProp = true),
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
@@ -134,7 +136,8 @@ main() {
         // todo create a new component for this
         sharedTest(() => TestCommonRequired()
           ..bar = true
-          ..foobar = true);
+          ..foobar = true
+          ..lateProp = true);
       });
 
       group('when passed a UiComponent2', () {
@@ -142,7 +145,8 @@ main() {
           // todo create a new component for this
           sharedTest(() => TestCommonRequired2()
             ..bar = true
-            ..foobar = true);
+            ..foobar = true
+            ..lateProp = true);
         });
 
         group('(new boilerplate)', () {

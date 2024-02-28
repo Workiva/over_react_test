@@ -535,13 +535,13 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
 
     for (var consumedProp in consumedProps) {
       for (var prop in consumedProp.props) {
-        if (!prop.isLate) {
+        // if (!prop.isLate) {
           if (prop.isNullable) {
             nullableProps.add(prop.key);
           } else if (prop.isRequired) {
             requiredProps.add(prop.key);
           }
-        }
+        // }
 
         keyToErrorMessage[prop.key] = prop.errorMessage;
       }
