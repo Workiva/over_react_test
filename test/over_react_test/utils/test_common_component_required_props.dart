@@ -30,6 +30,8 @@ class _$TestCommonRequiredProps extends UiProps {
 
   @nullableRequiredProp
   bool? defaultFoo;
+
+  late bool lateProp;
 }
 
 @Component()
