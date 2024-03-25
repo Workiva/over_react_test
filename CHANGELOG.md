@@ -1,5 +1,8 @@
 # OverReact Test Changelog
 
+## 2.11.7
+* Raise max allowed versions of `react` and `flux` dependencies ([#152](https://github.com/Workiva/over_react_test/pull/152))
+
 ## 2.11.6
 * Remove usages of deprecated APIs that will be removed in react-dart 7.0.0
 * Bump dependencies: `meta: ^1.8.0`, `test: ^1.21.1`
