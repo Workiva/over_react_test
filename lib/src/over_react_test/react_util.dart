@@ -422,6 +422,9 @@ Element? getComponentRootDomByTestId(dynamic root, String value, {String key = d
 /// Returns the [Element] of the first descendant of [root] that has its [key] html attribute value set to a
 /// space-delimited string containing [value].
 ///
+/// Throws if [root] or `findDomNode(root)` is `null`. [root] is kept nullable for convenience, since the input
+/// to this function is often a `dynamic` component instance value.
+///
 /// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
 /// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
 /// should only be needed if there are a lot of ShadowRoots within ShadowRoots.
@@ -450,7 +453,7 @@ Element? getComponentRootDomByTestId(dynamic root, String value, {String key = d
 ///     queryByTestId(renderedInstance, 'value'); // returns the `inner` `<div>`
 ///
 /// Related: [queryAllByTestId], [getComponentRootDomByTestId].
-Element? queryByTestId(Object root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
+Element? queryByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
   ArgumentError.checkNotNull(root, 'root');
 
   final node = findDomNode(root);
@@ -463,6 +466,9 @@ Element? queryByTestId(Object root, String value, {String key = defaultTestIdKey
 }
 
 /// Returns all descendant [Element]s of [root] that has their [key] html attribute value set to [value].
+///
+/// Throws if [root] or `findDomNode(root)` is `null`. [root] is kept nullable for convenience, since the input
+/// to this function is often a `dynamic` component instance value.
 ///
 /// Setting [searchInShadowDom] to true will allow the query to search within ShadowRoots that use `mode:"open"`.
 /// [shadowDepth] will limit how many layers of ShadowDOM will searched. By default it will search infinitely deep, and this
@@ -497,7 +503,7 @@ Element? queryByTestId(Object root, String value, {String key = defaultTestIdKey
 ///     </div>
 ///
 ///     queryAllByTestId(renderedInstance, 'value'); // returns both `inner` `<div>`s
-List<Element> queryAllByTestId(Object root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
+List<Element> queryAllByTestId(dynamic root, String value, {String key = defaultTestIdKey, bool searchInShadowDom = false, int? shadowDepth}) {
   ArgumentError.checkNotNull(root, 'root');
 
   final node = findDomNode(root);

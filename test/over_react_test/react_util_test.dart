@@ -809,6 +809,10 @@ main() {
         });
       });
 
+      test('throws when root is null', () {
+        expect(() => queryByTestId(null, 'unusedTestId'), throwsA(isA<ArgumentError>()));
+      });
+
       test('throws a helpful error when findDomNode(root) is null', () {
         var jacket = mount(RendersNothing()());
         expect(
@@ -932,6 +936,10 @@ main() {
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
         });
+      });
+
+      test('throws when root is null', () {
+        expect(() => queryAllByTestId(null, 'unusedTestId'), throwsA(isA<ArgumentError>()));
       });
 
       test('throws a helpful error when findDomNode(root) is null', () {
