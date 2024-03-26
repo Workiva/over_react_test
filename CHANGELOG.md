@@ -2,8 +2,6 @@
 
 ## 3.0.0
 * Add support for Dart null safety ([#155](https://github.com/Workiva/over_react_test/pull/155))
-  * **BREAKING CHANGES**
-    *  The first argument of `queryByTestId` / `queryAllByTestId` (`root`) is now non-nullable ([#157](https://github.com/Workiva/over_react_test/pull/157)).
   * SDK / Dependency Versioning:
     * Increase minimum Dart SDK version from `2.11.0` to `2.13.0`.
     * Increase minimum `react` version from `6.0.1` to `7.0.0`.
