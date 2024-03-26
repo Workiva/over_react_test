@@ -75,7 +75,7 @@ main() {
               configuration: errorConfig);
 
           expect(logs, hasLength(2));
-          expect(logs.firstWhere((log) => log.contains('shouldAlwaysBeFalse')),
+          expect(logs.firstWhere((log) => log?.contains('shouldAlwaysBeFalse') ?? false),
               contains('set to true'));
         });
 
@@ -229,11 +229,12 @@ main() {
             queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
-        triggerDocumentClick(button);
+        expect(button, isNotNull);
+        triggerDocumentClick(button!);
       }, configuration: warnConfig);
 
       expect(logs, hasLength(1));
-      expect(logs.first.contains('I have been clicked'), isTrue);
+      expect(logs.first?.contains('I have been clicked'), isTrue);
     });
 
     test('handles errors caused when rendering', () async {
@@ -301,7 +302,8 @@ main() {
             queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
-        triggerDocumentClick(button);
+        expect(button, isNotNull);
+        triggerDocumentClick(button!);
       }, configuration: logConfig);
 
       expect(logs, hasLength(3));
@@ -315,7 +317,8 @@ main() {
             queryByTestId(jacket.getInstance(), 'ort_sample_component_button');
         await Future.delayed(Duration(milliseconds: 5));
 
-        triggerDocumentClick(button);
+        expect(button, isNotNull);
+        triggerDocumentClick(button!);
       }, configuration: warnConfig);
 
       expect(logs, hasLength(5));

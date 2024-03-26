@@ -57,7 +57,7 @@ abstract class PropsThatShouldBeForwarded {
 
   Map get props;
 
-  bool foo;
+  bool? foo;
 }
 
 @PropsMixin()
@@ -69,7 +69,7 @@ abstract class PropsThatShouldNotBeForwarded {
 
   Map get props;
 
-  bool bar;
+  bool? bar;
 }
 
 // AF-3369 This will be removed once the transition to Dart 2 is complete.

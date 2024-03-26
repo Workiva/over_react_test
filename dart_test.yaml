@@ -3,3 +3,4 @@ platforms:
 
 paths:
   - test/over_react_test.dart
+  - test/unsound_test.dart

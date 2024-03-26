@@ -15,11 +15,10 @@
 import 'dart:html';
 
 import 'package:over_react/over_react.dart' as over_react;
+import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 import 'package:react/react.dart' as react;
 import 'package:react/react_client/react_interop.dart' show ReactComponent;
 import 'package:react/react_test_utils.dart' as react_test_utils;
-
-import 'package:over_react_test/src/over_react_test/react_util.dart' as react_util;
 
 import './zone_util.dart';
 
@@ -46,7 +45,7 @@ import './zone_util.dart';
 ///
 /// To have the instance not automatically unmounted when the test if over set [autoTearDown] to `false`.
 TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElement, {
-    Element mountNode,
+    Element? mountNode,
     bool attachedToDocument = false,
     bool autoTearDown = true
 }) {
@@ -60,14 +59,14 @@ TestJacket<T> mount<T extends react.Component>(over_react.ReactElement reactElem
 /// Provides more a more consistent and easier to use API to test and manipulate a rendered [ReactComponent].
 class TestJacket<T extends react.Component> {
 
-  TestJacket._(over_react.ReactElement reactElement, {Element mountNode, this.attachedToDocument = false, this.autoTearDown = true})
+  TestJacket._(over_react.ReactElement reactElement, {Element? mountNode, this.attachedToDocument = false, this.autoTearDown = true})
       : mountNode = mountNode ?? (DivElement()
     ..style.height = '800px'
     ..style.width = '800px') {
     _render(reactElement);
   }
 
-  /* [1] */ Object _renderedInstance;
+  /* [1] */ Object? _renderedInstance;
   final Element mountNode;
   final bool attachedToDocument;
   final bool autoTearDown;
@@ -169,7 +168,7 @@ class TestJacket<T extends react.Component> {
   /// >     ```
   /// >     jacket.mountNode.querySelector(someSelectorThatTargetsTheRootNode);
   /// >     ```
-  Element getNode() {
+  Element? getNode() {
     if (!_isCompositeComponent && !_isDomComponent) {
       throw StateError(over_react.unindent('''
         getNode() is only supported when the rendered object is a DOM or composite (class based) component.
@@ -192,7 +191,7 @@ class TestJacket<T extends react.Component> {
   /// > If you are rendering a function component using [mount], calling [getDartInstance] will throw a `StateError`.
   /// >
   /// > See [getInstance] for more information about this limitation.
-  T getDartInstance() {
+  T? getDartInstance() {
     // [1] Adding an additional check for dom components here because the current behavior when `_renderedInstance` is
     //     a DOM component (Element) - is to return `null`. While that will most likely cause null exceptions once the
     //     consumer attempts to make a call on the "Dart instance" they have requested - we don't want this change
@@ -203,7 +202,7 @@ class TestJacket<T extends react.Component> {
           'getDartInstance() is only supported when the rendered object is a composite (class based) component.');
     }
 
-    return over_react.getDartComponent(_renderedInstance) as T;
+    return over_react.getDartComponent(_renderedInstance);
   }
 
   /// Returns if the jacket component is mounted or not.
@@ -220,20 +219,20 @@ class TestJacket<T extends react.Component> {
   /// > If you are rendering a function or DOM component using [mount], calling [setState] will throw a `StateError`.
   /// >
   /// > See [getInstance] for more information about this limitation.
-  void setState(newState, [callback()]) {
+  void setState(newState, [callback()?]) {
     if (!_isCompositeComponent) {
       throw StateError(
           'setState() is only supported when the rendered object is a composite (class based) component.');
     }
 
-    getDartInstance().setState(newState, callback);
+    getDartInstance()!.setState(newState, callback);
   }
 
   /// Unmounts the React component instance and cleans up any attached DOM nodes.
   void unmount() {
     _isMounted = false;
     react_util.unmount(_renderedInstance);
-    mountNode?.remove();
+    mountNode.remove();
     react_util.tearDownAttachedNodes();
   }
 }

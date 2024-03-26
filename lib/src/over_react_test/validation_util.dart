@@ -160,17 +160,23 @@ void verifyValidationWarning(dynamic warningMatcher) {
 /// [startRecordingValidationWarnings] was first called.
 ///
 /// > Related: [clearValidationWarnings]
-List<String> getValidationWarnings() => _validationWarnings?.toList();
+List<String>? getValidationWarnings() => _validationWarnings?.toList();
 
 /// Clears the list of [ValidationUtil.warn]ings that have been recorded since
 /// [startRecordingValidationWarnings] was first called.
 ///
 /// > Related: [getValidationWarnings]
 void clearValidationWarnings() {
-  _validationWarnings.clear();
+  if (_validationWarnings == null) {
+    throw StateError('Need to call startRecordingValidationWarnings() first.');
+  }
+  _validationWarnings!.clear();
 }
 
-List<String> _validationWarnings;
+List<String>? _validationWarnings;
 void _recordValidationWarning(String warningMessage) {
-  _validationWarnings.add(warningMessage);
+  if (_validationWarnings == null) {
+    throw StateError('Need to call startRecordingValidationWarnings() first.');
+  }
+  _validationWarnings!.add(warningMessage);
 }

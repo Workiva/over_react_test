@@ -17,18 +17,17 @@ import 'dart:html';
 import 'dart:js';
 
 import 'package:meta/meta.dart';
-import 'package:over_react/over_react.dart';
 import 'package:over_react/component_base.dart' as component_base;
+import 'package:over_react/over_react.dart';
 import 'package:over_react_test/over_react_test.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
 import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
+import 'package:react/react_client/js_backed_map.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';
 
-import './custom_matchers.dart';
-import './react_util.dart';
 import 'dart_util.dart';
 
 /// Run common component tests around default props, prop forwarding, class name merging, and class name overrides.
@@ -81,16 +80,16 @@ void commonComponentTests(BuilderOnlyUiFactory factory, {
   bool shouldTestPropForwarding = true,
   List unconsumedPropKeys = const [],
   List skippedPropKeys = const [],
-  List Function(PropsMetaCollection) getUnconsumedPropKeys,
-  List Function(PropsMetaCollection) getSkippedPropKeys,
+  List Function(PropsMetaCollection)? getUnconsumedPropKeys,
+  List Function(PropsMetaCollection)? getSkippedPropKeys,
   Map nonDefaultForwardingTestProps = const {},
   bool shouldTestClassNameMerging = true,
   bool shouldTestClassNameOverrides = true,
   bool ignoreDomProps = true,
   bool shouldTestRequiredProps = true,
   @Deprecated('This flag is not needed as the test will auto detect the version')
-  bool isComponent2,
-  dynamic childrenFactory()
+  bool? isComponent2,
+  dynamic childrenFactory()?
 }) {
   childrenFactory ??= _defaultChildrenFactory;
 
@@ -132,14 +131,14 @@ Iterable _flatten(Iterable iterable) =>
 ///       });
 ///     }
 void expectCleanTestSurfaceAtEnd() {
-  Set<Element> nodesBefore;
+  late Set<Element> nodesBefore;
 
   setUpAll(() {
-    nodesBefore = document.body.children.toSet();
+    nodesBefore = document.body!.children.toSet();
   });
 
   tearDownAll(() {
-    Set<Element> nodesAfter = document.body.children.toSet();
+    Set<Element> nodesAfter = document.body!.children.toSet();
     var nodesAdded = nodesAfter.difference(nodesBefore).map((element) => element.outerHtml).toList();
 
     expect(nodesAdded, isEmpty, reason: 'tests should leave the test surface clean.');
@@ -161,12 +160,12 @@ void expectCleanTestSurfaceAtEnd() {
 /// todo make this public again if there's a need to expose it, once the API has stabilized
 @isTest
 void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory(), {
-  @required List unconsumedPropKeys,
-  @required List skippedPropKeys,
-  @required List Function(PropsMetaCollection) getUnconsumedPropKeys,
-  @required List Function(PropsMetaCollection) getSkippedPropKeys,
-  @required bool ignoreDomProps,
-  @required Map nonDefaultForwardingTestProps,
+  required List unconsumedPropKeys,
+  required List skippedPropKeys,
+  required List Function(PropsMetaCollection)? getUnconsumedPropKeys,
+  required List Function(PropsMetaCollection)? getSkippedPropKeys,
+  required bool ignoreDomProps,
+  required Map nonDefaultForwardingTestProps,
 }) {
   testFunction('forwards unconsumed props as expected', () {
     // This needs to be retrieved inside a `test`/`setUp`/etc, not inside a group,
@@ -335,13 +334,13 @@ void _testPropForwarding(BuilderOnlyUiFactory factory, dynamic childrenFactory()
       /// Test for prop keys that both are forwarded and exist on the forwarding target's default props.
       if (isDartComponent(forwardingTarget)) {
         final forwardingTargetType = (forwardingTarget as ReactElement).type as ReactClass;
-        Map forwardingTargetDefaults;
+        late Map forwardingTargetDefaults;
         switch (forwardingTargetType.dartComponentVersion) { // ignore: invalid_use_of_protected_member
           case ReactDartComponentVersion.component: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps; // ignore: deprecated_member_use
+            forwardingTargetDefaults = forwardingTargetType.dartDefaultProps!; // ignore: deprecated_member_use
             break;
           case ReactDartComponentVersion.component2: // ignore: invalid_use_of_protected_member
-            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps);
+            forwardingTargetDefaults = JsBackedMap.backedBy(forwardingTargetType.defaultProps!);
             break;
         }
 
@@ -427,7 +426,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
       ..classNameBlacklist = 'blacklisted-class-1 blacklisted-class-2';
 
     var renderedInstance = render(builder(childrenFactory()));
-    Iterable<Element> forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
+    final forwardingTargetNodes = getForwardingTargets(renderedInstance).map(findDomNode);
 
     expect(forwardingTargetNodes, everyElement(
         allOf(
@@ -461,7 +460,7 @@ void testClassNameMerging(BuilderOnlyUiFactory factory, dynamic childrenFactory(
 /// > Related: [testClassNameMerging]
 @isTestGroup
 void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  Set<String> classesToOverride;
+  late Set<String> classesToOverride;
   var error;
 
   setUp(() {
@@ -477,7 +476,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
     // but still fail the test if something goes wrong.
     try {
       classesToOverride = getForwardingTargets(reactInstanceWithoutOverrides)
-          .map((target) => findDomNode(target).classes)
+          .map((target) => findDomNode(target)!.classes)
           .expand((CssClassSet classSet) => classSet)
           .toSet();
     } catch(e) {
@@ -500,7 +499,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
         )(childrenFactory())
     );
 
-    Iterable<Element> forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
+    final forwardingTargetNodes = getForwardingTargets(reactInstance).map(findDomNode);
     expect(forwardingTargetNodes, everyElement(
         hasExactClasses('')
     ), reason: '$classesToOverride not overridden');
@@ -514,7 +513,7 @@ void testClassNameOverrides(BuilderOnlyUiFactory factory, dynamic childrenFactor
 /// __Note__: All required props must be provided by [factory].
 @isTestGroup
 void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) {
-  bool isComponent2;
+  late bool isComponent2;
 
   var keyToErrorMessage = {};
   var nullableProps = <String>[];
@@ -531,18 +530,20 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     isComponent2 = version == ReactDartComponentVersion.component2;
 
     var jacket = mount(factory()(childrenFactory()), autoTearDown: false);
-    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps;
+    var consumedProps = (jacket.getDartInstance() as component_base.UiComponent).consumedProps!;
     jacket.unmount();
 
     for (var consumedProp in consumedProps) {
       for (var prop in consumedProp.props) {
-        if (prop.isNullable) {
-          nullableProps.add(prop.key);
-        } else if (prop.isRequired) {
-          requiredProps.add(prop.key);
+        if (!prop.isLate) {
+          if (prop.isNullable) {
+            nullableProps.add(prop.key);
+          } else if (prop.isRequired) {
+            requiredProps.add(prop.key);
+          }
         }
 
-        keyToErrorMessage[prop.key] = prop.errorMessage ?? '';
+        keyToErrorMessage[prop.key] = prop.errorMessage;
       }
     }
   });
@@ -580,8 +581,8 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     void component2RequiredPropsTest() {
       PropTypes.resetWarningCache();
 
-      List<String> consoleErrors = [];
-      JsFunction originalConsoleError = context['console']['error'];
+      var consoleErrors = <String?>[];
+      final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);
@@ -590,7 +591,7 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
       });
 
       final reactComponentFactory = factory().componentFactory as
-      ReactDartComponentFactoryProxy2; // ignore: avoid_as
+          ReactDartComponentFactoryProxy2; // ignore: avoid_as
 
       for (var propKey in requiredProps) {
         if (!reactComponentFactory.defaultProps.containsKey(propKey)) {
@@ -657,8 +658,8 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
     } else {
       PropTypes.resetWarningCache();
 
-      List<String> consoleErrors = [];
-      JsFunction originalConsoleError = context['console']['error'];
+      var consoleErrors = <String?>[];
+      final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
         consoleErrors.add(message);

@@ -20,8 +20,8 @@ import 'package:over_react/react_dom.dart' as react_dom;
 part 'shadow_nested_component.over_react.g.dart';
 
 mixin ShadowNestedProps on UiProps {
-  String shadowRootHostTestId;
-  String shadowRootFirstChildTestId;
+  String? shadowRootHostTestId;
+  String? shadowRootFirstChildTestId;
 }
 
 UiFactory<ShadowNestedProps> ShadowNested = uiForwardRef(
@@ -30,7 +30,7 @@ UiFactory<ShadowNestedProps> ShadowNested = uiForwardRef(
 
     useEffect(() {
 	      var shadowRootFirstChild = DivElement()..dataset['test-id'] = props.shadowRootFirstChildTestId ?? 'shadowRootFirstChild';
-	      divRef.current.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
+	      divRef.current!.attachShadow({'mode':'open'}).append(shadowRootFirstChild);
 	      react_dom.render(Fragment()(props.children), shadowRootFirstChild);
 	      return () => react_dom.unmountComponentAtNode(shadowRootFirstChild);
 	    }, []);

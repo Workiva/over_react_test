@@ -49,7 +49,7 @@ main() {
 
     group('should skip checking for certain props', () {
       final meta = getPropsMeta(new_boilerplate.TestCommonForwarding()());
-      final consumedKeys = meta.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
+      final consumedKeys = meta!.forMixin(new_boilerplate.ShouldNotBeForwardedProps).keys;
       final skippedKey = consumedKeys.first;
 
       commonComponentTests(
@@ -68,7 +68,8 @@ main() {
       group('when passed a UiComponent', () {
         commonComponentTests(() => (TestCommonRequired()
               ..bar = true
-              ..foobar = true),
+              ..foobar = true
+              ..lateProp = true),
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
@@ -79,7 +80,8 @@ main() {
       group('when passed a UiComponent2', () {
         commonComponentTests(() => (TestCommonRequired2()
               ..bar = true
-              ..foobar = true),
+              ..foobar = true
+              ..lateProp = true),
             shouldTestRequiredProps: true,
             shouldTestClassNameMerging: false,
             shouldTestClassNameOverrides: false,
@@ -93,7 +95,7 @@ main() {
     group('does not call `factory` directly within the consuming group', () {
       void sharedTest(
         BuilderOnlyUiFactory factory, {
-        List Function(PropsMetaCollection) getUnconsumedPropKeys,
+        List Function(PropsMetaCollection)? getUnconsumedPropKeys,
       }) {
         var wasFactoryCalled = false;
 
@@ -134,7 +136,8 @@ main() {
         // todo create a new component for this
         sharedTest(() => TestCommonRequired()
           ..bar = true
-          ..foobar = true);
+          ..foobar = true
+          ..lateProp = true);
       });
 
       group('when passed a UiComponent2', () {
@@ -142,7 +145,8 @@ main() {
           // todo create a new component for this
           sharedTest(() => TestCommonRequired2()
             ..bar = true
-            ..foobar = true);
+            ..foobar = true
+            ..lateProp = true);
         });
 
         group('(new boilerplate)', () {
@@ -161,7 +165,7 @@ main() {
       void expectedFailGroup(String description, void Function() groupBody, {@required dynamic testFailureMatcher}) {
         group(description, () {
           int totalTestCount = 0;
-          List<TestFailure> testFailureErrors;
+          late List<TestFailure> testFailureErrors;
           setUpAll(() => testFailureErrors = []);
 
           void testButReAndIgnoreExceptions(name, testBody) {
@@ -249,10 +253,10 @@ typedef HelperRenderFunction = dynamic Function(CommonHelperComponent component)
 const UiFactory<UiProps> arbitraryUiFactory = domProps;
 
 UiFactory<UiProps> registerHelperComponent({
-  @required HelperRenderFunction render,
-  Map defaultProps,
-  Iterable<ConsumedProps> consumedProps,
-  PropsMetaCollection propsMeta,
+  required HelperRenderFunction render,
+  Map? defaultProps,
+  Iterable<ConsumedProps>? consumedProps,
+  PropsMetaCollection? propsMeta,
 }) {
   final factory = registerComponent2(() {
     return CommonHelperComponent(
@@ -263,7 +267,7 @@ UiFactory<UiProps> registerHelperComponent({
       );
   });
 
-  return ([Map backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
+  return ([Map? backingMap]) => arbitraryUiFactory(backingMap)..componentFactory = factory;
 }
 
 class CommonHelperComponent extends UiComponent2<UiProps> {
@@ -273,10 +277,10 @@ class CommonHelperComponent extends UiComponent2<UiProps> {
   final HelperRenderFunction renderValue;
 
   CommonHelperComponent({
-    @required Map defaultPropsValue,
-    @required Iterable<ConsumedProps> consumedPropsValue,
-    @required PropsMetaCollection propsMetaValue,
-    @required this.renderValue,
+    required Map? defaultPropsValue,
+    required Iterable<ConsumedProps>? consumedPropsValue,
+    required PropsMetaCollection? propsMetaValue,
+    required this.renderValue,
   }) :
     defaultPropsValue = defaultPropsValue ?? {},
     propsMetaValue = propsMetaValue ?? const PropsMetaCollection({}),
@@ -305,7 +309,7 @@ class CommonHelperComponent extends UiComponent2<UiProps> {
   @override
   typedPropsFactoryJs(map) => typedPropsFactory(map);
 
-  UiProps _cachedTypedProps;
+  late UiProps _cachedTypedProps;
 
   @override
   UiProps get props => _cachedTypedProps;

@@ -23,13 +23,15 @@ UiFactory<TestCommonRequiredProps> TestCommonRequired =
 @Props()
 class _$TestCommonRequiredProps extends UiProps {
   @nullableRequiredProp
-  bool foobar;
+  bool? foobar;
 
   @requiredProp
-  bool bar;
+  bool? bar;
 
   @nullableRequiredProp
-  bool defaultFoo;
+  bool? defaultFoo;
+
+  late bool lateProp;
 }
 
 @Component()

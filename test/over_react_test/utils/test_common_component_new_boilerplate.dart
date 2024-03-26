@@ -38,7 +38,7 @@ class TestCommonForwardingComponent extends UiComponent2<TestCommonForwardingPro
       ..modifyProps(addUnconsumedProps)
       ..className = forwardingClassNameBuilder().toClassName()
       ..modifyProps((p) {
-        for (var key in props.propKeysToForwardAnyways) {
+        for (var key in (props.propKeysToForwardAnyways ?? [])) {
           p[key] = props[key];
         }
       })
@@ -47,13 +47,13 @@ class TestCommonForwardingComponent extends UiComponent2<TestCommonForwardingPro
 }
 
 mixin ShouldBeForwardedProps on UiProps {
-  bool foo;
-  bool foo2;
+  bool? foo;
+  bool? foo2;
 }
 
 mixin ShouldNotBeForwardedProps on UiProps {
-  bool bar;
-  Iterable propKeysToForwardAnyways;
+  bool? bar;
+  Iterable? propKeysToForwardAnyways;
 }
 
 UiFactory<TestCommonDomOnlyForwardingProps> TestCommonDomOnlyForwarding =

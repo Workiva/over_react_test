@@ -26,7 +26,7 @@ import './helper_components/sample_component2.dart';
 /// Main entry point for CustomMatchers testing
 main() {
   group('CustomMatcher', () {
-    Element testElement;
+    late Element testElement;
 
     setUp(() {
       testElement = Element.div();
@@ -383,14 +383,14 @@ main() {
         List<Element> allAttachedNodes = [];
         Element makeAttachedNode() {
           var node = DivElement()..tabIndex = 1;
-          document.body.append(node);
+          document.body!.append(node);
 
           allAttachedNodes.add(node);
 
           return node;
         }
 
-        Element attachedNode;
+        late Element attachedNode;
 
         setUp(() {
           attachedNode = makeAttachedNode();
@@ -445,7 +445,7 @@ main() {
 
     group('LoggingFunctionMatcher', () {
       group('when passed a List of logs', () {
-        List<String> logs;
+        late List<String> logs;
 
         setUp(() {
           logs = [
@@ -607,7 +607,7 @@ main() {
 
     group('PropTypeLogMatcher', () {
       group('when passed a List of logs', () {
-        List<String> logs;
+        late List<String> logs;
 
         setUp(() {
           logs = [
@@ -865,7 +865,8 @@ void shouldFail(value, Matcher matcher, expected) {
     if (expected is String) {
       expect(_errorString, equalsIgnoringWhitespace(expected));
     } else {
-      expect(_errorString.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
+      expect(_errorString, isNotNull);
+      expect(_errorString!.replaceAll(RegExp(r'[\s\n]+'), ' '), expected);
     }
   }
 

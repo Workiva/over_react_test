@@ -59,37 +59,37 @@ main() {
             reason: 'The React instance should have been unmounted.'
         );
 
-        expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+        expect(document.body!.children, isEmpty, reason: 'All attached mount points should have been removed.');
       });
 
       test('renderAttachedToDocument renders the component into the document', () {
-        expect(document.body.children, isEmpty);
+        expect(document.body!.children, isEmpty);
 
         renderedInstance = renderAttachedToDocument(Wrapper());
 
-        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+        expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
             reason: 'The component should have been rendered into the container div.');
       });
 
       test('renderAttachedToDocument renders the component into the document with a given container', () {
-        expect(document.body.children, isEmpty);
+        expect(document.body!.children, isEmpty);
 
         var container = DivElement();
         renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
 
-        expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+        expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
             reason: 'The component should have been rendered into the container div.');
-        expect(document.body.children[0], container);
+        expect(document.body!.children[0], container);
       });
     });
 
 
     test('renderAttachedToDocument renders the component into the document and tearDownAttachedNodes cleans them up', () {
-      expect(document.body.children, isEmpty);
+      expect(document.body!.children, isEmpty);
 
       var renderedInstance = renderAttachedToDocument(Wrapper(), autoTearDown: false);
 
-      expect(document.body.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
+      expect(document.body!.children[0].children.contains(findDomNode(renderedInstance)), isTrue,
           reason: 'The component should have been rendered into the container div.');
 
       tearDownAttachedNodes();
@@ -102,7 +102,28 @@ main() {
           reason: 'The React instance should have been unmounted.'
       );
 
-      expect(document.body.children, isEmpty, reason: 'All attached mount points should have been removed.');
+      expect(document.body!.children, isEmpty, reason: 'All attached mount points should have been removed.');
+    });
+
+    test('renderAttachedToDocument uses a 800px/800px container when none is provided', () {
+      final renderedInstance = renderAttachedToDocument(Wrapper());
+      final container = findDomNode(renderedInstance)!.parent!;
+      expect(container.style.width, '800px');
+      expect(container.style.height, '800px');
+    });
+
+    test('renderAttachedToDocument does not mutate the styles (including width/height) of the provided container', () {
+      var container = DivElement()
+        ..style.width = '123px'
+        ..style.height = '456px';
+      final initialContainerCssText = container.style.cssText;
+
+      final renderedInstance = renderAttachedToDocument(Wrapper(), container: container);
+      expect(findDomNode(renderedInstance)!.parent!, container, reason: 'test setup check');
+
+      expect(container.style.width, '123px');
+      expect(container.style.height, '456px');
+      expect(container.style.cssText, initialContainerCssText);
     });
 
     group('renderAndGetDom', () {
@@ -145,7 +166,7 @@ main() {
 
       test('simulates a click on a component with additional event data', () {
         var flag = false;
-        SyntheticMouseEvent event;
+        late SyntheticMouseEvent event;
         var renderedInstance = render((Dom.div()
           ..onClick = (evt) {
             flag = true;
@@ -253,7 +274,7 @@ main() {
     });
 
     group('getByTestId returns', () {
-      sharedTests({bool shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
             shallow ? renderShallow(instance) : render(instance);
 
@@ -427,16 +448,6 @@ main() {
 
           expect(descendant, isNull);
         });
-
-        test('null if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))()
-          ));
-
-          var descendant = getByTestId(renderedInstance, null);
-
-          expect(descendant, isNull);
-        });
       }
 
       group('(rendered component)', () {
@@ -461,7 +472,7 @@ main() {
     });
 
     group('getAllByTestId returns', () {
-      sharedTests({bool shallow}) {
+      sharedTests({required bool shallow}) {
         testSpecificRender(ReactElement instance) =>
             shallow ? renderShallow(instance) : render(instance);
 
@@ -640,15 +651,6 @@ main() {
           expect(descendants, isEmpty);
         });
 
-        test('an empty list if the user searches for a test ID of `null` when the test ID is set to \'null\'', () {
-          var renderedInstance = testSpecificRender(Wrapper()(
-            (Test()..addTestId('null'))(),
-          ));
-
-          var descendants = getAllByTestId(renderedInstance, null);
-          expect(descendants, isEmpty);
-        });
-
         test('without throwing when text nodes are present in the tree', () {
           var renderedInstance = render(Wrapper()(
             Dom.div()(),
@@ -750,7 +752,7 @@ main() {
         group('`data-test-id` html attribute key', () {
           test('', () {
             var renderedInstance = render((Nested()..addTestId('value'))());
-            var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+            var innerNode = findDomNode(renderedInstance)!.querySelector('[data-test-id~="inner"]');
 
             expect(queryByTestId(renderedInstance, 'value'), innerNode);
           });
@@ -764,7 +766,7 @@ main() {
 
         test('custom html attribute key', () {
           var renderedInstance = render((Nested()..addTestId('value', key: 'data-custom-id'))());
-          var innerNode = findDomNode(renderedInstance).querySelector('[data-test-id~="inner"]');
+          var innerNode = findDomNode(renderedInstance)!.querySelector('[data-test-id~="inner"]');
 
           expect(queryByTestId(renderedInstance, 'value', key: 'data-custom-id'), innerNode);
         });
@@ -788,7 +790,7 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var innerNode = shadowHostRef.current.shadowRoot.querySelector('[data-test-id~="$searchId"]');
+          var innerNode = shadowHostRef.current!.shadowRoot!.querySelector('[data-test-id~="$searchId"]');
 
           expect(queryByTestId(jacket.mountNode, searchId, searchInShadowDom: true), innerNode);
         });
@@ -807,6 +809,17 @@ main() {
         });
       });
 
+      test('throws when root is null', () {
+        expect(() => queryByTestId(null, 'unusedTestId'), throwsA(isA<ArgumentError>()));
+      });
+
+      test('throws a helpful error when findDomNode(root) is null', () {
+        var jacket = mount(RendersNothing()());
+        expect(
+            () => queryByTestId(jacket.getInstance(), 'unusedTestId'),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+                contains('findDomNode(root) must not be null'))));
+      });
     });
 
     group('queryAllByTestId returns all Elements', () {
@@ -817,7 +830,7 @@ main() {
               (Nested()..addTestId('value'))(),
               (Nested()..addTestId('value'))(),
             ));
-            var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+            var innerNodes = findDomNode(renderedInstance)!.querySelectorAll('[data-test-id~="inner"]');
 
             expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
           });
@@ -834,7 +847,7 @@ main() {
             (Nested()..addTestId('value'))(),
             (Nested()..addTestId('value'))(),
           ));
-          var innerNodes = findDomNode(renderedInstance).querySelectorAll('[data-test-id~="inner"]');
+          var innerNodes = findDomNode(renderedInstance)!.querySelectorAll('[data-test-id~="inner"]');
 
           expect(queryAllByTestId(renderedInstance, 'value'), innerNodes);
         });
@@ -878,9 +891,9 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
-          var level2 = shadow2Ref.current.shadowRoot.querySelector('.div2');
-          var level3 = shadow3Ref.current.shadowRoot.querySelector('.div3');
+          var level1 = shadow1Ref.current!.shadowRoot!.querySelector('.div1');
+          var level2 = shadow2Ref.current!.shadowRoot!.querySelector('.div2');
+          var level3 = shadow3Ref.current!.shadowRoot!.querySelector('.div3');
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true), [level1, level2, level3]);
         });
@@ -919,125 +932,22 @@ main() {
           // Let the shadow dom mount (the test components kinda slow since it does it after adding it to the dom.)
           await pumpEventQueue();
 
-          var level1 = shadow1Ref.current.shadowRoot.querySelector('.div1');
+          var level1 = shadow1Ref.current!.shadowRoot!.querySelector('.div1');
 
           expect(queryAllByTestId(jacket.mountNode, 'findMe', searchInShadowDom: true, shadowDepth: 1), [level1]);
         });
       });
-    });
 
-    group('getComponentByTestId returns', () {
-      test('the topmost react.Component that has the appropriate value for the `data-test-id` prop key', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('value'))('First Descendant'),
-          Dom.div()(
-            (Test()..addTestId('value'))('Nested Descendant')
-          )
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, 'value');
-
-        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'value')));
+      test('throws when root is null', () {
+        expect(() => queryAllByTestId(null, 'unusedTestId'), throwsA(isA<ArgumentError>()));
       });
 
-      test('the topmost react.Component that has the appropriate value for the custom prop key', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('value'))('First Descendant'),
-          Dom.div()(
-            (Test()..addTestId('value', key: 'data-custom-id'))('Nested Descendant')
-          )
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, 'value', key: 'data-custom-id');
-
-        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'value', key: 'data-custom-id')));
-      });
-
-      test('the topmost react.Component that has the value \'null\' for the `data-test-id` prop key when the user searches for \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))('First Descendant'),
-          Dom.div()(
-            (Test()..addTestId('null'))('Nested Descendant')
-          )
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, 'null');
-
-        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'null')));
-      });
-
-      group('the topmost react.Component that has the appropriate value for the `data-test-id` prop key, an additional testId is added, and', () {
-        test('the first testId is passed in', () {
-          var renderedInstance = render((Test()
-            ..addTestId('testId1')
-            ..addTestId('testId2')
-          )());
-
-          var descendant = getComponentByTestId(renderedInstance, 'testId1');
-          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId1')));
-        });
-
-        test('the new testId is passed in', () {
-          var renderedInstance = render((Test()
-            ..addTestId('testId1')
-            ..addTestId('testId2')
-          )());
-
-          var descendant = getComponentByTestId(renderedInstance, 'testId2');
-          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId2')));
-        });
-      });
-
-      group('the topmost react.Component that has the appropriate value for a custom prop key and', () {
-        test('the first testId is passed in', () {
-          var renderedInstance = render((Test()
-            ..addTestId('testId1', key: 'data-custom-id')
-            ..addTestId('testId2', key: 'data-custom-id')
-          )());
-
-          var descendant = getComponentByTestId(renderedInstance, 'testId1', key: 'data-custom-id');
-          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId1', key: 'data-custom-id')));
-        });
-
-        test('the first testId is passed in', () {
-          var renderedInstance = render((Test()
-            ..addTestId('testId1', key: 'data-custom-id')
-            ..addTestId('testId2', key: 'data-custom-id')
-          )());
-
-          var descendant = getComponentByTestId(renderedInstance, 'testId2', key: 'data-custom-id');
-          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId2', key: 'data-custom-id')));
-        });
-      });
-
-      test('null if no descendant has the appropriate value for the `data-test-id` prop key', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('otherValue'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, 'value');
-
-        expect(descendant, isNull);
-      });
-
-      test('null if the user searches for \'null\' when no test ID is set', () {
-        var renderedInstance = render(Wrapper()(
-          Test()()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, 'null');
-
-        expect(descendant, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var descendant = getComponentByTestId(renderedInstance, null);
-
-        expect(descendant, isNull);
+      test('throws a helpful error when findDomNode(root) is null', () {
+        var jacket = mount(RendersNothing()());
+        expect(
+            () => queryAllByTestId(jacket.getInstance(), 'unusedTestId'),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+                contains('findDomNode(root) must not be null'))));
       });
     });
 
@@ -1144,13 +1054,108 @@ main() {
 
         expect(descendant, isNull);
       });
+    });
 
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
+    group('getComponentByTestId returns', () {
+      test('the topmost react.Component that has the appropriate value for the `data-test-id` prop key', () {
         var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
+          (Test()..addTestId('value'))('First Descendant'),
+          Dom.div()(
+            (Test()..addTestId('value'))('Nested Descendant')
+          )
         ));
 
-        var descendant = getComponentByTestId(renderedInstance, null);
+        var descendant = getComponentByTestId(renderedInstance, 'value');
+
+        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'value')));
+      });
+
+      test('the topmost react.Component that has the appropriate value for the custom prop key', () {
+        var renderedInstance = render(Wrapper()(
+          (Test()..addTestId('value'))('First Descendant'),
+          Dom.div()(
+            (Test()..addTestId('value', key: 'data-custom-id'))('Nested Descendant')
+          )
+        ));
+
+        var descendant = getComponentByTestId(renderedInstance, 'value', key: 'data-custom-id');
+
+        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'value', key: 'data-custom-id')));
+      });
+
+      test('the topmost react.Component that has the value \'null\' for the `data-test-id` prop key when the user searches for \'null\'', () {
+        var renderedInstance = render(Wrapper()(
+          (Test()..addTestId('null'))('First Descendant'),
+          Dom.div()(
+            (Test()..addTestId('null'))('Nested Descendant')
+          )
+        ));
+
+        var descendant = getComponentByTestId(renderedInstance, 'null');
+
+        expect(descendant, getDartComponent(getByTestId(renderedInstance, 'null')));
+      });
+
+      group('the topmost react.Component that has the appropriate value for the `data-test-id` prop key, an additional testId is added, and', () {
+        test('the first testId is passed in', () {
+          var renderedInstance = render((Test()
+            ..addTestId('testId1')
+            ..addTestId('testId2')
+          )());
+
+          var descendant = getComponentByTestId(renderedInstance, 'testId1');
+          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId1')));
+        });
+
+        test('the new testId is passed in', () {
+          var renderedInstance = render((Test()
+            ..addTestId('testId1')
+            ..addTestId('testId2')
+          )());
+
+          var descendant = getComponentByTestId(renderedInstance, 'testId2');
+          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId2')));
+        });
+      });
+
+      group('the topmost react.Component that has the appropriate value for a custom prop key and', () {
+        test('the first testId is passed in', () {
+          var renderedInstance = render((Test()
+            ..addTestId('testId1', key: 'data-custom-id')
+            ..addTestId('testId2', key: 'data-custom-id')
+          )());
+
+          var descendant = getComponentByTestId(renderedInstance, 'testId1', key: 'data-custom-id');
+          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId1', key: 'data-custom-id')));
+        });
+
+        test('the first testId is passed in', () {
+          var renderedInstance = render((Test()
+            ..addTestId('testId1', key: 'data-custom-id')
+            ..addTestId('testId2', key: 'data-custom-id')
+          )());
+
+          var descendant = getComponentByTestId(renderedInstance, 'testId2', key: 'data-custom-id');
+          expect(descendant, getDartComponent(getByTestId(renderedInstance, 'testId2', key: 'data-custom-id')));
+        });
+      });
+
+      test('null if no descendant has the appropriate value for the `data-test-id` prop key', () {
+        var renderedInstance = render(Wrapper()(
+          (Test()..addTestId('otherValue'))()
+        ));
+
+        var descendant = getComponentByTestId(renderedInstance, 'value');
+
+        expect(descendant, isNull);
+      });
+
+      test('null if the user searches for \'null\' when no test ID is set', () {
+        var renderedInstance = render(Wrapper()(
+          Test()()
+        ));
+
+        var descendant = getComponentByTestId(renderedInstance, 'null');
 
         expect(descendant, isNull);
       });
@@ -1262,16 +1267,6 @@ main() {
         ));
 
         var props = getPropsByTestId(renderedInstance, 'null');
-
-        expect(props, isNull);
-      });
-
-      test('null if the user searches for `null` when a test ID is set to \'null\'', () {
-        var renderedInstance = render(Wrapper()(
-          (Test()..addTestId('null'))()
-        ));
-
-        var props = getPropsByTestId(renderedInstance, null);
 
         expect(props, isNull);
       });
@@ -1391,4 +1386,14 @@ mixin Test2Props on UiProps {}
 class Test2Component extends UiComponent2<Test2Props> {
   @override
   render() => (Dom.div()..addProp('isRenderResult', true))();
+}
+
+
+UiFactory<RendersNothingProps> RendersNothing = castUiFactory(_$RendersNothing); // ignore: undefined_identifier
+
+mixin RendersNothingProps on UiProps {}
+
+class RendersNothingComponent extends UiComponent2<RendersNothingProps> {
+  @override
+  render() => null;
 }
