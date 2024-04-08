@@ -37,6 +37,11 @@ jobs:
         run: if [ ${{ matrix.sdk }} = '2.7.2' ]; then dart pub global activate tuneup && tuneup check --ignore-infos; else dart analyze; fi
         if: always() && steps.install.outcome == 'success'
 
+      - uses: anchore/sbom-action@v0
+        with:
+          path: ./
+          format: cyclonedx-json
+
   test_ddc:
     permissions:
         id-token: write
