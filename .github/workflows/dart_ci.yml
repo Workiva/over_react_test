@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, 2.19.6 ]
+        sdk: [ 2.19.6 ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
@@ -34,7 +34,7 @@ jobs:
         if: always() && steps.install.outcome == 'success'
 
       - name: Analyze project source
-        run: if [ ${{ matrix.sdk }} = '2.7.2' ]; then dart pub global activate tuneup && tuneup check --ignore-infos; else dart analyze; fi
+        run: dart analyze
         if: always() && steps.install.outcome == 'success'
 
       - uses: anchore/sbom-action@v0
@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, 2.19.6 ]
+        sdk: [ 2.19.6 ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
@@ -85,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sdk: [ 2.18.7, 2.19.6 ]
+        sdk: [ 2.19.6 ]
     steps:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v0.2
