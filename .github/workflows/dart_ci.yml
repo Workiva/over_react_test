@@ -70,7 +70,7 @@ jobs:
         if: always() && steps.install.outcome == 'success'
 
       - name: Upload Unit Test Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ steps.install.outcome == 'success' && (success() || failure()) }} # run this step even if previous step failed, but not if it was skipped
         with:
           name: ddc-test-results@${{ matrix.sdk }}
@@ -104,7 +104,7 @@ jobs:
         if: always() && steps.install.outcome == 'success'
 
       - name: Upload Unit Test Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: ${{ steps.install.outcome == 'success' && (success() || failure()) }} # run this step even if previous step failed, but not if it was skipped
         with:
           name: dart2js-test-results@${{ matrix.sdk }}
