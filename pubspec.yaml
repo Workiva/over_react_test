@@ -23,9 +23,9 @@ dev_dependencies:
 dependency_overrides:
   react:
     git:
-      url: git@github.com:Workiva/react-dart.git
+      url: https://github.com/Workiva/react-dart.git
       ref: react-18-2-0
   over_react:
     git:
-      url: git@github.com:Workiva/over_react.git
+      url: https://github.com/Workiva/over_react.git
       ref: test-react-18
