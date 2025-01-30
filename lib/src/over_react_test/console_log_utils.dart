@@ -17,7 +17,8 @@ import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
-// Do similar suppression as https://github.com/Workiva/react-dart/pull/413 - we can come back later and align this with the RTL solution.
+/// Intercept console.error calls and silence warnings for each react_dom.render call,
+/// until at the very least createRoot is made available in react-dart.
 bool shouldFilterOutLog(String log) {
   if(log.startsWith('Warning: ReactDOM.render is no longer supported in React 18.')) return true;
   return false;
@@ -58,12 +59,12 @@ List<String?> recordConsoleLogs(
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
           if(!shouldFilterOutLog(message)) {
-        // NOTE: Using console.log or print within this function will cause an infinite
-        // loop when the logType is set to `log`.
-        consoleLogs.add(message);
-        consoleRefs[config]!
-            .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-      }
+            // NOTE: Using console.log or print within this function will cause an infinite
+            // loop when the logType is set to `log`.
+            consoleLogs.add(message);
+            consoleRefs[config]!
+                .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          }
     });
   }
 
@@ -107,12 +108,12 @@ FutureOr<List<String?>> recordConsoleLogsAsync(
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
           if(!shouldFilterOutLog(message)) {
-        // NOTE: Using console.log or print within this function will cause an infinite
-        // loop when the logType is set to `log`.
-        consoleLogs.add(message);
-        consoleRefs[config]!
-            .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
-      }
+            // NOTE: Using console.log or print within this function will cause an infinite
+            // loop when the logType is set to `log`.
+            consoleLogs.add(message);
+            consoleRefs[config]!
+                .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          }
     });
   }
 
