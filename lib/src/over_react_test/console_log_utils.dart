@@ -19,10 +19,8 @@ import 'package:react/react_client/react_interop.dart';
 
 /// Intercept console.error calls and silence warnings for each react_dom.render call,
 /// until at the very least createRoot is made available in react-dart.
-bool shouldFilterOutLog(String log) {
-  if(log.startsWith('Warning: ReactDOM.render is no longer supported in React 18.')) return true;
-  return false;
-}
+bool shouldFilterOutLog(String log) =>
+    log.startsWith('Warning: ReactDOM.render is no longer supported in React 18.');
 
 /// Runs a provided callback and returns the logs that occur during the runtime
 /// of that function.
