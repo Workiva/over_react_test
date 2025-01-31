@@ -585,9 +585,11 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
       final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
-        consoleErrors.add(message);
-        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
-            thisArg: self);
+        if(!shouldFilterOutLog(message)) {
+          consoleErrors.add(message);
+          originalConsoleError
+              .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+        }
       });
 
       final reactComponentFactory = factory().componentFactory as
@@ -662,9 +664,11 @@ void testRequiredProps(BuilderOnlyUiFactory factory, dynamic childrenFactory()) 
       final originalConsoleError = context['console']['error'] as JsFunction;
       addTearDown(() => context['console']['error'] = originalConsoleError);
       context['console']['error'] = JsFunction.withThis((self, [message, arg1, arg2, arg3,  arg4, arg5]) {
-        consoleErrors.add(message);
-        originalConsoleError.apply([message, arg1, arg2, arg3,  arg4, arg5],
-            thisArg: self);
+        if(!shouldFilterOutLog(message)) {
+          consoleErrors.add(message);
+          originalConsoleError
+              .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+        }
       });
 
       final reactComponentFactory = factory().componentFactory as

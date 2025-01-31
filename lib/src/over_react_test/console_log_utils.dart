@@ -17,6 +17,11 @@ import 'dart:js';
 
 import 'package:react/react_client/react_interop.dart';
 
+/// Intercept console.error calls and silence warnings for each react_dom.render call,
+/// until at the very least createRoot is made available in react-dart.
+bool shouldFilterOutLog(String log) =>
+    log.startsWith('Warning: ReactDOM.render is no longer supported in React 18.');
+
 /// Runs a provided callback and returns the logs that occur during the runtime
 /// of that function.
 ///
@@ -51,11 +56,13 @@ List<String?> recordConsoleLogs(
     consoleRefs[config] = context['console'][config];
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-      // NOTE: Using console.log or print within this function will cause an infinite
-      // loop when the logType is set to `log`.
-      consoleLogs.add(message);
-      consoleRefs[config]!
-          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          if(!shouldFilterOutLog(message)) {
+            // NOTE: Using console.log or print within this function will cause an infinite
+            // loop when the logType is set to `log`.
+            consoleLogs.add(message);
+            consoleRefs[config]!
+                .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          }
     });
   }
 
@@ -98,11 +105,13 @@ FutureOr<List<String?>> recordConsoleLogsAsync(
     consoleRefs[config] = context['console'][config];
     context['console'][config] =
         JsFunction.withThis((self, [message, arg1, arg2, arg3, arg4, arg5]) {
-      // NOTE: Using console.log or print within this function will cause an infinite
-      // loop when the logType is set to `log`.
-      consoleLogs.add(message);
-      consoleRefs[config]!
-          .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          if(!shouldFilterOutLog(message)) {
+            // NOTE: Using console.log or print within this function will cause an infinite
+            // loop when the logType is set to `log`.
+            consoleLogs.add(message);
+            consoleRefs[config]!
+                .apply([message, arg1, arg2, arg3, arg4, arg5], thisArg: self);
+          }
     });
   }
 
