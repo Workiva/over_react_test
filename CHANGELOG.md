@@ -1,5 +1,12 @@
 # OverReact Test Changelog
 
+## 3.0.2
+* React 18 Prep - suppress react_dom.render warnings ([#170](https://github.com/Workiva/over_react_test/pull/170))
+
+## 3.0.1
+* GHA OSS changes ([#164](https://github.com/Workiva/over_react_test/pull/164))
+* Increase minimum Dart SDK version to 2.19.0 ([#168](https://github.com/Workiva/over_react_test/pull/168))
+
 ## 3.0.0
 * Add support for Dart null safety ([#155](https://github.com/Workiva/over_react_test/pull/155))
   * SDK / Dependency Versioning:
