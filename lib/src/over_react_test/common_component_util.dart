@@ -19,7 +19,7 @@ import 'dart:js';
 import 'package:meta/meta.dart';
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react/over_react.dart';
-import 'package:over_react_test/over_react_test.dart';
+
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
 import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
