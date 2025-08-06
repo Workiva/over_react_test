@@ -19,11 +19,13 @@ import 'dart:js';
 import 'package:meta/meta.dart';
 import 'package:over_react/component_base.dart' as component_base;
 import 'package:over_react/over_react.dart';
-
+import 'package:over_react_test/src/over_react_test/console_log_utils.dart';
+import 'package:over_react_test/src/over_react_test/custom_matchers.dart';
+import 'package:over_react_test/src/over_react_test/jacket.dart';
 import 'package:over_react_test/src/over_react_test/props_meta.dart';
+import 'package:over_react_test/src/over_react_test/react_util.dart';
 import 'package:over_react_test/src/over_react_test/test_helpers.dart';
 import 'package:react/react_client.dart';
-import 'package:react/react_client/js_backed_map.dart';
 import 'package:react/react_client/react_interop.dart';
 import 'package:react/react_test_utils.dart' as react_test_utils;
 import 'package:test/test.dart';

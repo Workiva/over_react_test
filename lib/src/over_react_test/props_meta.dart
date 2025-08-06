@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:over_react/over_react.dart';
-
+import 'package:over_react_test/src/over_react_test/jacket.dart';
 import 'package:react/react_client/react_interop.dart';
 
 /// Returns the [UiComponent2.propsMeta] obtained by rendering [el].
