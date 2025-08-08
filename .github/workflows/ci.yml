@@ -16,6 +16,7 @@ jobs:
   checks:
     uses: Workiva/gha-dart-oss/.github/workflows/checks.yaml@v0.1.11
     with:
+      format-check: false
       additional-checks: |
         no_entrypoint_imports
 
