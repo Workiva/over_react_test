@@ -1,5 +1,8 @@
 # OverReact Test Changelog
 
+## 3.0.3
+* Set up gha-dart-oss ([#174](https://github.com/Workiva/over_react_test/pull/174))
+
 ## 3.0.2
 * React 18 Prep - suppress react_dom.render warnings ([#170](https://github.com/Workiva/over_react_test/pull/170))
 
