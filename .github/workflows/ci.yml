@@ -22,3 +22,16 @@ jobs:
 
   unit-tests:
     uses: Workiva/gha-dart-oss/.github/workflows/test-unit.yaml@v0.1.11
+
+  testing-and-checks-complete:
+    name: Testing and Checks Completed
+    needs: [ build, checks, unit-tests ]
+    if: ${{ !cancelled() && github.event_name == 'pull_request' || github.ref_type == 'tag' }}
+    runs-on: [ xs-al2023 ]
+    steps:
+      - run: |
+          if [ "${{ needs.checks.result }}" == "failure" ]; then
+            echo "Some checks have failed. Please fix the issues and try again."
+            exit 1
+          fi
+          echo 'All Testing and checks have completed.'
