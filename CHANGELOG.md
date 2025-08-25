@@ -1,6 +1,6 @@
 # OverReact Test Changelog
 
-## Unreleased
+## 3.0.3
 * Set up gha-dart-oss ([#174](https://github.com/Workiva/over_react_test/pull/174))
 
 ## 3.0.2
