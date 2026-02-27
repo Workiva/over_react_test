@@ -1,4 +1,6 @@
 # OverReact Test Changelog
+## 3.0.4
+* Allow analyzer 10 ([#177]https://github.com/Workiva/over_react_test/pull/177)
 
 ## 3.0.3
 * Set up gha-dart-oss ([#174](https://github.com/Workiva/over_react_test/pull/174))
