@@ -11,17 +11,17 @@ on:
 
 jobs:
   build:
-    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v0.1.11
+    uses: Workiva/gha-dart-oss/.github/workflows/build.yaml@v3.0.5
 
   checks:
-    uses: Workiva/gha-dart-oss/.github/workflows/checks.yaml@v0.1.11
+    uses: Workiva/gha-dart-oss/.github/workflows/checks.yaml@v3.0.5
     with:
       format-check: false
       additional-checks: |
         no_entrypoint_imports
 
   unit-tests:
-    uses: Workiva/gha-dart-oss/.github/workflows/test-unit.yaml@v0.1.11
+    uses: Workiva/gha-dart-oss/.github/workflows/test-unit.yaml@v3.0.5
 
   testing-and-checks-complete:
     name: Testing and Checks Completed
